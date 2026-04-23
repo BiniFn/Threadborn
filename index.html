@@ -1095,6 +1095,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .reader-progress-bar {
@@ -1128,6 +1130,10 @@
       border-bottom: 1px solid var(--line);
       background: rgba(10, 10, 12, 0.92);
       backdrop-filter: blur(18px);
+    }
+
+    .reader:not(.tools-open) .reader-toolbar {
+      display: none;
     }
 
     .toolbar-pill {
@@ -1222,7 +1228,16 @@
       font-weight: 800;
     }
 
-    .reader-tools-btn,
+    .reader-tools-btn {
+      display: inline-flex;
+      min-height: 42px;
+      padding-left: 16px;
+      padding-right: 16px;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
     .mobile-only {
       display: none;
     }
@@ -1613,12 +1628,15 @@
       .reader-controls {
         justify-content: space-between;
         width: 100%;
+        gap: 6px;
       }
 
       .reader-toolbar {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        padding: 12px 16px;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 10px 12px;
+        max-height: min(42vh, 360px);
+        overflow-y: auto;
       }
 
       .reader-toolbar::-webkit-scrollbar,
@@ -1631,8 +1649,10 @@
         width: 100%;
         min-width: 0;
         min-height: 0;
-        border-radius: 20px;
-        padding: 12px;
+        border-radius: 16px;
+        padding: 10px;
+        gap: 8px;
+        font-size: 12px;
       }
 
       .toolbar-pill span,
@@ -1640,16 +1660,41 @@
         width: 100%;
       }
 
+      .pill-label {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+      }
+
+      .toolbar-value {
+        font-size: 16px;
+      }
+
+      .toolbar-note {
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
       .toolbar-pill select,
       .toolbar-pill input[type="range"] {
         width: 100%;
         min-width: 0;
+        min-height: 40px;
+        padding: 10px 12px;
       }
 
       .toolbar-pill.status,
       .toolbar-pill.chapter-card,
       .toolbar-pill.export-card {
         grid-column: 1 / -1;
+      }
+
+      .toolbar-actions {
+        gap: 6px;
+      }
+
+      .toolbar-actions .ghost-btn {
+        min-height: 40px;
+        flex: 1 1 calc(50% - 3px);
       }
 
       .reader-progress-bar {
@@ -1691,19 +1736,11 @@
         height: 38px;
       }
 
-      .mobile-only {
-        display: inline-flex;
-      }
-
       .reader-tools-btn {
-        display: inline-flex;
-        min-height: 42px;
-        padding-left: 16px;
-        padding-right: 16px;
-      }
-
-      .reader:not(.tools-open) .reader-toolbar {
-        display: none;
+        min-height: 38px;
+        padding-left: 12px;
+        padding-right: 12px;
+        font-size: 13px;
       }
 
       .mobile-nav .nav-btn {
@@ -1767,6 +1804,26 @@
         grid-template-columns: 1fr;
       }
 
+      .reader-top-main {
+        gap: 10px;
+      }
+
+      .reader-controls {
+        justify-content: flex-start;
+      }
+
+      .reader-tools-btn {
+        flex: 1 1 auto;
+      }
+
+      .reader-toolbar {
+        padding: 8px 10px;
+      }
+
+      .toolbar-pill {
+        padding: 9px;
+      }
+
       .mobile-nav .nav-btn,
       .subtab-btn {
         min-width: 96px;
@@ -1788,6 +1845,10 @@
 
       .loading-shell {
         padding: 28px 22px 24px;
+      }
+
+      .toolbar-actions .ghost-btn {
+        flex-basis: 100%;
       }
     }
   </style>
@@ -2282,7 +2343,7 @@
         <button class="icon-btn" onclick="resetReaderSize()" aria-label="Reset text size">•</button>
         <button class="icon-btn" onclick="changeReaderSize(1)" aria-label="Larger text">+</button>
         <button class="icon-btn" id="theme-toggle" onclick="cycleReaderTheme()" aria-label="Change reader theme">◐</button>
-        <button class="btn btn-secondary reader-tools-btn mobile-only" id="reader-tools-btn" onclick="toggleReaderTools()">Tools</button>
+        <button class="btn btn-secondary reader-tools-btn" id="reader-tools-btn" onclick="toggleReaderTools()" aria-expanded="false" aria-controls="reader-toolbar">Show tools</button>
       </div>
     </div>
 
@@ -3277,7 +3338,7 @@ legacyEpisodes.push({
     let readerSize = 18;
     let activeHomeVolume = "Volume 1";
     let readerTheme = "night";
-    let readerToolsOpen = window.innerWidth > 820;
+    let readerToolsOpen = false;
     let ttsUtterance = null;
     let ttsVoices = [];
     let deferredInstallPrompt = null;
@@ -3344,7 +3405,8 @@ legacyEpisodes.push({
       reader.classList.toggle("tools-open", readerToolsOpen);
       const button = document.getElementById("reader-tools-btn");
       if (button) {
-        button.textContent = readerToolsOpen ? "Hide tools" : "Tools";
+        button.textContent = readerToolsOpen ? "Hide tools" : "Show tools";
+        button.setAttribute("aria-expanded", readerToolsOpen ? "true" : "false");
       }
     }
 
@@ -3655,7 +3717,7 @@ legacyEpisodes.push({
       document.getElementById("reader").setAttribute("aria-hidden", "false");
       document.body.classList.add("reader-open");
       document.body.style.overflow = "hidden";
-      toggleReaderTools(window.innerWidth > 820);
+      toggleReaderTools(false);
     }
 
     function openLatestChapter() {
@@ -4444,9 +4506,7 @@ legacyEpisodes.push({
     }
 
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 820) {
-        toggleReaderTools(true);
-      }
+      toggleReaderTools(readerToolsOpen);
     });
 
     window.addEventListener("beforeinstallprompt", event => {
@@ -4497,7 +4557,7 @@ legacyEpisodes.push({
     loadDesktopDownloadLinks();
     updateRateLabel();
     syncInstallButton();
-    toggleReaderTools(window.innerWidth > 820);
+    toggleReaderTools(false);
     if ("speechSynthesis" in window) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     } else {
