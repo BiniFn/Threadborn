@@ -1673,19 +1673,19 @@
         </article>
         <article class="card app-card">
           <strong>Windows Version</strong>
-          <p>Open the GitHub Releases page to download the latest desktop Windows build when it has finished publishing.</p>
+          <p>Download the latest desktop Windows build as soon as the newest release asset is available.</p>
           <div class="link-cluster" style="margin-top:18px;">
-            <a class="btn btn-secondary" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases" target="_blank" rel="noreferrer">Open Releases</a>
+            <a class="btn btn-secondary" id="windows-download-link" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases" target="_blank" rel="noreferrer">Download Windows</a>
           </div>
-          <p class="apk-note">Look for `Threadborn-Windows.zip` in the newest desktop release.</p>
+          <p class="apk-note" id="windows-download-note">If the newest Windows asset is still publishing, this button opens the Releases page.</p>
         </article>
         <article class="card app-card">
           <strong>macOS Version</strong>
-          <p>Open the GitHub Releases page to download the latest desktop macOS build when it has finished publishing.</p>
+          <p>Download the latest desktop macOS build as soon as the newest release asset is available.</p>
           <div class="link-cluster" style="margin-top:18px;">
-            <a class="btn btn-secondary" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases" target="_blank" rel="noreferrer">Open Releases</a>
+            <a class="btn btn-secondary" id="mac-download-link" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases" target="_blank" rel="noreferrer">Download macOS</a>
           </div>
-          <p class="apk-note">Look for `Threadborn-macOS.zip` in the newest desktop release.</p>
+          <p class="apk-note" id="mac-download-note">If the newest macOS asset is still publishing, this button opens the Releases page.</p>
         </article>
       </div>
     </section>
@@ -3138,6 +3138,74 @@ legacyEpisodes.push({
       button.textContent = deferredInstallPrompt ? "Install App" : "Install App";
     }
 
+    async function loadDesktopDownloadLinks() {
+      const releasesUrl = "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases";
+      const windowsLink = document.getElementById("windows-download-link");
+      const macLink = document.getElementById("mac-download-link");
+      const windowsNote = document.getElementById("windows-download-note");
+      const macNote = document.getElementById("mac-download-note");
+
+      if (!windowsLink || !macLink) {
+        return;
+      }
+
+      try {
+        const response = await fetch("https://api.github.com/repos/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases");
+        if (!response.ok) {
+          throw new Error("Could not load releases");
+        }
+
+        const releases = await response.json();
+        let windowsAsset = null;
+        let macAsset = null;
+
+        releases.forEach(release => {
+          if (!release.assets) {
+            return;
+          }
+
+          if (!windowsAsset) {
+            windowsAsset = release.assets.find(asset => asset.name === "Threadborn-Windows.zip");
+          }
+
+          if (!macAsset) {
+            macAsset = release.assets.find(asset => asset.name === "Threadborn-macOS.zip");
+          }
+        });
+
+        if (windowsAsset) {
+          windowsLink.href = windowsAsset.browser_download_url;
+          windowsLink.setAttribute("download", "");
+          if (windowsNote) {
+            windowsNote.textContent = "Latest Windows desktop build found and ready to download.";
+          }
+        } else if (windowsNote) {
+          windowsNote.textContent = "Windows build not found yet. This button opens the Releases page until it finishes publishing.";
+          windowsLink.href = releasesUrl;
+        }
+
+        if (macAsset) {
+          macLink.href = macAsset.browser_download_url;
+          macLink.setAttribute("download", "");
+          if (macNote) {
+            macNote.textContent = "Latest macOS desktop build found and ready to download.";
+          }
+        } else if (macNote) {
+          macNote.textContent = "macOS build not found yet. This button opens the Releases page until it finishes publishing.";
+          macLink.href = releasesUrl;
+        }
+      } catch (error) {
+        windowsLink.href = releasesUrl;
+        macLink.href = releasesUrl;
+        if (windowsNote) {
+          windowsNote.textContent = "Could not check GitHub assets from this browser, so this button opens the Releases page.";
+        }
+        if (macNote) {
+          macNote.textContent = "Could not check GitHub assets from this browser, so this button opens the Releases page.";
+        }
+      }
+    }
+
     function updateReaderSummary(chapter) {
       const totalPages = chapter.pages.length;
       const percent = ((activePage + 1) / totalPages) * 100;
@@ -4143,6 +4211,7 @@ legacyEpisodes.push({
     applyReaderTheme();
     updateResumeButton();
     loadVoices();
+    loadDesktopDownloadLinks();
     updateRateLabel();
     syncInstallButton();
     toggleReaderTools(window.innerWidth > 820);
