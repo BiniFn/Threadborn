@@ -92,17 +92,20 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
       text-decoration: none;
       cursor: pointer;
       min-width: 0;
     }
 
     .brand-mark {
-      width: clamp(150px, 20vw, 230px);
-      height: 76px;
-      display: block;
+      width: clamp(110px, 12vw, 150px);
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex: 0 0 auto;
+      overflow: hidden;
     }
 
     .brand-mark::after {
@@ -114,7 +117,10 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.45));
+      object-position: left center;
+      transform: scale(1.22);
+      transform-origin: left center;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.38));
     }
 
     .brand-copy {
