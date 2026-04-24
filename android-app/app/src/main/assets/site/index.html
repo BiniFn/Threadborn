@@ -2897,6 +2897,7 @@
         name: "Volume 2 • The Covenant Door",
         status: "Active",
         summary: "Yono, Violet, Mirika, Meryn, and Lyra return to the Old Covenant seal, Velkor wakes up, and every new chapter turns Yono's last ceiling into the floor of the next one.",
+        coverArt: "./assets/volume2-cover.png",
         chips: ["Velkor", "door arc", "chapter by chapter ascension", "romance"],
         actionLabel: "Read Volume 2",
         action: "openVolumeStart('Volume 2')"
@@ -5398,15 +5399,21 @@ Last chapter's ceiling is always this chapter's floor.</div>
       return Array.from(bytes).map(byte => byte.toString(16).padStart(2, "0")).join("");
     }
 
-    let volumeOneCoverPromise = null;
-    async function getVolumeOneCoverForExport() {
-      if (volumeOneCoverPromise) {
-        return volumeOneCoverPromise;
+    let volumeCoversPromises = {};
+    async function getVolumeCoverForExport(volumeStr) {
+      if (volumeCoversPromises[volumeStr]) {
+        return volumeCoversPromises[volumeStr];
       }
-      volumeOneCoverPromise = (async () => {
-        const response = await fetch("./assets/volume1-cover.png");
+      
+      let coverPath = "./assets/volume1-cover.png";
+      if (volumeStr === "Volume 2") {
+        coverPath = "./assets/volume2-cover.png";
+      }
+
+      volumeCoversPromises[volumeStr] = (async () => {
+        const response = await fetch(coverPath);
         if (!response.ok) {
-          throw new Error("Volume 1 cover image not found");
+          throw new Error(volumeStr + " cover image not found");
         }
         const blob = await response.blob();
         const sourceDataUrl = await new Promise((resolve, reject) => {
@@ -5439,7 +5446,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
           height: image.naturalHeight
         };
       })();
-      return volumeOneCoverPromise;
+      return volumeCoversPromises[volumeStr];
     }
 
     async function downloadBlob(blob, filename) {
@@ -5485,16 +5492,14 @@ Last chapter's ceiling is always this chapter's floor.</div>
       const estimatedRead = estimateMinutesLeft(chapter, 0);
       const exportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
       const pdfPages = [];
-      let volumeOneCover = null;
-      if (chapter.volume === "Volume 1") {
-        try {
-          volumeOneCover = await getVolumeOneCoverForExport();
-        } catch (error) {
-          volumeOneCover = null;
-        }
+      let volumeCover = null;
+      try {
+        volumeCover = await getVolumeCoverForExport(chapter.volume);
+      } catch (error) {
+        volumeCover = null;
       }
 
-      if (volumeOneCover) {
+      if (volumeCover) {
         pdfPages.push({
           stream: `q\n${pageWidth} 0 0 ${pageHeight} 0 0 cm\n/ImCover Do\nQ`,
           hasImage: true
@@ -5621,7 +5626,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
       const helveticaId = 3 + pdfPages.length * 2;
       const boldId = helveticaId + 1;
       const italicId = helveticaId + 2;
-      const imageId = volumeOneCover ? italicId + 1 : null;
+      const imageId = volumeCover ? italicId + 1 : null;
 
       objects[1] = `<< /Type /Catalog /Pages 2 0 R >>`;
       objects[2] = `<< /Type /Pages /Count ${pdfPages.length} /Kids [${pageIds.map(id => `${id} 0 R`).join(" ")}] >>`;
@@ -5637,9 +5642,9 @@ Last chapter's ceiling is always this chapter's floor.</div>
       objects[helveticaId] = `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`;
       objects[boldId] = `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`;
       objects[italicId] = `<< /Type /Font /Subtype /Type1 /BaseFont /Times-Italic >>`;
-      if (volumeOneCover && imageId) {
-        const imageHex = `${bytesToHex(volumeOneCover.bytes)}>`;
-        objects[imageId] = `<< /Type /XObject /Subtype /Image /Width ${volumeOneCover.width} /Height ${volumeOneCover.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/ASCIIHexDecode /DCTDecode] /Length ${imageHex.length} >>\nstream\n${imageHex}\nendstream`;
+      if (volumeCover && imageId) {
+        const imageHex = `${bytesToHex(volumeCover.bytes)}>`;
+        objects[imageId] = `<< /Type /XObject /Subtype /Image /Width ${volumeCover.width} /Height ${volumeCover.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/ASCIIHexDecode /DCTDecode] /Length ${imageHex.length} >>\nstream\n${imageHex}\nendstream`;
       }
 
       let pdf = "%PDF-1.4\n";
@@ -5768,16 +5773,14 @@ Last chapter's ceiling is always this chapter's floor.</div>
       const modifiedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
       const exportCredits = getExportCredits(chapter);
       const styleCss = `:root{--paper:#f5ede4;--paper-strong:#fffaf4;--ink:#231817;--muted:#6d5a52;--blood:#8a2333;--blood-deep:#190b0c;--thread:#2f736d;--line:#dccdc1;}body{margin:0;background:radial-gradient(circle at top,rgba(138,35,51,.08),transparent 26%),var(--paper);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.78;}a{color:var(--blood);text-decoration:none;}img{max-width:100%;height:auto;}.cover,.nav-page,.credits-page,.page{max-width:44rem;margin:0 auto;padding:2.6rem 2.2rem;}.cover{background:linear-gradient(180deg,var(--blood-deep) 0 34%,var(--paper) 34.1% 100%);}.cover-card,.nav-card,.credits-card,.page-frame{background:var(--paper-strong);border:1px solid var(--line);border-radius:1.4rem;box-shadow:0 18px 40px rgba(18,10,10,.08);}.cover-card{margin-top:2rem;padding:2rem 2rem 1.8rem;}.cover-art{width:100%;display:block;border-radius:1rem;border:1px solid var(--line);margin:.75rem 0 1rem;}.eyebrow,.page-eyebrow{margin:0 0 1rem;color:var(--thread);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;}.page-eyebrow{margin-bottom:1.2rem;display:flex;justify-content:space-between;gap:.75rem;flex-wrap:wrap;}.cover-title{margin:0;font-size:2.4rem;line-height:1.02;color:#1d1112;}.cover-summary{margin:1rem 0 0;color:var(--muted);}.tag-row{margin-top:1.2rem;}.tag{display:inline-block;margin:.2rem .45rem .2rem 0;padding:.45rem .75rem;border-radius:999px;border:1px solid var(--line);background:#f8efe6;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;}.credit-line,.note,.page-footer-note{color:var(--muted);}.nav-card,.credits-card,.page-frame{padding:1.8rem;}.nav-page h1,.credits-page h1{margin:0 0 .6rem;font-size:2rem;color:#1d1112;}.nav-page ol,.credits-page ol,.credits-page ul{padding-left:1.25rem;}.nav-page li,.credits-page li{margin-bottom:.75rem;}.page-frame{padding:2rem 1.8rem;}.chapter-head{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line);}.chapter-num{display:block;margin-bottom:.75rem;color:var(--thread);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;}.chapter-title{margin:0 0 .6rem;font-size:2.1rem;line-height:1.05;color:#1b1011;}.chapter-subtitle{margin:0;color:var(--muted);font-style:italic;}.novel-p{margin:0 0 1rem;}.scene-title{margin:1.8rem 0 .85rem;color:var(--blood);font-weight:700;letter-spacing:.05em;text-transform:uppercase;}.system-box,.ep-intro-bar,.tbc{margin:1.3rem 0;padding:1rem 1.1rem;border-radius:1rem;border:1px solid var(--line);background:linear-gradient(135deg,rgba(138,35,51,.08),rgba(47,115,109,.08));}.system-box h5{margin:0 0 .65rem;color:var(--thread);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;}.big-sfx{display:block;margin:1.35rem 0;text-align:center;font-size:1.55rem;font-weight:700;letter-spacing:.16em;color:var(--blood);}.thought{font-style:italic;}.dialogue{color:#351b1d;}.shout{font-weight:700;letter-spacing:.05em;}.page-footer-note{margin-top:1.6rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.9rem;}`;
-      let volumeOneCover = null;
-      if (chapter.volume === "Volume 1") {
-        try {
-          volumeOneCover = await getVolumeOneCoverForExport();
-        } catch (error) {
-          volumeOneCover = null;
-        }
+      let volumeCover = null;
+      try {
+        volumeCover = await getVolumeCoverForExport(chapter.volume);
+      } catch (error) {
+        volumeCover = null;
       }
 
-      const coverPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="cover">\n    <div class="cover-card">\n      <p class="eyebrow">Threadborn Collector EPUB</p>\n      <h1 class="cover-title">${bookTitle}</h1>\n      ${volumeOneCover ? `<img class="cover-art" src="images/volume1-cover.jpg" alt="Volume 1 cover art" />` : ""}\n      <p class="cover-summary">${escapeXml(chapter.summary)}</p>\n      <div class="tag-row">${chapter.tags.map(tag => `<span class="tag">${escapeXml(tag)}</span>`).join("")}</div>\n      <p class="credit-line">Created by BiniFn</p>\n      <p class="note">Official offline chapter export from the Threadborn web reader.</p>\n    </div>\n  </section>\n</body>\n</html>`;
+      const coverPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="cover">\n    <div class="cover-card">\n      <p class="eyebrow">Threadborn Collector EPUB</p>\n      <h1 class="cover-title">${bookTitle}</h1>\n      ${volumeCover ? `<img class="cover-art" src="images/volume-cover.jpg" alt="${chapter.volume} cover art" />` : ""}\n      <p class="cover-summary">${escapeXml(chapter.summary)}</p>\n      <div class="tag-row">${chapter.tags.map(tag => `<span class="tag">${escapeXml(tag)}</span>`).join("")}</div>\n      <p class="credit-line">Created by BiniFn</p>\n      <p class="note">Official offline chapter export from the Threadborn web reader.</p>\n    </div>\n  </section>\n</body>\n</html>`;
 
       const creditsPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n  <title>${bookTitle} - Credits</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="credits-page">\n    <div class="credits-card">\n      <p class="eyebrow">Credits</p>\n      <h1>Release Credits</h1>\n      <ul>${exportCredits.map(line => `<li>${escapeXml(line)}</li>`).join("")}</ul>\n      <p class="note">Please keep the BiniFn credit attached if this EPUB is reposted or shared.</p>\n    </div>\n  </section>\n</body>\n</html>`;
 
@@ -5792,7 +5795,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
         `<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>`,
         `<item id="css" href="styles.css" media-type="text/css"/>`,
         `<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>`,
-        ...(volumeOneCover ? [`<item id="cover-art" href="images/volume1-cover.jpg" media-type="image/jpeg"/>`] : []),
+        ...(volumeCover ? [`<item id="cover-art" href="images/volume-cover.jpg" media-type="image/jpeg"/>`] : []),
         `<item id="credits" href="credits.xhtml" media-type="application/xhtml+xml"/>`,
         ...pageFiles.map((page, index) => `<item id="page-${index + 1}" href="text/page-${index + 1}.xhtml" media-type="${page.mediaType}"/>`)
       ].join("\n    ");
@@ -5814,7 +5817,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
         { name: "META-INF/container.xml", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">\n  <rootfiles>\n    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>\n  </rootfiles>\n</container>`) },
         { name: "OEBPS/styles.css", data: encoder.encode(styleCss) },
         { name: "OEBPS/cover.xhtml", data: encoder.encode(coverPage) },
-        ...(volumeOneCover ? [{ name: "OEBPS/images/volume1-cover.jpg", data: volumeOneCover.bytes }] : []),
+        ...(volumeCover ? [{ name: "OEBPS/images/volume-cover.jpg", data: volumeCover.bytes }] : []),
         { name: "OEBPS/credits.xhtml", data: encoder.encode(creditsPage) },
         { name: "OEBPS/nav.xhtml", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">\n<head>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="nav-page">\n    <div class="nav-card">\n      <p class="eyebrow">Contents</p>\n      <nav epub:type="toc" id="toc">\n        <h1>${bookTitle}</h1>\n        <ol>${navLinks}</ol>\n      </nav>\n    </div>\n  </section>\n</body>\n</html>`) },
         { name: "OEBPS/content.opf", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id">\n  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n    <dc:identifier id="book-id">${escapeXml(bookId)}</dc:identifier>\n    <dc:title>${bookTitle}</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator>BiniFn</dc:creator>\n    <dc:publisher>BiniFn</dc:publisher>\n    <dc:description>${escapeXml(chapter.summary)}</dc:description>\n    <meta property="dcterms:modified">${modifiedAt}</meta>\n  </metadata>\n  <manifest>\n    ${manifestItems}\n  </manifest>\n  <spine>\n    ${spineItems}\n  </spine>\n</package>`) },
