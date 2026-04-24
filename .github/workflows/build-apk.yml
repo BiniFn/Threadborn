@@ -34,17 +34,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build APK (release with debug fallback)
+      - name: Build Debug APK
         working-directory: ./android-app
         run: |
           chmod +x ./gradlew
-          if ./gradlew assembleRelease --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"; then
-            cp app/build/outputs/apk/release/app-release.apk ../Threadborn.apk
-          else
-            echo "Release build failed, falling back to debug APK."
-            ./gradlew assembleDebug --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"
-            cp app/build/outputs/apk/debug/app-debug.apk ../Threadborn.apk
-          fi
+          ./gradlew assembleDebug --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"
+          cp app/build/outputs/apk/debug/app-debug.apk ../Threadborn.apk
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
