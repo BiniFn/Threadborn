@@ -3,8 +3,11 @@ package com.binifn.threadborn;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceError;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -18,6 +21,8 @@ import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends AppCompatActivity {
   private static final String START_URL = "https://appassets.androidplatform.net/assets/site/index.html";
+  private static final String APP_HOST = "https://appassets.androidplatform.net/";
+  private static final String LEGACY_WEB_HOST = "https://threadborn.vercel.app";
   private WebView webView;
 
   @SuppressLint("SetJavaScriptEnabled")
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     settings.setDisplayZoomControls(false);
     settings.setMediaPlaybackRequiresUserGesture(false);
     settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+    settings.setAllowFileAccessFromFileURLs(true);
 
     webView.setWebChromeClient(new WebChromeClient());
     webView.addJavascriptInterface(new AndroidBridge(this), "AndroidBridge");
@@ -81,6 +87,28 @@ public class MainActivity extends AppCompatActivity {
       }
 
       @Override
+      public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        super.onReceivedError(view, request, error);
+        if (request != null && request.isForMainFrame()) {
+          recoverToOfflineShell();
+        }
+      }
+
+      @Override
+      public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+        super.onReceivedHttpError(view, request, errorResponse);
+        if (request != null && request.isForMainFrame() && errorResponse != null && errorResponse.getStatusCode() >= 400) {
+          recoverToOfflineShell();
+        }
+      }
+
+      @Override
+      public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        handler.cancel();
+        recoverToOfflineShell();
+      }
+
+      @Override
       public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         return assetLoader.shouldInterceptRequest(request.getUrl());
       }
@@ -95,8 +123,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     if (url.startsWith("http://") || url.startsWith("https://")) {
-      if (url.startsWith("https://appassets.androidplatform.net/")) {
+      if (url.startsWith(APP_HOST)) {
         return false;
+      }
+      if (url.startsWith(LEGACY_WEB_HOST)) {
+        webView.loadUrl(START_URL);
+        return true;
       }
       openExternal(url);
       return true;
@@ -115,6 +147,15 @@ public class MainActivity extends AppCompatActivity {
     } catch (ActivityNotFoundException error) {
       showToast("No app can open this link.");
     }
+  }
+
+  private void recoverToOfflineShell() {
+    runOnUiThread(() -> {
+      if (webView != null) {
+        webView.loadUrl(START_URL);
+      }
+      showToast("Offline mode: loading bundled reader.");
+    });
   }
 
   @Override
