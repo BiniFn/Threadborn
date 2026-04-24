@@ -46,6 +46,7 @@
       min-height: 100vh;
       color: var(--bone);
       font-family: "Bricolage Grotesque", sans-serif;
+      -webkit-text-size-adjust: 100%;
       background:
         radial-gradient(circle at top, rgba(207, 47, 47, 0.22), transparent 28%),
         radial-gradient(circle at 80% 20%, rgba(132, 208, 199, 0.14), transparent 22%),
@@ -1991,12 +1992,12 @@
       }
 
       .reader-toolbar {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        display: block;
         padding: 12px;
         max-height: min(66vh, 520px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        background: rgba(12, 14, 20, 0.98);
       }
 
       .reader-toolbar::-webkit-scrollbar,
@@ -2019,11 +2020,16 @@
       .toolbar-pill {
         width: 100%;
         min-width: 0;
-        min-height: 0;
+        min-height: auto;
         border-radius: 16px;
         padding: 12px;
         gap: 8px;
         font-size: 12px;
+        margin-bottom: 10px;
+      }
+
+      .toolbar-pill:last-child {
+        margin-bottom: 0;
       }
 
       .toolbar-pill span,
@@ -2060,11 +2066,14 @@
       }
 
       .toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
         gap: 6px;
       }
 
       .toolbar-actions .ghost-btn {
         min-height: 40px;
+        flex: 1 1 calc(50% - 3px);
       }
 
       .reader-progress-bar {
@@ -2160,7 +2169,7 @@
       }
 
       .toolbar-actions .ghost-btn {
-        grid-column: 1 / -1;
+        flex-basis: 100%;
       }
 
       .chapter-card strong,
@@ -2230,7 +2239,7 @@
       }
 
       .toolbar-actions .ghost-btn {
-        grid-column: 1 / -1;
+        flex-basis: 100%;
       }
     }
   </style>

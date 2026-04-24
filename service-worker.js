@@ -1,4 +1,4 @@
-const CACHE_NAME = "threadborn-static-v7";
+const CACHE_NAME = "threadborn-static-v8";
 const CORE_ASSETS = [
   "./",
   "./index.html",
