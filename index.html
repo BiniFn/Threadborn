@@ -2874,7 +2874,6 @@
   </div>
 
   <script>
-    const CURRENT_APK_VERSION = "v17 (1.0.17)";
     const volumes = [
       {
         name: "Volume 1 • Reborn With Zero Dignity",
@@ -4200,6 +4199,7 @@ legacyEpisodes.push({
     async function loadDesktopDownloadLinks() {
       const releasesUrl = "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases";
       const latestApkDirect = "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk";
+      const latestReleaseApi = "https://api.github.com/repos/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest";
       const latestApkReleaseApi = "https://api.github.com/repos/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/tags/latest-apk";
       const apkLink = document.getElementById("apk-download-link");
       const apkLinkSecondary = document.getElementById("apk-download-link-secondary");
@@ -4226,10 +4226,20 @@ legacyEpisodes.push({
         apkNote.textContent = "Download points to the latest APK release.";
       }
       if (apkVersionNote) {
-        apkVersionNote.textContent = `Current APK version: ${CURRENT_APK_VERSION}`;
+        apkVersionNote.textContent = "Current APK version: checking latest build...";
       }
 
       try {
+        let latestRelease = null;
+        const latestReleaseResponse = await fetch(latestReleaseApi);
+        if (latestReleaseResponse.ok) {
+          latestRelease = await latestReleaseResponse.json();
+          if (apkVersionNote) {
+            const label = latestRelease.name || latestRelease.tag_name || "latest";
+            apkVersionNote.textContent = `Current APK version: ${label}`;
+          }
+        }
+
         let releases = [];
         const taggedReleaseResponse = await fetch(latestApkReleaseApi);
         if (taggedReleaseResponse.ok) {
@@ -4322,6 +4332,9 @@ legacyEpisodes.push({
         }
         if (apkNote) {
           apkNote.textContent = "Could not check GitHub assets from this browser, so this button opens the Releases page.";
+        }
+        if (apkVersionNote) {
+          apkVersionNote.textContent = "Current APK version: latest (unable to load label)";
         }
         windowsLink.href = releasesUrl;
         macLink.href = releasesUrl;
