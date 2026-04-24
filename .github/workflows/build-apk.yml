@@ -4,16 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'index.html'
-      - 'login.html'
-      - 'signup.html'
-      - 'profile.html'
-      - 'manifest.json'
-      - 'service-worker.js'
-      - 'assets/**'
-      - 'android-app/**'
-      - 'scripts/**'
   workflow_dispatch:
 
 permissions:
