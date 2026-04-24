@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
   private static final String START_URL = "https://appassets.androidplatform.net/assets/site/index.html";
   private static final String APP_HOST = "https://appassets.androidplatform.net/";
   private static final String LEGACY_WEB_HOST = "https://threadborn.vercel.app";
+  private static final String APP_SITE_PREFIX = "https://appassets.androidplatform.net/assets/site";
   private WebView webView;
 
   @SuppressLint("SetJavaScriptEnabled")
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     webView = findViewById(R.id.web_view);
     WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
+      .addPathHandler("/assets/site/", new WebViewAssetLoader.AssetsPathHandler(this))
       .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
       .build();
 
@@ -48,8 +50,9 @@ public class MainActivity extends AppCompatActivity {
     settings.setBuiltInZoomControls(false);
     settings.setDisplayZoomControls(false);
     settings.setMediaPlaybackRequiresUserGesture(false);
-    settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+    settings.setCacheMode(WebSettings.LOAD_DEFAULT);
     settings.setAllowFileAccessFromFileURLs(true);
+    webView.clearCache(true);
 
     webView.setWebChromeClient(new WebChromeClient());
     webView.addJavascriptInterface(new AndroidBridge(this), "AndroidBridge");
@@ -130,32 +133,56 @@ public class MainActivity extends AppCompatActivity {
 
     Uri parsed = Uri.parse(url);
     String path = parsed.getPath() == null ? "" : parsed.getPath();
-    if (path.endsWith("/login.html") || path.equals("/login.html")) {
-      webView.loadUrl("https://appassets.androidplatform.net/assets/site/login.html");
-      return true;
+
+    // Keep any in-app navigation pinned to bundled site files.
+    if (url.startsWith(APP_HOST) || url.startsWith(LEGACY_WEB_HOST) || !path.isEmpty()) {
+      String bundledUrl = toBundledSiteUrl(parsed);
+      if (bundledUrl != null) {
+        if (!bundledUrl.equals(url)) {
+          webView.loadUrl(bundledUrl);
+          return true;
+        }
+        return false;
+      }
     }
-    if (path.endsWith("/signup.html") || path.equals("/signup.html")) {
-      webView.loadUrl("https://appassets.androidplatform.net/assets/site/signup.html");
-      return true;
-    }
-    if (path.endsWith("/profile.html") || path.equals("/profile.html")) {
-      webView.loadUrl("https://appassets.androidplatform.net/assets/site/profile.html");
-      return true;
+
+    if (path.endsWith(".html") || path.equals("/") || path.isEmpty()) {
+      String fallback = APP_SITE_PREFIX + "/index.html";
+      if (!fallback.equals(url)) {
+        webView.loadUrl(fallback);
+        return true;
+      }
+      return false;
     }
 
     if (url.startsWith("http://") || url.startsWith("https://")) {
-      if (url.startsWith(APP_HOST)) {
-        return false;
-      }
-      if (url.startsWith(LEGACY_WEB_HOST)) {
-        webView.loadUrl(START_URL);
-        return true;
-      }
       openExternal(url);
       return true;
     }
-
     return false;
+  }
+
+  private String toBundledSiteUrl(Uri parsed) {
+    String path = parsed.getPath();
+    if (path == null || path.isEmpty() || "/".equals(path)) {
+      path = "/index.html";
+    }
+    if (path.startsWith("/assets/site/")) {
+      return APP_HOST + path.substring(1);
+    }
+    if (path.startsWith("/assets/")) {
+      return APP_HOST + path.substring(1);
+    }
+    if (path.endsWith(".html")) {
+      return APP_SITE_PREFIX + path;
+    }
+    if (path.startsWith("/api/")) {
+      return null;
+    }
+    if (path.startsWith("/")) {
+      return APP_SITE_PREFIX + path;
+    }
+    return APP_SITE_PREFIX + "/" + path;
   }
 
   void showToast(String message) {
