@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+html
 <html lang="ja">
 <head>
-  <script>
+<script>
     (function() {
       try {
         var savedLang = localStorage.getItem('threadborn_lang');
@@ -27,10 +27,10 @@
       } catch(e) {}
     })();
   </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Threadborn Login</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Threadborn Login</title>
+<style>
     :root {
       color-scheme: dark;
       --bg: #07090f;
@@ -137,26 +137,21 @@
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>ログイン</h1>
-    <p>Sign in with your Threadborn account.</p>
-
-    <form id="login-form">
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" required autocomplete="email" />
-
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" required autocomplete="current-password" />
-
-      <button id="submit-btn" type="submit">Sign In</button>
-    </form>
-
-    <div id="status" class="status" aria-live="polite"></div>
-    <div class="back"><a href="./signup.html">Create account</a> · <a href="./index.html">Back to Reader</a></div>
-  </main>
-
-  <script src="./runtime-config.js"></script>
-  <script>
+<main class="card">
+<h1>ログイン</h1>
+<p>Threadborn アカウントでサインインします。</p>
+<form id="login-form">
+<label for="email">電子メール</label>
+<input autocomplete="email" id="email" name="email" required="" type="email"/>
+<label for="password">パスワード</label>
+<input autocomplete="current-password" id="password" name="password" required="" type="password"/>
+<button id="submit-btn" type="submit">サインイン</button>
+</form>
+<div aria-live="polite" class="status" id="status"></div>
+<div class="back"><a href="./signup.html">アカウントを作成する</a> · <a href="./index.html">リーダーに戻る</a></div>
+</main>
+<script src="./runtime-config.js"></script>
+<script>
     function resolveApiBase() {
       const configured = (window.__THREADBORN_API_BASE || localStorage.getItem("threadborn_api_base") || "").replace(/\/$/, "");
       if (configured) {

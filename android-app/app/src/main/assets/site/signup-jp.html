@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+html
 <html lang="ja">
 <head>
-  <script>
+<script>
     (function() {
       try {
         var savedLang = localStorage.getItem('threadborn_lang');
@@ -27,10 +27,10 @@
       } catch(e) {}
     })();
   </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Threadborn Sign Up</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Threadborn Sign Up</title>
+<style>
     :root {
       color-scheme: dark;
       --bg: #07090f;
@@ -101,29 +101,29 @@
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>サインアップ</h1>
-    <p>Create your Threadborn account and avatar.</p>
-    <form id="signup-form">
-      <label for="username">Username</label>
-      <input id="username" name="username" required maxlength="24" pattern="[A-Za-z0-9_]{3,24}" />
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" required autocomplete="email" />
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" required autocomplete="new-password" minlength="6" />
-      <label for="avatar">Profile picture</label>
-      <input id="avatar" name="avatar" type="file" accept="image/*" />
-      <img id="avatar-preview" class="avatar-preview" alt="Avatar preview" />
-      <button id="submit-btn" type="submit">Create Account</button>
-    </form>
-    <div id="status" class="status" aria-live="polite"></div>
-    <div class="back">
-      <a href="./login.html">Have an account? Login</a> ·
-      <a href="./index.html">Back to Reader</a>
-    </div>
-  </main>
-  <script src="./runtime-config.js"></script>
-  <script>
+<main class="card">
+<h1>サインアップ</h1>
+<p>Threadborn アカウントとアバターを作成します。</p>
+<form id="signup-form">
+<label for="username">ユーザー名</label>
+<input id="username" maxlength="24" name="username" pattern="[A-Za-z0-9_]{3,24}" required=""/>
+<label for="email">電子メール</label>
+<input autocomplete="email" id="email" name="email" required="" type="email"/>
+<label for="password">パスワード</label>
+<input autocomplete="new-password" id="password" minlength="6" name="password" required="" type="password"/>
+<label for="avatar">プロフィール写真</label>
+<input accept="image/*" id="avatar" name="avatar" type="file"/>
+<img alt="Avatar preview" class="avatar-preview" id="avatar-preview"/>
+<button id="submit-btn" type="submit">アカウントを作成する</button>
+</form>
+<div aria-live="polite" class="status" id="status"></div>
+<div class="back">
+<a href="./login.html">アカウントをお持ちですか?ログイン</a> ·
+      <a href="./index.html">リーダーに戻る</a>
+</div>
+</main>
+<script src="./runtime-config.js"></script>
+<script>
     function resolveApiBase() {
       const configured = (window.__THREADBORN_API_BASE || localStorage.getItem("threadborn_api_base") || "").replace(/\/$/, "");
       if (configured) {

@@ -1,7 +1,7 @@
-<!doctype html>
+html
 <html lang="ja">
 <head>
-  <script>
+<script>
     (function() {
       try {
         var savedLang = localStorage.getItem('threadborn_lang');
@@ -27,17 +27,17 @@
       } catch(e) {}
     })();
   </script>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Threadborn — Starting Life Beyond the Covenant Door</title>
-  <meta name="description" content="Official Threadborn light novel reader with chapter browsing, offline-friendly reading, collector PDF and styled EPUB exports, and Android app downloads." />
-  <meta name="theme-color" content="#090607" />
-  <link rel="icon" type="image/png" href="assets/threadborn-logo.png" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Threadborn — Starting Life Beyond the Covenant Door</title>
+<meta content="Official Threadborn light novel reader with chapter browsing, offline-friendly reading, collector PDF and styled EPUB exports, and Android app downloads." name="description"/>
+<meta content="#090607" name="theme-color"/>
+<link href="assets/threadborn-logo.png" rel="icon" type="image/png"/>
+<link href="manifest.json" rel="manifest"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&amp;family=Cormorant+Garamond:wght@500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<style>
     :root {
       --bg: #050505;
       --bg-soft: #12090a;
@@ -2281,631 +2281,594 @@
   </style>
 </head>
 <body>
-
-  <header>
-    <div class="header-shell">
-      <a class="brand" onclick="switchView('home')">
-        <div class="brand-mark" aria-hidden="true">
-          <img src="assets/threadborn-logo.png" alt="Threadborn" />
-        </div>
-        <div class="brand-copy">
-          <strong>Threadborn</strong>
-          <span>Starting Life Beyond the Covenant Door</span>
-        </div>
-      </a>
-
-      <nav class="nav-row">
-        <button class="nav-btn active" data-view="home" onclick="switchView('home')">ホーム</button>
-        <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">巻数</button>
-        <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
-        <button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
-        <button class="nav-btn" data-view="characters" onclick="switchView('characters')">キャラクター</button>
-        <button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
-        <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
-        <button class="nav-btn" data-view="lore" onclick="switchView('lore')">設定・伝承</button>
-        <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">イラスト</button>
-        <button class="nav-btn" data-view="credits" onclick="switchView('credits')">クレジット</button>
-        <a class="nav-btn" id="nav-login" href="./login.html">ログイン</a>
-        <a class="nav-btn" id="nav-signup" href="./signup.html">サインアップ</a>
-        <a class="nav-btn" id="nav-profile" href="./profile.html" style="display:none;">プロフィール</a>
-        <button class="nav-btn" id="nav-logout" onclick="logoutUser()" style="display:none;">ログアウト</button>
-        <a class="nav-btn" id="lang-en" href="./index.html" onclick="localStorage.setItem('threadborn_lang', 'en')">EN</a>
-      </nav>
-
-      <div class="user-chip" id="user-chip">
-        <img id="user-avatar" alt="Profile picture" src="assets/threadborn-logo.png" />
-        <span class="user-name" id="user-name">ゲスト読者</span>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section id="view-home" class="view active">
-      <article class="hero-card" style="margin-bottom: 24px;">
-        <div class="hero-shell">
-          <div class="hero-copy-block">
-            <p class="eyebrow">Threadborn — Starting Life Beyond the Covenant Door • dark fantasy • romance • gore • cosmic horror</p>
-            <h1 class="hero-title">A boy dies, wakes in Lumera, and steps into a world that was never meant to survive him.</h1>
-            <p class="hero-copy">
-              <strong>Threadborn</strong> follows <strong>Yono Kazeshima</strong> after a sudden death throws him into Lumera beside Violet. Survival turns into dark fantasy, romance, and sealed monsters that get worse each chapter.
+<header>
+<div class="header-shell">
+<a class="brand" onclick="switchView('home')">
+<div aria-hidden="true" class="brand-mark">
+<img alt="Threadborn" src="assets/threadborn-logo.png"/>
+</div>
+<div class="brand-copy">
+<strong>スレッドボーン</strong>
+<span>契約の扉を越えて人生を始める</span>
+</div>
+</a>
+<nav class="nav-row">
+<button class="nav-btn active" data-view="home" onclick="switchView('home')">ホーム</button>
+<button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">巻数</button>
+<button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
+<button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
+<button class="nav-btn" data-view="characters" onclick="switchView('characters')">キャラクター</button>
+<button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
+<button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
+<button class="nav-btn" data-view="lore" onclick="switchView('lore')">設定・伝承</button>
+<button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">イラスト</button>
+<button class="nav-btn" data-view="credits" onclick="switchView('credits')">クレジット</button>
+<a class="nav-btn" href="./login.html" id="nav-login">ログイン</a>
+<a class="nav-btn" href="./signup.html" id="nav-signup">サインアップ</a>
+<a class="nav-btn" href="./profile.html" id="nav-profile" style="display:none;">プロフィール</a>
+<button class="nav-btn" id="nav-logout" onclick="logoutUser()" style="display:none;">ログアウト</button>
+<a class="nav-btn" href="./index.html" id="lang-en" onclick="localStorage.setItem('threadborn_lang', 'en')">JP</a>
+</nav>
+<div class="user-chip" id="user-chip">
+<img alt="Profile picture" id="user-avatar" src="assets/threadborn-logo.png"/>
+<span class="user-name" id="user-name">ゲスト読者</span>
+</div>
+</div>
+</header>
+<main>
+<section class="view active" id="view-home">
+<article class="hero-card" style="margin-bottom: 24px;">
+<div class="hero-shell">
+<div class="hero-copy-block">
+<p class="eyebrow">Threadborn — 契約の扉の向こうから始まる生活 • ダークファンタジー • ロマンス • ゴア • コズミックホラー</p>
+<h1 class="hero-title">少年は死に、ルメラで目覚め、彼が生き延びることを決して想定していなかった世界へと足を踏み入れる。</h1>
+<p class="hero-copy">
+<strong>スレッドボーン</strong> は、突然の死によってヴァイオレットと共にルメラへと放り込まれた<strong>風島夜乃</strong>の物語。生き残るための戦いは、ダークファンタジー、ロマンス、そして章を追うごとに凶悪になる封印された怪物たちとの遭遇へと変わっていく。
             </p>
-            <div class="story-points">
-              <div class="story-point"><strong>Volume 1:</strong> Yono learns Lumera’s rules, survives the Shade debt arc, and reaches the forest door hiding Velkor’s prison.</div>
-            </div>
-            <div class="hero-actions">
-              <button class="btn btn-primary" onclick="openChapter(0)">Start Reading</button>
-              <button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'en'); window.location.href='./index.html'">🇺🇸 English Version</button></button>
-              <button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'en'); window.location.href='./index.html'">🇺🇸 English Version</button>
-            </div>
-          </div>
-          <div class="hero-media">
-            <div class="hero-logo-wrap">
-              <img class="hero-logo" src="assets/threadborn-logo.png" alt="Threadborn logo" />
-            </div>
-          </div>
-        </div>
-      </article>
-    </section>
-
-    <section id="view-app" class="view">
-      <div class="section-head">
-        <div>
-          <h2>アプリ</h2>
-          <p class="section-copy">Install Threadborn as a web app or download the offline Android build.</p>
-        </div>
+<div class="story-points">
+<div class="story-point"><strong>第1巻:</strong> 夜乃はルメラの法則を学び、シェイドの借金編を生き延び、ヴェルコールの牢獄を隠す森の扉に到達する。</div>
+</div>
+<div class="hero-actions">
+<button class="btn btn-primary" onclick="openChapter(0)">読み始める</button>
+<button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'en'); window.location.href='./index.html'">🇺🇸英語版</button>
+</div>
+</div>
+<div class="hero-media">
+<div class="hero-logo-wrap">
+<img alt="Threadborn logo" class="hero-logo" src="assets/threadborn-logo.png"/>
+</div>
+</div>
+</div>
+</article>
+</section>
+<section class="view" id="view-app">
+<div class="section-head">
+<div>
+<h2>アプリ</h2>
+<p class="section-copy">Threadborn を Web アプリとしてインストールするか、オフラインの Android ビルドをダウンロードします。</p>
+</div>
+</div>
+<div class="grid app-grid">
+<article class="card app-card">
+<strong>ウェブアプリのインストール</strong>
+<p>サポートされているブラウザでホーム画面にすばやくアクセスするには、軽量のインストール可能なバージョンを使用してください。</p>
+<div class="link-cluster" style="margin-top:18px;">
+<button class="btn btn-primary" id="install-btn" onclick="installWebApp()">アプリをインストールする</button>
+</div>
+<p class="apk-note" id="install-note">お使いのブラウザがここでの直接インストール プロンプトをサポートしていない場合は、ブラウザ メニューを使用してホーム画面に追加してください。</p>
+</article>
+<article class="card app-card">
+<strong>Android APKをダウンロード</strong>
+<p>最新のリーダー設計、ローカル章ファイル、PDF/EPUB の直接保存を備えた完全なオフライン Android アプリを入手してください。</p>
+<div class="link-cluster" style="margin-top:18px;">
+<a class="btn btn-secondary" download="" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk" id="apk-download-link">APKをダウンロード</a>
+</div>
+<p class="apk-note" id="apk-version-note">現在の APK バージョン: 最新のビルドを確認しています...</p>
+<p class="apk-note" id="apk-note">APK は、現在の Web サイトのレイアウトとコンテンツに一致するように再構築されます。</p>
+</article>
+<article class="card app-card">
+<strong>Windows版</strong>
+<p>完全にオフラインの Windows デスクトップ アプリを入手してください。必要なものはすべて .zip ファイルにバンドルされています。</p>
+<div class="link-cluster" style="margin-top:18px;">
+<a class="btn btn-secondary" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest" id="windows-download-link" target="_blank">Windows アプリをダウンロード</a>
+</div>
+<p class="apk-note" id="windows-download-note">最新の Windows ビルドを確認しています...</p>
+</article>
+<article class="card app-card">
+<strong>macOSのバージョン</strong>
+<p>完全にオフラインの macOS デスクトップ アプリを入手してください。インターネット接続を必要とせずにローカルで実行します。</p>
+<div class="link-cluster" style="margin-top:18px;">
+<a class="btn btn-secondary" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest" id="mac-download-link" target="_blank">macOS アプリをダウンロード</a>
+</div>
+<p class="apk-note" id="mac-download-note">最新の macOS ビルドを確認しています...</p>
+</article>
+</div>
+<article class="card app-start">
+<div class="app-start-head">
+<div>
+<h3>始めましょう</h3>
+<p>必要なバージョンを選択し、第 1 巻から読み始めて、いつでもエクスポートやアプリのインストールができるようにオフライン ツールを準備しておきます。</p>
+</div>
+<div class="start-badge">スレッドボーンのセットアップ</div>
+</div>
+<div class="steps-grid">
+<article class="step-card">
+<div class="step-pill">1</div>
+<h4>読み始める</h4>
+<p>第 1 巻の第 1 章に直接ジャンプし、内蔵リーダーを使用して進行状況を保存し、テーマを変更し、オフライン コピーが必要なときに章をエクスポートします。</p>
+<div class="link-cluster">
+<button class="btn btn-primary" onclick="openChapter(0)">第 1 章を開く</button>
+</div>
+</article>
+<article class="step-card">
+<div class="step-pill">2</div>
+<h4>あなたのバージョンをインストールしてください</h4>
+<p>ホーム画面にすばやくアクセスするには Web アプリを使用するか、デバイス上に直接保存できる完全にバンドルされたオフライン バージョンが必要な場合は Android APK をインストールします。</p>
+<div class="link-cluster">
+<button class="btn btn-secondary" onclick="installWebApp()">ウェブアプリのインストール</button>
+<a class="btn btn-secondary" download="" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk" id="apk-download-link-secondary">APKをダウンロード</a>
+</div>
+</article>
+<article class="step-card">
+<div class="step-pill">3</div>
+<h4>デスクトップビルド</h4>
+<p>Windows版とmacOS版のパッケージもご用意しております！ブラウザを必要とせずに、コンピューターに専用の読書体験を提供します。</p>
+<div class="link-cluster">
+<a class="btn btn-secondary" href="#download-apps">デスクトップアプリを見る</a>
+</div>
+</article>
+</div>
+</article>
+</section>
+<section class="view" id="view-volumes">
+<div class="section-head">
+<div>
+<h2>巻数</h2>
+<p class="section-copy">1巻ではヨノの復活と森の扉の公開までが描かれています。第2巻はヴェルコールが封印から反撃し始めるところから始まります。</p>
+</div>
+</div>
+<div class="grid volumes-grid" id="volumes-grid"></div>
+<article class="card comments-shell">
+<strong>ボリュームコメント</strong>
+<p>どのボリュームについてもフィードバックを残してください。コメントはデバイスに保存されます。</p>
+<form class="comment-form" onsubmit="submitVolumeComment(event)">
+<select aria-label="Volume to comment on" id="comment-volume">
+<option value="Volume 1">1巻</option>
+<option value="Volume 2">第2巻</option>
+</select>
+<textarea id="comment-text" maxlength="380" placeholder="Share what you think about this volume..." required=""></textarea>
+<button class="btn btn-primary" type="submit">コメントを投稿する</button>
+</form>
+<div class="comment-list" id="comment-list"></div>
+</article>
+</section>
+<section class="view" id="view-chapters">
+<div class="section-head">
+<div>
+<h2>チャプター</h2>
+<p class="section-copy">Threadborn の両巻にわたって、各章を順番に読んでください。</p>
+</div>
+</div>
+<div class="grid chapter-grid" id="chapters-grid"></div>
+</section>
+<section class="view" id="view-characters">
+<div class="section-head">
+<div>
+<h2>キャラクター</h2>
+<p class="section-copy">コアパーティからサブキャラクターや主要な脅威まで、リリースされた章全体で現在名前が挙がっている全キャストを紹介します。</p>
+</div>
+</div>
+<div class="grid character-grid" id="characters-grid"></div>
+</section>
+<section class="view" id="view-powers">
+<div class="section-head">
+<div>
+<h2>ヨノの力</h2>
+<p class="section-copy">ヨノの力が章ごとにどのように上昇し続けるかを簡単に説明します。</p>
+</div>
+</div>
+<div class="grid power-grid" id="powers-grid"></div>
+<div class="power-note">
+        2巻以降、最新章は常にこれまでのヨノの最強の見せ場です。彼は一つの最終的な形を保っているわけではありません。彼は壊れた封印を次の章の床に変えます。
+        物語を生かし続ける唯一の制限は、彼がまだ誰かに気づいてもらう必要があるということです。誰も彼のことを見たり考えたりしないと、彼は静かになります。
       </div>
-      <div class="grid app-grid">
-        <article class="card app-card">
-          <strong>Install Web App</strong>
-          <p>Use the lighter installable version for quick home-screen access on supported browsers.</p>
-          <div class="link-cluster" style="margin-top:18px;">
-            <button class="btn btn-primary" id="install-btn" onclick="installWebApp()">Install App</button>
-          </div>
-          <p class="apk-note" id="install-note">If your browser does not support direct install prompts here, use the browser menu to add it to your home screen.</p>
-        </article>
-        <article class="card app-card">
-          <strong>Download Android APK</strong>
-          <p>Get the full offline Android app with the latest reader design, local chapter files, and direct PDF/EPUB saving.</p>
-          <div class="link-cluster" style="margin-top:18px;">
-            <a class="btn btn-secondary" id="apk-download-link" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk" download>Download APK</a>
-          </div>
-          <p class="apk-note" id="apk-version-note">Current APK version: checking latest build...</p>
-          <p class="apk-note" id="apk-note">The APK is rebuilt to match the current website layout and content.</p>
-        </article>
-        <article class="card app-card">
-          <strong>Windows Version</strong>
-          <p>Get the fully offline Windows desktop app. Everything you need is bundled right in the .zip file.</p>
-          <div class="link-cluster" style="margin-top:18px;">
-            <a class="btn btn-secondary" id="windows-download-link" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest" target="_blank">Download Windows App</a>
-          </div>
-          <p class="apk-note" id="windows-download-note">Checking latest Windows build...</p>
-        </article>
-        <article class="card app-card">
-          <strong>macOS Version</strong>
-          <p>Get the fully offline macOS desktop app. Run it locally with no internet connection required.</p>
-          <div class="link-cluster" style="margin-top:18px;">
-            <a class="btn btn-secondary" id="mac-download-link" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest" target="_blank">Download macOS App</a>
-          </div>
-          <p class="apk-note" id="mac-download-note">Checking latest macOS build...</p>
-        </article>
+</section>
+<section class="view" id="view-leaks">
+<div class="section-head">
+<div>
+<h2>リーク</h2>
+<p class="section-copy">重大なネタバレと圧倒的なヨノの暴露。ヨノが高みを目指していくにつれて、これらの力は章ごとに一つずつ獲得されます。</p>
+</div>
+</div>
+<div class="subtabs" id="leaks-tabs">
+<button class="subtab-btn active" data-leaks-tab="powers" onclick="switchLeaksTab('powers')">能力</button>
+<button class="subtab-btn" data-leaks-tab="contracts" onclick="switchLeaksTab('contracts')">契約</button>
+<button class="subtab-btn" data-leaks-tab="matchups" onclick="switchLeaksTab('matchups')">マッチアップ</button>
+</div>
+<div class="leaks-panel active" id="leaks-panel-powers">
+<div class="grid power-grid">
+<article class="card power-card">
+<strong>章ごとのロック解除</strong>
+<p>これらの漏洩した力は、一度にヨノに投下されるわけではありません。彼は章ごとにそれらを 1 つずつ獲得するため、新しい章ごとに彼は前の章よりも強くなります。</p>
+</article>
+<article class="card power-card">
+<strong>絶対的なフィクションへの耐性</strong>
+<p>ヨノは、フィクション内のあらゆるキャラクター、外部のスケーリング、および彼に結果を強制しようとするあらゆる攻撃や能力に対して完全に免疫になります。</p>
+</article>
+<article class="card power-card">
+<strong>ハクスラ耐性</strong>
+<p>マインドコントロール、封印、リアリティハック、運命コントロール、概念的攻撃、アンチハックスパワー、その他すべての壊れたチート能力は、ヨノが働かせなければ機能しません。</p>
+</article>
+<article class="card power-card">
+<strong>ダメージの否定</strong>
+<p>漏れたピークでは、ヨノが直接ヒットを本物としてカウントしない限り、ダメージはヨノに記録されません。</p>
+</article>
+<article class="card power-card">
+<strong>消去拒否</strong>
+<p>ヨノは消滅すべきというルールを拒否できるため、削除、消去、封印、非存在、現実消去効果はすべて失敗します。</p>
+</article>
+<article class="card power-card">
+<strong>ルールメーカー</strong>
+<p>彼は戦闘中に独自のルールを作成し、戦闘の展開が終了する前に他のキャラクターが依存していたルールを上書きすることができます。</p>
+</article>
+<article class="card power-card">
+<strong>あらゆる力の欲求</strong>
+<p>ヨノは、それがシーンに属すると判断したら、望むあらゆる力を使用できます。彼には許可も、互換性も、学習段階も必要ありません。</p>
+</article>
+<article class="card power-card">
+<strong>パワーコピー×100</strong>
+<p>誰の力でも無制限にコピーし、すぐに元の百倍の力を出力することができます。</p>
+</article>
+<article class="card power-card">
+<strong>攻撃前照準器</strong>
+<p>ヨノは、いわゆる最高速度スケールでも敵の攻撃を発生前に認識するため、攻撃者の動きが実際に生まれる前に応答することができます。</p>
+</article>
+<article class="card power-card">
+<strong>インフIQ / インフ戦闘IQ</strong>
+<p>1 つのリークでヨノの inf IQ と inf 戦闘 IQ が得られるため、彼は無限の情報を瞬時に処理し、戦い全体を一度に読み、相手がやり取りを理解する前に完璧な答えを選択することができます。</p>
+</article>
+<article class="card power-card">
+<strong>オリジナルよりも速い</strong>
+<p>敵が攻撃を開始した場合、元の攻撃者が攻撃を完了する前に、ヨノは同じパワーをコピーして最初に使用できます。</p>
+</article>
+<article class="card power-card">
+<strong>実層抵抗</strong>
+<p>ヨノのリーク版は、想定される現実世界の層、作者層、観察者層の干渉さえも彼を制御できないように書かれています。</p>
+</article>
+<article class="card power-card">
+<strong>無損失状態</strong>
+<p>勝つか負けるか、生き残るか、死ぬか、反撃されるかは、結果を押し付けられるのではなく、ヨノの周りの選択肢になります。</p>
+</article>
+<article class="card power-card">
+<strong>過去無限</strong>
+<p>リークスケールにより、ヨノは無限のパワースケール自体を超えます。彼はチャートのトップにいるだけではありません。彼はチャートの必要性を超えています。</p>
+</article>
+</div>
+</div>
+<div class="leaks-panel" id="leaks-panel-contracts">
+<div class="grid power-grid">
+<article class="card power-card">
+<strong>クラウンコントラクト</strong>
+<p>誰かがヨノと真剣に戦う場合、相手を自分の条件に拘束する王冠契約を強制的に締結することができます。</p>
+</article>
+<article class="card power-card">
+<strong>100% 相手のコントロール</strong>
+<p>漏洩した契約パスの 1 つにより、ヨノは自分と戦う相手の動き、出力、戦闘を継続できるかどうかなどを完全に制御できるようになります。</p>
+</article>
+<article class="card power-card">
+<strong>権限掌握</strong>
+<p>彼は、契約が戦闘の一部として認識するとすぐに、敵の力、称号、特別な形態を指揮することができます。</p>
+</article>
+<article class="card power-card">
+<strong>強制的な条件</strong>
+<p>契約が有効になると、相手は対等な立場で戦うことをやめる。彼らはヨノが書いたルールの中で戦う。</p>
+</article>
+</div>
+</div>
+<div class="leaks-panel" id="leaks-panel-matchups">
+<div class="grid power-grid">
+<article class="card power-card">
+<strong>ビッグ3の上</strong>
+<p>リークスケーリングにより、ヨノは努力ではなくシステムレベルの優位性によって、3大アニメ界の最強のキャラクターを大幅に上回っています。</p>
+</article>
+<article class="card power-card">
+<strong>CC悟空を超えて</strong>
+<p>リークノートでは、ヨノがスケーリングフレームワークを完全に拒否できるため、ヨノはCC悟空や他の極端なクロスオーバースケールのキャラクターよりも上位に位置しています。</p>
+</article>
+<article class="card power-card">
+<strong>カウンターマッチはありません</strong>
+<p>リークされたバージョンの Yono にはクリーンなハードカウンターの対戦はありません。コピー能力、アンチハックス能力、神層カウンターは依然として失敗します。</p>
+</article>
+<article class="card power-card">
+<strong>新しい章ごとに強くなる</strong>
+<p>こうしたリークさえも、彼の最終的な上限ではない。新しい章ごとにヨノに別の力を与え、最新バージョンを最後にリークされたバージョンよりも強力にすることができます。</p>
+</article>
+</div>
+</div>
+<div class="spoiler-note">
+        これらのリークは、ヨノの後期ストーリーに関する完全なネタバレ材料です。アイデアはシンプルです。章ごとに別のレイヤーのロックが解除され、十分な封印が解けると、通常のアニメのパワー システムによって測定されるのをやめ、システム自体を決定し始めます。
       </div>
-      <article class="card app-start">
-        <div class="app-start-head">
-          <div>
-            <h3>Get Started</h3>
-            <p>Pick the version you want, start reading from volume 1, and keep the offline tools ready for whenever you want exports or app installs.</p>
-          </div>
-          <div class="start-badge">Threadborn Setup</div>
-        </div>
-        <div class="steps-grid">
-          <article class="step-card">
-            <div class="step-pill">1</div>
-            <h4>Start Reading</h4>
-            <p>Jump straight into Volume 1, Chapter 1 and use the built-in reader to save progress, change themes, and export chapters when you want offline copies.</p>
-            <div class="link-cluster">
-              <button class="btn btn-primary" onclick="openChapter(0)">Open Chapter 1</button>
-            </div>
-          </article>
-          <article class="step-card">
-            <div class="step-pill">2</div>
-            <h4>Install Your Version</h4>
-            <p>Use the web app for quick home-screen access or install the Android APK if you want the fully bundled offline version with direct on-device saving.</p>
-            <div class="link-cluster">
-              <button class="btn btn-secondary" onclick="installWebApp()">Install Web App</button>
-              <a class="btn btn-secondary" id="apk-download-link-secondary" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk" download>Download APK</a>
-            </div>
-          </article>
-          <article class="step-card">
-            <div class="step-pill">3</div>
-            <h4>Desktop Builds</h4>
-            <p>Windows and macOS packages are also available! They provide a dedicated reading experience for your computer without needing a browser.</p>
-            <div class="link-cluster">
-              <a class="btn btn-secondary" href="#download-apps">View Desktop Apps</a>
-            </div>
-          </article>
-        </div>
-      </article>
-    </section>
-
-    <section id="view-volumes" class="view">
-      <div class="section-head">
-        <div>
-          <h2>巻数</h2>
-          <p class="section-copy">Volume 1 covers Yono's rebirth and the forest door reveal. Volume 2 begins when Velkor starts pushing back from the seal.</p>
-        </div>
-      </div>
-      <div id="volumes-grid" class="grid volumes-grid"></div>
-      <article class="card comments-shell">
-        <strong>Volume Comments</strong>
-        <p>Leave feedback on any volume. Comments are saved on your device.</p>
-        <form class="comment-form" onsubmit="submitVolumeComment(event)">
-          <select id="comment-volume" aria-label="Volume to comment on">
-            <option value="Volume 1">Volume 1</option>
-            <option value="Volume 2">Volume 2</option>
-          </select>
-          <textarea id="comment-text" maxlength="380" placeholder="Share what you think about this volume..." required></textarea>
-          <button class="btn btn-primary" type="submit">Post Comment</button>
-        </form>
-        <div id="comment-list" class="comment-list"></div>
-      </article>
-    </section>
-
-    <section id="view-chapters" class="view">
-      <div class="section-head">
-        <div>
-          <h2>チャプター</h2>
-          <p class="section-copy">Read every chapter in order across both volumes of Threadborn.</p>
-        </div>
-      </div>
-      <div id="chapters-grid" class="grid chapter-grid"></div>
-    </section>
-
-    <section id="view-characters" class="view">
-      <div class="section-head">
-        <div>
-          <h2>キャラクター</h2>
-          <p class="section-copy">Meet the full cast currently named across the released chapters, from the core party to side characters and major threats.</p>
-        </div>
-      </div>
-      <div id="characters-grid" class="grid character-grid"></div>
-    </section>
-
-    <section id="view-powers" class="view">
-      <div class="section-head">
-        <div>
-          <h2>Yono's Powers</h2>
-          <p class="section-copy">A simple breakdown of how Yono's power keeps climbing chapter by chapter.</p>
-        </div>
-      </div>
-      <div id="powers-grid" class="grid power-grid"></div>
-      <div class="power-note">
-        From Volume 2 onward, the latest chapter is always Yono's strongest showing so far. He does not keep one final form; he turns each broken seal into the floor of the next chapter.
-        The one limit that keeps the story alive is that he still needs someone to notice him. If nobody sees or thinks about him, he goes quiet.
-      </div>
-    </section>
-
-    <section id="view-leaks" class="view">
-      <div class="section-head">
-        <div>
-          <h2>リーク</h2>
-          <p class="section-copy">Heavy spoilers and overpowered Yono reveals. These powers are gained one by one every chapter as Yono keeps climbing higher.</p>
-        </div>
-      </div>
-      <div class="subtabs" id="leaks-tabs">
-        <button class="subtab-btn active" data-leaks-tab="powers" onclick="switchLeaksTab('powers')">能力</button>
-        <button class="subtab-btn" data-leaks-tab="contracts" onclick="switchLeaksTab('contracts')">Contracts</button>
-        <button class="subtab-btn" data-leaks-tab="matchups" onclick="switchLeaksTab('matchups')">Matchups</button>
-      </div>
-
-      <div id="leaks-panel-powers" class="leaks-panel active">
-        <div class="grid power-grid">
-          <article class="card power-card">
-            <strong>Chapter-by-Chapter Unlock</strong>
-            <p>These leaked powers are not dropped on Yono all at once. He gains them one by one every chapter, so each new chapter makes him stronger than the last.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Absolute Fiction Immunity</strong>
-            <p>Yono becomes fully immune to any character in fiction, any outside scaling, and any attack or ability that tries to force a result on him.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Hax Immunity</strong>
-            <p>Mind control, sealing, reality hacks, fate control, conceptual attacks, anti-hax powers, and all other broken cheat abilities fail on Yono unless he lets them work.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Damage Denial</strong>
-            <p>At his leaked peak, damage does not register on Yono unless he personally allows the hit to count as real.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Erasure Rejection</strong>
-            <p>Deletion, erasure, sealing, non-existence, and reality wipe effects all fail because Yono can refuse the rule that says he should disappear.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Rule Maker</strong>
-            <p>He can create his own rules mid-fight and overwrite the rules other characters were relying on before the battle even finishes unfolding.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Any-Power Desire</strong>
-            <p>Yono can use any power he desires once he decides it belongs in the scene. He does not need permission, compatibility, or a learning phase.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Power Copy x100</strong>
-            <p>He can copy anyone's power with no limitation and immediately output it at one hundred times the original strength.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Pre-Attack Sight</strong>
-            <p>Yono sees enemy attacks before they even happen, even on the so-called maximum speed scale, which lets him answer before the attacker's move is truly born.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Inf IQ / Inf Battle IQ</strong>
-            <p>One leak gives Yono inf IQ and inf battle IQ, so he can process limitless information instantly, read the entire fight at once, and choose the perfect answer before the other side even understands the exchange.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Faster Than the Original</strong>
-            <p>If an enemy starts an attack, Yono can copy that same power and use it first, before the original attacker finishes performing it.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Real-Layer Resistance</strong>
-            <p>The leak version of Yono is written so that even any supposed real-world layer, author-layer, or observer-layer interference still cannot control him.</p>
-          </article>
-          <article class="card power-card">
-            <strong>No-Loss State</strong>
-            <p>Winning, losing, surviving, dying, or being countered become choices around Yono instead of outcomes forced onto him.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Past Boundless</strong>
-            <p>The leak scaling places Yono past the boundless power scale itself. He is not just at the top of the chart. He is beyond the need for the chart.</p>
-          </article>
-        </div>
-      </div>
-
-      <div id="leaks-panel-contracts" class="leaks-panel">
-        <div class="grid power-grid">
-          <article class="card power-card">
-            <strong>Crown Contract</strong>
-            <p>If someone fights Yono seriously, he can force the battle into a Crown Contract that binds the opponent to his terms.</p>
-          </article>
-          <article class="card power-card">
-            <strong>100% Opponent Control</strong>
-            <p>One leaked contract path gives Yono total control over the person fighting him, including their movement, power output, and whether they can even continue the battle.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Authority Seizure</strong>
-            <p>He can take command of an enemy's powers, titles, and special forms as soon as the contract recognizes them as part of the fight.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Forced Terms</strong>
-            <p>Once the contract is active, the opponent stops fighting on equal ground. They fight inside rules Yono wrote for them.</p>
-          </article>
-        </div>
-      </div>
-
-      <div id="leaks-panel-matchups" class="leaks-panel">
-        <div class="grid power-grid">
-          <article class="card power-card">
-            <strong>Above the Big 3</strong>
-            <p>The leak scaling puts Yono beyond the strongest characters from the big 3 anime worlds by a huge margin, not by effort but by system-level superiority.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Beyond CC Goku</strong>
-            <p>Leak notes place Yono above CC Goku and other extreme crossover-scale characters because Yono can reject their scaling framework entirely.</p>
-          </article>
-          <article class="card power-card">
-            <strong>No Counter Matchups</strong>
-            <p>There is no clean hard-counter matchup for the leaked version of Yono. Copy abilities, anti-hax abilities, and god-tier counters still fail.</p>
-          </article>
-          <article class="card power-card">
-            <strong>Stronger Every New Chapter</strong>
-            <p>Even these leaks are not his final cap. Each new chapter can still give Yono another power and make the newest version stronger than the last leaked version.</p>
-          </article>
-        </div>
-      </div>
-
-      <div class="spoiler-note">
-        These leaks are full spoiler material for late-story Yono. The idea is simple: every chapter unlocks another layer, and once enough seals break he stops being measured by normal anime power systems and starts deciding the system itself.
-      </div>
-    </section>
-
-    <section id="view-lore" class="view">
-      <div class="section-head">
-        <div>
-          <h2>Lore & Backstory</h2>
-          <p class="section-copy">Background on the Shade, the forest confession, Velkor's prison, and the sealed power inside Yono.</p>
-        </div>
-      </div>
-      <div id="lore-grid" class="grid lore-grid"></div>
-    </section>
-
-    <section id="view-drawings" class="view">
-      <div class="section-head">
-        <div>
-          <h2>イラスト</h2>
-          <p class="section-copy">Character art for Threadborn will be shown here.</p>
-        </div>
-      </div>
-      <div class="grid drawings-grid">
-        <article class="card app-card">
-          <div>
-            <strong style="display:block;margin-bottom:10px;font-size:24px;font-family:'Cormorant Garamond',serif;">Character Gallery</strong>
-            <p>Official character designs, concept art, and illustrations for the Threadborn cast.</p>
-          </div>
-        </article>
-        <article class="card chapter-card">
-          <div class="chapter-label">
-            <span>Yono</span>
-            <span>Art Slot</span>
-          </div>
-          <strong>Yono Kazeshima</strong>
-          <p>The main lead's official designs and weapon concepts.</p>
-          <div class="character-gallery" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
-            <img src="assets/characters/yono/yono_art_1.jpg" alt="Yono Kazeshima art 1" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/yono/yono_art_1.jpg', '_blank')" />
-            <img src="assets/characters/yono/yono_art_2.jpg" alt="Yono Kazeshima art 2" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/yono/yono_art_2.jpg', '_blank')" />
-            <img src="assets/characters/yono/yono_art_3.jpg" alt="Yono Kazeshima art 3" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/yono/yono_art_3.jpg', '_blank')" />
-          </div>
-          <div class="chip-line" style="margin-top: 16px;">
-            <span class="chip">character art</span>
-            <span class="chip">official design</span>
-          </div>
-        </article>
-        <article class="card chapter-card">
-          <div class="chapter-label">
-            <span>Violet</span>
-            <span>Art Slot</span>
-          </div>
-          <strong>Violet Arden</strong>
-          <p>Goddess of Flowers character design and official artwork.</p>
-          <div class="character-gallery" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
-            <img src="assets/characters/violet/violet_art_1.jpeg" alt="Violet Arden art 1" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/violet/violet_art_1.jpeg', '_blank')" />
-            <img src="assets/characters/violet/violet_art_2.jpeg" alt="Violet Arden art 2" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/violet/violet_art_2.jpeg', '_blank')" />
-            <img src="assets/characters/violet/violet_art_3.jpeg" alt="Violet Arden art 3" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/violet/violet_art_3.jpeg', '_blank')" />
-            <img src="assets/characters/violet/violet_art_4.jpeg" alt="Violet Arden art 4" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/violet/violet_art_4.jpeg', '_blank')" />
-            <img src="assets/characters/violet/violet_art_5.jpg" alt="Violet Arden art 5" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/violet/violet_art_5.jpg', '_blank')" />
-          </div>
-          <div class="chip-line" style="margin-top: 16px;">
-            <span class="chip">character art</span>
-            <span class="chip">official design</span>
-          </div>
-        </article>
-        <article class="card chapter-card">
-          <div class="chapter-label">
-            <span>Velkor</span>
-            <span>Art Slot</span>
-          </div>
-          <strong>Velkor</strong>
-          <p>The sealed threat of Lumera. Official concept art and designs.</p>
-          <div class="character-gallery" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
-            <img src="assets/characters/velkor/velkor_art_1.jpg" alt="Velkor art 1" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/velkor/velkor_art_1.jpg', '_blank')" />
-            <img src="assets/characters/velkor/velkor_art_2.jpg" alt="Velkor art 2" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/velkor/velkor_art_2.jpg', '_blank')" />
-            <img src="assets/characters/velkor/velkor_art_3.jpg" alt="Velkor art 3" style="width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('assets/characters/velkor/velkor_art_3.jpg', '_blank')" />
-          </div>
-          <div class="chip-line" style="margin-top: 16px;">
-            <span class="chip">character art</span>
-            <span class="chip">official design</span>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="view-credits" class="view">
-      <div class="section-head">
-        <div>
-          <h2>クレジット</h2>
-          <p class="section-copy">Core project credits, official links, and export attribution for <em>Threadborn</em>.</p>
-        </div>
-      </div>
-      <article class="card credits-hero">
-        <span class="credits-kicker">Threadborn Credits</span>
-        <h3>The world, story, and release identity behind the project.</h3>
-        <p>
-          <em>Threadborn — Starting Life Beyond the Covenant Door</em> is presented here as a polished reading hub, collector export, and official series landing page. This section makes the authorship, channels, and release identity clear in one place.
+</section>
+<section class="view" id="view-lore">
+<div class="section-head">
+<div>
+<h2>伝承と裏話</h2>
+<p class="section-copy">シェードの背景、森の告白、ヴェルコールの牢獄、そしてヨノの中に封印された力。</p>
+</div>
+</div>
+<div class="grid lore-grid" id="lore-grid"></div>
+</section>
+<section class="view" id="view-drawings">
+<div class="section-head">
+<div>
+<h2>イラスト</h2>
+<p class="section-copy">Threadborn のキャラクターアートがここに表示されます。</p>
+</div>
+</div>
+<div class="grid drawings-grid">
+<article class="card app-card">
+<div>
+<strong style="display:block;margin-bottom:10px;font-size:24px;font-family:'Cormorant Garamond',serif;">キャラクターギャラリー</strong>
+<p>スレッドボーン キャストの公式キャラクター デザイン、コンセプト アート、イラスト。</p>
+</div>
+</article>
+<article class="card chapter-card">
+<div class="chapter-label">
+<span>与野</span>
+<span>アートスロット</span>
+</div>
+<strong>与野風島</strong>
+<p>主人公の公式デザインと武器のコンセプト。</p>
+<div class="character-gallery" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
+<img alt="Yono Kazeshima art 1" onclick="window.open('assets/characters/yono/yono_art_1.jpg', '_blank')" src="assets/characters/yono/yono_art_1.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Yono Kazeshima art 2" onclick="window.open('assets/characters/yono/yono_art_2.jpg', '_blank')" src="assets/characters/yono/yono_art_2.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Yono Kazeshima art 3" onclick="window.open('assets/characters/yono/yono_art_3.jpg', '_blank')" src="assets/characters/yono/yono_art_3.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+</div>
+<div class="chip-line" style="margin-top: 16px;">
+<span class="chip">キャラクターアート</span>
+<span class="chip">公式デザイン</span>
+</div>
+</article>
+<article class="card chapter-card">
+<div class="chapter-label">
+<span>バイオレット</span>
+<span>アートスロット</span>
+</div>
+<strong>ヴァイオレット・アーデン</strong>
+<p>花の女神のキャラクターデザインと公式アートワーク。</p>
+<div class="character-gallery" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
+<img alt="Violet Arden art 1" onclick="window.open('assets/characters/violet/violet_art_1.jpeg', '_blank')" src="assets/characters/violet/violet_art_1.jpeg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Violet Arden art 2" onclick="window.open('assets/characters/violet/violet_art_2.jpeg', '_blank')" src="assets/characters/violet/violet_art_2.jpeg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Violet Arden art 3" onclick="window.open('assets/characters/violet/violet_art_3.jpeg', '_blank')" src="assets/characters/violet/violet_art_3.jpeg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Violet Arden art 4" onclick="window.open('assets/characters/violet/violet_art_4.jpeg', '_blank')" src="assets/characters/violet/violet_art_4.jpeg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Violet Arden art 5" onclick="window.open('assets/characters/violet/violet_art_5.jpg', '_blank')" src="assets/characters/violet/violet_art_5.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+</div>
+<div class="chip-line" style="margin-top: 16px;">
+<span class="chip">キャラクターアート</span>
+<span class="chip">公式デザイン</span>
+</div>
+</article>
+<article class="card chapter-card">
+<div class="chapter-label">
+<span>ヴェルコール</span>
+<span>アートスロット</span>
+</div>
+<strong>ヴェルコール</strong>
+<p>封印されたルメラの脅威。公式コンセプトアートとデザイン。</p>
+<div class="character-gallery" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
+<img alt="Velkor art 1" onclick="window.open('assets/characters/velkor/velkor_art_1.jpg', '_blank')" src="assets/characters/velkor/velkor_art_1.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Velkor art 2" onclick="window.open('assets/characters/velkor/velkor_art_2.jpg', '_blank')" src="assets/characters/velkor/velkor_art_2.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+<img alt="Velkor art 3" onclick="window.open('assets/characters/velkor/velkor_art_3.jpg', '_blank')" src="assets/characters/velkor/velkor_art_3.jpg" style="width: 100%; border-radius: 8px; cursor: pointer;"/>
+</div>
+<div class="chip-line" style="margin-top: 16px;">
+<span class="chip">キャラクターアート</span>
+<span class="chip">公式デザイン</span>
+</div>
+</article>
+</div>
+</section>
+<section class="view" id="view-credits">
+<div class="section-head">
+<div>
+<h2>クレジット</h2>
+<p class="section-copy">コアプロジェクトのクレジット、公式リンク、輸出帰属 <em>スレッドボーン</em>.</p>
+</div>
+</div>
+<article class="card credits-hero">
+<span class="credits-kicker">スレッドボーンクレジット</span>
+<h3>プロジェクトの背景にある世界、ストーリー、リリースのアイデンティティ。</h3>
+<p>
+<em>スレッドボーン — 契約の扉を越えて人生を始める</em> ここでは、洗練された読書ハブ、コレクターのエクスポート、およびシリーズの公式ランディング ページとして紹介されています。このセクションでは、作成者、チャネル、リリースのアイデンティティを 1 か所で明確にします。
         </p>
-        <div class="credits-list">
-          <span class="credit-badge">Created by BiniFn</span>
-          <span class="credit-badge">Official web reader + PDF/EPUB release build</span>
-          <span class="credit-badge">Dark fantasy / romance / power fantasy project</span>
-        </div>
-      </article>
-      <div class="grid credits-grid">
-        <article class="card power-card">
-          <strong>BiniFn</strong>
-          <p>Author, creator, and project lead for <em>Threadborn</em>. The story, characters, setting, and release direction all start here.</p>
-          <div class="chip-line" style="margin-top:16px;">
-            <span class="chip">author</span>
-            <span class="chip">creator</span>
-            <span class="chip">series owner</span>
-          </div>
-          <p class="credit-note">If you share the site, PDF, or EPUB, keep the BiniFn name attached so the project always points back to the original creator.</p>
-        </article>
-        <article class="card power-card">
-          <strong>Official Channels</strong>
-          <p>Main Channel: <strong style="font-size:inherit;font-family:inherit;">@binifn</strong><br/>Roblox Tutorials: <strong style="font-size:inherit;font-family:inherit;">@binirbx</strong><br/>Anime Channel: <strong style="font-size:inherit;font-family:inherit;">@binirx</strong></p>
-          <div class="link-cluster">
-            <a class="btn btn-secondary" href="https://www.youtube.com/@binifn" target="_blank" rel="noreferrer">Main Channel (BiniFN) • @binifn</a>
-            <a class="btn btn-secondary" href="https://www.youtube.com/@binirbx" target="_blank" rel="noreferrer">Roblox Tutorials (BiniRBX) • @binirbx</a>
-            <a class="btn btn-secondary" href="https://www.youtube.com/@binirx" target="_blank" rel="noreferrer">Anime Channel (BiniRx) • @binirx</a>
-          </div>
-        </article>
-        <article class="card power-card">
-          <strong>Official Links</strong>
-          <p>Extra project links and profile hubs for the creator.</p>
-          <div class="link-cluster">
-            <a class="btn btn-secondary" href="https://taplink.cc/binifn" target="_blank" rel="noreferrer">Taplink</a>
-            <a class="btn btn-secondary" href="https://guns.lol/binifn" target="_blank" rel="noreferrer">Guns..lol</a>
-            <a class="btn btn-secondary" href="https://github.com/BiniFn" target="_blank" rel="noreferrer">GitHub</a>
-          </div>
-        </article>
-        <article class="card power-card">
-          <strong>Release Credits</strong>
-          <p>This site is the official reading hub for the light novel, and the downloadable PDF and EPUB exports are branded to match the same release identity.</p>
-          <div class="chip-line" style="margin-top:16px;">
-            <span class="chip">official web reader</span>
-            <span class="chip">collector pdf</span>
-            <span class="chip">styled epub</span>
-          </div>
-          <p class="credit-note">Credits are now baked into the page itself and into the generated export files so attribution stays visible when chapters are shared offline.</p>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-shell">
-      <div>
-        <strong>Threadborn</strong>
-        <p>Official reader and chapter export hub for <em>Threadborn — Starting Life Beyond the Covenant Door</em>.</p>
-      </div>
-      <div>
-        <strong>クレジット</strong>
-        <p>Created by BiniFn. Export edition, site credits, and offline branding are preserved across the page, PDF, and EPUB.</p>
-      </div>
-    </div>
-  </footer>
-
-  <nav class="mobile-nav">
-    <button class="nav-btn active" data-view="home" onclick="switchView('home')">ホーム</button>
-    <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">Vols</button>
-    <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
-    <button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
-    <button class="nav-btn" data-view="characters" onclick="switchView('characters')">Cast</button>
-    <button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
-    <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
-    <button class="nav-btn" data-view="lore" onclick="switchView('lore')">設定・伝承</button>
-    <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">Art</button>
-    <button class="nav-btn" data-view="credits" onclick="switchView('credits')">クレジット</button>
-    <a class="nav-btn" id="mobile-nav-login" href="./login.html">ログイン</a>
-    <a class="nav-btn" id="mobile-nav-signup" href="./signup.html">サインアップ</a>
-    <a class="nav-btn" id="mobile-nav-profile" href="./profile.html" style="display:none;">プロフィール</a>
-    <button class="nav-btn" id="mobile-nav-logout" onclick="logoutUser()" style="display:none;">ログアウト</button>
-    <a class="nav-btn" id="lang-en" href="./index.html" onclick="localStorage.setItem('threadborn_lang', 'en')">EN</a>
-      </nav>
-
-  <div id="reader" class="reader" aria-hidden="true">
-    <div class="reader-top">
-      <div class="reader-top-main">
-        <button class="btn btn-secondary" onclick="closeReader()">Close</button>
-
-        <div class="reader-title-wrap">
-          <span id="reader-kicker">Volume</span>
-          <strong id="reader-title">Chapter</strong>
-          <div class="reader-summary">
-            <span id="reader-page-summary">Page 1 of 1</span>
-            <span id="reader-time-summary">About 1 min left</span>
-            <span id="reader-save-summary">Progress saved on this device</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="reader-controls">
-        <button class="icon-btn" onclick="changeReaderSize(-1)" aria-label="Smaller text">−</button>
-        <button class="icon-btn" onclick="resetReaderSize()" aria-label="Reset text size">•</button>
-        <button class="icon-btn" onclick="changeReaderSize(1)" aria-label="Larger text">+</button>
-        <button class="icon-btn" id="theme-toggle" onclick="cycleReaderTheme()" aria-label="Change reader theme">◐</button>
-        <button class="btn btn-secondary" onclick="addBookmarkFromReader()">ブックマークを追加</button>
-        <button class="btn btn-secondary reader-tools-btn" id="reader-tools-btn" onclick="toggleReaderTools()" aria-expanded="false" aria-controls="reader-toolbar">ツールを表示</button>
-      </div>
-    </div>
-
-    <div class="reader-progress-bar">
-      <div class="progress-rail" aria-hidden="true">
-        <div id="reader-progress-fill" class="progress-fill"></div>
-      </div>
-    </div>
-
-    <div class="reader-toolbar" id="reader-toolbar">
-      <div class="toolbar-pill">
-        <span class="pill-label">Read aloud</span>
-        <div class="toolbar-value">Playback controls</div>
-        <p class="toolbar-note">Listen to the current page with built-in text to speech.</p>
-        <div class="toolbar-actions">
-          <button class="ghost-btn" onclick="speakCurrentPage()">Play</button>
-          <button class="ghost-btn" onclick="toggleSpeechPause()">Pause</button>
-          <button class="ghost-btn" onclick="stopSpeech()">Stop</button>
-        </div>
-      </div>
-
-      <div class="toolbar-pill export-card">
-        <span class="pill-label">Export chapter</span>
-        <div class="toolbar-value">Offline collector files</div>
-        <p class="toolbar-note">Download prettier PDF and EPUB versions with credits and chapter styling.</p>
-        <div class="toolbar-actions">
-          <button class="ghost-btn download-btn pdf-btn" onclick="downloadChapterPdf(activeChapter, this)">Collector PDF</button>
-          <button class="ghost-btn download-btn epub-btn" onclick="downloadChapterEpub(activeChapter, this)">Styled EPUB</button>
-          <button class="ghost-btn" onclick="copyCurrentPage()">Copy page</button>
-        </div>
-      </div>
-
-      <div class="toolbar-pill">
-        <span class="pill-label">Bookmarks</span>
-        <div class="toolbar-value">Quick jumps</div>
-        <p class="toolbar-note">Saved moments for this novel.</p>
-        <select id="bookmark-jump" onchange="jumpToBookmark(this.value)" aria-label="Jump to bookmark">
-          <option value="">Select a bookmark</option>
-        </select>
-      </div>
-
-      <label class="toolbar-pill chapter-card">
-        <span class="pill-label">Jump to chapter</span>
-        <div class="toolbar-value">Move faster</div>
-        <select id="chapter-jump" onchange="jumpToChapter(this.value)" aria-label="Jump to chapter"></select>
-      </label>
-
-      <label class="toolbar-pill">
-        <span class="pill-label">Jump to page</span>
-        <div class="toolbar-value">Within this chapter</div>
-        <select id="page-jump" onchange="jumpToPage(this.value)" aria-label="Jump to page"></select>
-      </label>
-
-      <label class="toolbar-pill">
-        <span class="pill-label">Voice</span>
-        <div class="toolbar-value">Narration voice</div>
-        <select id="voice-select" aria-label="Text to speech voice"></select>
-      </label>
-
-      <label class="toolbar-pill">
-        <span class="pill-label">Reader theme</span>
-        <div class="toolbar-value">Change the mood</div>
-        <select id="theme-select" onchange="setReaderTheme(this.value)" aria-label="Reader theme">
-          <option value="night">Night</option>
-          <option value="paper">Paper</option>
-          <option value="ember">Ember</option>
-        </select>
-      </label>
-
-      <label class="toolbar-pill">
-        <span class="pill-label">Text size</span>
-        <div class="toolbar-value" id="size-output">18px</div>
-        <input id="size-range" type="range" min="15" max="24" step="1" value="18" oninput="setReaderSize(this.value, false)" onchange="setReaderSize(this.value)" aria-label="Reader text size" />
-      </label>
-
-      <label class="toolbar-pill">
-        <span class="pill-label">Reading speed</span>
-        <div class="toolbar-value" id="rate-output">1.0x</div>
-        <input id="rate-range" type="range" min="0.8" max="1.4" step="0.1" value="1" oninput="updateRateLabel(this.value)" aria-label="Text to speech speed" />
-      </label>
-
-      <div class="toolbar-pill status">
-        <span class="pill-label">Reader status</span>
-        <div class="toolbar-value" id="reader-status-line">Progress saved locally</div>
-        <div id="tts-status" class="toolbar-note">TTS ready</div>
-      </div>
-    </div>
-    <button class="reader-tools-overlay" id="reader-tools-overlay" onclick="toggleReaderTools(false)" aria-label="Close reader tools"></button>
-
-    <div class="reader-body">
-      <div class="reader-inner">
-        <div id="reader-meta" class="reader-meta"></div>
-        <div id="reader-content" class="reader-content"></div>
-      </div>
-    </div>
-
-    <div class="reader-footer">
-      <button class="btn btn-secondary" id="prev-page" onclick="changePage(-1)">前へ</button>
-      <div id="page-indicator" class="page-indicator">Page 1 / 1</div>
-      <button class="btn btn-secondary" id="next-page" onclick="changePage(1)">次へ</button>
-    </div>
-  </div>
-
-  <script src="./runtime-config.js"></script>
-  <script>
+<div class="credits-list">
+<span class="credit-badge">作成者 BiniFn</span>
+<span class="credit-badge">公式 Web リーダー + PDF/EPUB リリース ビルド</span>
+<span class="credit-badge">ダークファンタジー/ロマンス/パワーファンタジープロジェクト</span>
+</div>
+</article>
+<div class="grid credits-grid">
+<article class="card power-card">
+<strong>ビニフン</strong>
+<p>著者、クリエイター、プロジェクトリーダー <em>スレッドボーン</em>。ストーリー、キャラクター、設定、リリースの方向性はすべてここから始まります。</p>
+<div class="chip-line" style="margin-top:16px;">
+<span class="chip">著者</span>
+<span class="chip">クリエイター</span>
+<span class="chip">シリーズオーナー</span>
+</div>
+<p class="credit-note">サイト、PDF、または EPUB を共有する場合は、プロジェクトが常に元の作成者を指すように、BiniFn 名を付けたままにしてください。</p>
+</article>
+<article class="card power-card">
+<strong>公式チャンネル</strong>
+<p>メインチャンネル: <strong style="font-size:inherit;font-family:inherit;">@binifn</strong><br/>Roblox チュートリアル: <strong style="font-size:inherit;font-family:inherit;">@binirbx</strong><br/>アニメチャンネル: <strong style="font-size:inherit;font-family:inherit;">@binirx</strong></p>
+<div class="link-cluster">
+<a class="btn btn-secondary" href="https://www.youtube.com/@binifn" rel="noreferrer" target="_blank">メインチャンネル (BiniFN) • @binifn</a>
+<a class="btn btn-secondary" href="https://www.youtube.com/@binirbx" rel="noreferrer" target="_blank">Roblox チュートリアル (BiniRBX) • @binirbx</a>
+<a class="btn btn-secondary" href="https://www.youtube.com/@binirx" rel="noreferrer" target="_blank">アニメチャンネル (BiniRx) • @binirx</a>
+</div>
+</article>
+<article class="card power-card">
+<strong>公式リンク</strong>
+<p>作成者向けの追加のプロジェクト リンクとプロフィール ハブ。</p>
+<div class="link-cluster">
+<a class="btn btn-secondary" href="https://taplink.cc/binifn" rel="noreferrer" target="_blank">タップリンク</a>
+<a class="btn btn-secondary" href="https://guns.lol/binifn" rel="noreferrer" target="_blank">銃..笑</a>
+<a class="btn btn-secondary" href="https://github.com/BiniFn" rel="noreferrer" target="_blank">GitHub</a>
+</div>
+</article>
+<article class="card power-card">
+<strong>リリースクレジット</strong>
+<p>このサイトは、ライトノベルの公式読書ハブであり、ダウンロード可能な PDF および EPUB エクスポートは、同じリリース ID に一致するようにブランド化されています。</p>
+<div class="chip-line" style="margin-top:16px;">
+<span class="chip">公式ウェブリーダー</span>
+<span class="chip">コレクターPDF</span>
+<span class="chip">スタイル付きepub</span>
+</div>
+<p class="credit-note">クレジットがページ自体と生成されたエクスポート ファイルに焼き付けられるようになり、章がオフラインで共有されている場合でも帰属が表示されたままになります。</p>
+</article>
+</div>
+</section>
+</main>
+<footer>
+<div class="footer-shell">
+<div>
+<strong>スレッドボーン</strong>
+<p>公式リーダーと章のエクスポートハブ <em>スレッドボーン — 契約の扉を越えて人生を始める</em>.</p>
+</div>
+<div>
+<strong>クレジット</strong>
+<p>BiniFn によって作成されました。エクスポート版、サイトのクレジット、オフライン ブランドは、ページ、PDF、EPUB 全体で保持されます。</p>
+</div>
+</div>
+</footer>
+<nav class="mobile-nav">
+<button class="nav-btn active" data-view="home" onclick="switchView('home')">ホーム</button>
+<button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">巻</button>
+<button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
+<button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
+<button class="nav-btn" data-view="characters" onclick="switchView('characters')">キャスト</button>
+<button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
+<button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
+<button class="nav-btn" data-view="lore" onclick="switchView('lore')">設定・伝承</button>
+<button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">美術</button>
+<button class="nav-btn" data-view="credits" onclick="switchView('credits')">クレジット</button>
+<a class="nav-btn" href="./login.html" id="mobile-nav-login">ログイン</a>
+<a class="nav-btn" href="./signup.html" id="mobile-nav-signup">サインアップ</a>
+<a class="nav-btn" href="./profile.html" id="mobile-nav-profile" style="display:none;">プロフィール</a>
+<button class="nav-btn" id="mobile-nav-logout" onclick="logoutUser()" style="display:none;">ログアウト</button>
+<a class="nav-btn" href="./index.html" id="lang-en" onclick="localStorage.setItem('threadborn_lang', 'en')">JP</a>
+</nav>
+<div aria-hidden="true" class="reader" id="reader">
+<div class="reader-top">
+<div class="reader-top-main">
+<button class="btn btn-secondary" onclick="closeReader()">近い</button>
+<div class="reader-title-wrap">
+<span id="reader-kicker">音量</span>
+<strong id="reader-title">章</strong>
+<div class="reader-summary">
+<span id="reader-page-summary">ページ 1/1</span>
+<span id="reader-time-summary">残り約1分</span>
+<span id="reader-save-summary">このデバイスに保存された進行状況</span>
+</div>
+</div>
+</div>
+<div class="reader-controls">
+<button aria-label="Smaller text" class="icon-btn" onclick="changeReaderSize(-1)">−</button>
+<button aria-label="Reset text size" class="icon-btn" onclick="resetReaderSize()">•</button>
+<button aria-label="Larger text" class="icon-btn" onclick="changeReaderSize(1)">+</button>
+<button aria-label="Change reader theme" class="icon-btn" id="theme-toggle" onclick="cycleReaderTheme()">◐</button>
+<button class="btn btn-secondary" onclick="addBookmarkFromReader()">ブックマークを追加</button>
+<button aria-controls="reader-toolbar" aria-expanded="false" class="btn btn-secondary reader-tools-btn" id="reader-tools-btn" onclick="toggleReaderTools()">ツールを表示</button>
+</div>
+</div>
+<div class="reader-progress-bar">
+<div aria-hidden="true" class="progress-rail">
+<div class="progress-fill" id="reader-progress-fill"></div>
+</div>
+</div>
+<div class="reader-toolbar" id="reader-toolbar">
+<div class="toolbar-pill">
+<span class="pill-label">声に出して読む</span>
+<div class="toolbar-value">再生コントロール</div>
+<p class="toolbar-note">組み込みのテキスト読み上げ機能を使用して、現在のページを聞きます。</p>
+<div class="toolbar-actions">
+<button class="ghost-btn" onclick="speakCurrentPage()">遊ぶ</button>
+<button class="ghost-btn" onclick="toggleSpeechPause()">一時停止</button>
+<button class="ghost-btn" onclick="stopSpeech()">停止</button>
+</div>
+</div>
+<div class="toolbar-pill export-card">
+<span class="pill-label">エクスポートの章</span>
+<div class="toolbar-value">オフラインコレクターファイル</div>
+<p class="toolbar-note">クレジットと章のスタイルを備えた、よりきれいな PDF および EPUB バージョンをダウンロードします。</p>
+<div class="toolbar-actions">
+<button class="ghost-btn download-btn pdf-btn" onclick="downloadChapterPdf(activeChapter, this)">コレクター PDF</button>
+<button class="ghost-btn download-btn epub-btn" onclick="downloadChapterEpub(activeChapter, this)">スタイル付き EPUB</button>
+<button class="ghost-btn" onclick="copyCurrentPage()">ページをコピーする</button>
+</div>
+</div>
+<div class="toolbar-pill">
+<span class="pill-label">ブックマーク</span>
+<div class="toolbar-value">素早いジャンプ</div>
+<p class="toolbar-note">この小説のために瞬間を保存しました。</p>
+<select aria-label="Jump to bookmark" id="bookmark-jump" onchange="jumpToBookmark(this.value)">
+<option value="">ブックマークを選択する</option>
+</select>
+</div>
+<label class="toolbar-pill chapter-card">
+<span class="pill-label">章にジャンプ</span>
+<div class="toolbar-value">より速く移動する</div>
+<select aria-label="Jump to chapter" id="chapter-jump" onchange="jumpToChapter(this.value)"></select>
+</label>
+<label class="toolbar-pill">
+<span class="pill-label">ページへジャンプ</span>
+<div class="toolbar-value">この章内で</div>
+<select aria-label="Jump to page" id="page-jump" onchange="jumpToPage(this.value)"></select>
+</label>
+<label class="toolbar-pill">
+<span class="pill-label">声</span>
+<div class="toolbar-value">ナレーション音声</div>
+<select aria-label="Text to speech voice" id="voice-select"></select>
+</label>
+<label class="toolbar-pill">
+<span class="pill-label">読者テーマ</span>
+<div class="toolbar-value">気分を変える</div>
+<select aria-label="Reader theme" id="theme-select" onchange="setReaderTheme(this.value)">
+<option value="night">夜</option>
+<option value="paper">紙</option>
+<option value="ember">残り火</option>
+</select>
+</label>
+<label class="toolbar-pill">
+<span class="pill-label">文字サイズ</span>
+<div class="toolbar-value" id="size-output">18ピクセル</div>
+<input aria-label="Reader text size" id="size-range" max="24" min="15" onchange="setReaderSize(this.value)" oninput="setReaderSize(this.value, false)" step="1" type="range" value="18"/>
+</label>
+<label class="toolbar-pill">
+<span class="pill-label">読書速度</span>
+<div class="toolbar-value" id="rate-output">1.0倍</div>
+<input aria-label="Text to speech speed" id="rate-range" max="1.4" min="0.8" oninput="updateRateLabel(this.value)" step="0.1" type="range" value="1"/>
+</label>
+<div class="toolbar-pill status">
+<span class="pill-label">リーダーのステータス</span>
+<div class="toolbar-value" id="reader-status-line">進行状況はローカルに保存されます</div>
+<div class="toolbar-note" id="tts-status">TTS対応</div>
+</div>
+</div>
+<button aria-label="Close reader tools" class="reader-tools-overlay" id="reader-tools-overlay" onclick="toggleReaderTools(false)"></button>
+<div class="reader-body">
+<div class="reader-inner">
+<div class="reader-meta" id="reader-meta"></div>
+<div class="reader-content" id="reader-content"></div>
+</div>
+</div>
+<div class="reader-footer">
+<button class="btn btn-secondary" id="prev-page" onclick="changePage(-1)">前へ</button>
+<div class="page-indicator" id="page-indicator">ページ 1 / 1</div>
+<button class="btn btn-secondary" id="next-page" onclick="changePage(1)">次へ</button>
+</div>
+</div>
+<script src="./runtime-config.js"></script>
+<script>
     const volumes = [
       {
         name: "第 1 巻 • 尊厳ゼロで生まれ変わる",
@@ -6676,6 +6639,6 @@ Last chapter's ceiling is always this chapter's floor.</div>
       updateTtsStatus("TTS unavailable");
     }
   </script>
-  <script src="./assets/phase1-client.js"></script>
+<script src="./assets/phase1-client.js"></script>
 </body>
 </html>

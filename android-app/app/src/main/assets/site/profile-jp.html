@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+html
 <html lang="ja">
 <head>
-  <script>
+<script>
     (function() {
       try {
         var savedLang = localStorage.getItem('threadborn_lang');
@@ -27,10 +27,10 @@
       } catch(e) {}
     })();
   </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Threadborn Profile</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Threadborn Profile</title>
+<style>
     :root { color-scheme: dark; --bg:#07090f; --card:#111521; --text:#eef3ff; --muted:#99a4bf; --accent:#6da8ff; --border:rgba(255,255,255,.14); }
     * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif; }
     body { margin:0; background:radial-gradient(circle at top, #1a2440, var(--bg) 52%); color:var(--text); padding:24px; }
@@ -47,66 +47,61 @@
   </style>
 </head>
 <body>
-  <main class="shell">
-    <article class="card">
-      <div class="row">
-        <img id="avatar" class="avatar" alt="Avatar" src="./assets/threadborn-logo.png" />
-        <div>
-          <h1 id="name" style="margin:0;">プロフィール</h1>
-          <p id="meta" class="muted" style="margin:6px 0 0;">Loading...</p>
-          <span id="verified" class="badge" style="display:none;">Verified</span>
-        </div>
-      </div>
-    </article>
-
-    <article class="card">
-      <h2 style="margin-top:0;">Profile Settings</h2>
-      <div class="grid">
-        <div>
-          <label>Username</label>
-          <input id="username" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" />
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button id="save-profile">Save Profile</button>
-        <a href="./index.html" class="muted">Back to reader</a>
-      </div>
-      <p id="profile-status" class="muted"></p>
-    </article>
-
-    <article class="card">
-      <h2 style="margin-top:0;">Reading Settings</h2>
-      <div class="grid">
-        <div>
-          <label>Theme</label>
-          <select id="setting-theme">
-            <option value="night">Night</option>
-            <option value="paper">Paper</option>
-            <option value="ember">Ember</option>
-          </select>
-        </div>
-        <div>
-          <label>Text size</label>
-          <input id="setting-size" type="number" min="15" max="24" step="1" />
-        </div>
-      </div>
-      <button id="save-settings" style="margin-top:10px;">Save Settings</button>
-      <p id="settings-status" class="muted"></p>
-    </article>
-
-    <article class="card">
-      <h2 style="margin-top:0;">Bookmarks</h2>
-      <div id="bookmarks" class="muted">Loading bookmarks...</div>
-    </article>
-
-    <article class="card">
-      <h2 style="margin-top:0;">Reading Analytics</h2>
-      <div id="analytics" class="muted">Loading analytics...</div>
-    </article>
-  </main>
-
-  <script src="./runtime-config.js"></script>
-  <script>
+<main class="shell">
+<article class="card">
+<div class="row">
+<img alt="Avatar" class="avatar" id="avatar" src="./assets/threadborn-logo.png"/>
+<div>
+<h1 id="name" style="margin:0;">プロフィール</h1>
+<p class="muted" id="meta" style="margin:6px 0 0;">読み込み中...</p>
+<span class="badge" id="verified" style="display:none;">確認済み</span>
+</div>
+</div>
+</article>
+<article class="card">
+<h2 style="margin-top:0;">プロファイル設定</h2>
+<div class="grid">
+<div>
+<label>ユーザー名</label>
+<input id="username" maxlength="24" pattern="[A-Za-z0-9_]{3,24}"/>
+</div>
+</div>
+<div class="row" style="margin-top:10px;">
+<button id="save-profile">プロファイルの保存</button>
+<a class="muted" href="./index.html">読者に戻る</a>
+</div>
+<p class="muted" id="profile-status"></p>
+</article>
+<article class="card">
+<h2 style="margin-top:0;">読み取り設定</h2>
+<div class="grid">
+<div>
+<label>テーマ</label>
+<select id="setting-theme">
+<option value="night">夜</option>
+<option value="paper">紙</option>
+<option value="ember">残り火</option>
+</select>
+</div>
+<div>
+<label>文字サイズ</label>
+<input id="setting-size" max="24" min="15" step="1" type="number"/>
+</div>
+</div>
+<button id="save-settings" style="margin-top:10px;">設定の保存</button>
+<p class="muted" id="settings-status"></p>
+</article>
+<article class="card">
+<h2 style="margin-top:0;">ブックマーク</h2>
+<div class="muted" id="bookmarks">ブックマークを読み込んでいます...</div>
+</article>
+<article class="card">
+<h2 style="margin-top:0;">読書分析</h2>
+<div class="muted" id="analytics">分析を読み込んでいます...</div>
+</article>
+</main>
+<script src="./runtime-config.js"></script>
+<script>
     function resolveApiBase() {
       const configured = (window.__THREADBORN_API_BASE || localStorage.getItem("threadborn_api_base") || "").replace(/\/$/, "");
       if (configured) {
