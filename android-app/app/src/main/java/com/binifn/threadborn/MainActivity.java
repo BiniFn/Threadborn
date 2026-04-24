@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     webView = findViewById(R.id.web_view);
     WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
-      .addPathHandler("/assets/site/", new WebViewAssetLoader.AssetsPathHandler(this))
       .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
       .build();
 

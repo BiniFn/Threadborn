@@ -349,7 +349,7 @@
       margin: 0;
       max-width: 12ch;
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(3rem, 7vw, 5.3rem);
+      font-size: clamp(2.4rem, 5.4vw, 4.1rem);
       line-height: 0.9;
       letter-spacing: -0.03em;
     }
@@ -362,8 +362,8 @@
     .hero-copy {
       max-width: 62ch;
       margin: 18px 0 0;
-      font-size: 16px;
-      line-height: 1.8;
+      font-size: 15px;
+      line-height: 1.65;
       color: var(--mist);
     }
 
@@ -2310,11 +2310,10 @@
             <p class="eyebrow">Threadborn — Starting Life Beyond the Covenant Door • dark fantasy • romance • gore • cosmic horror</p>
             <h1 class="hero-title">A boy dies, wakes in Lumera, and steps into a world that was never meant to survive him.</h1>
             <p class="hero-copy">
-              <strong>Threadborn</strong> follows <strong>Yono Kazeshima</strong> after a sudden death in Tokyo throws him into Lumera beside Violet, a dangerous goddess whose mistake changed both of their lives. What starts as survival turns into a dark fantasy story about love, debt, sealed monsters, and power that keeps climbing with every chapter.
+              <strong>Threadborn</strong> follows <strong>Yono Kazeshima</strong> after a sudden death throws him into Lumera beside Violet. Survival turns into dark fantasy, romance, and sealed monsters that get worse each chapter.
             </p>
             <div class="story-points">
               <div class="story-point"><strong>Volume 1:</strong> Yono learns Lumera’s rules, survives the Shade debt arc, and reaches the forest door hiding Velkor’s prison.</div>
-              <div class="story-point"><strong>Why it matters:</strong> The story mixes romance, gore, cosmic pressure, and an overpowered rise that keeps getting bigger without losing the emotional core.</div>
             </div>
             <div class="hero-actions">
               <button class="btn btn-primary" onclick="openChapter(0)">Start Reading</button>
@@ -4563,13 +4562,19 @@ legacyEpisodes.push({
         return;
       }
       const totalPages = chapter.pages.length;
+      const hasPrevChapter = activeChapter > 0;
+      const hasNextChapter = activeChapter < (chapters.length - 1);
+      const prevButton = document.getElementById("prev-page");
+      const nextButton = document.getElementById("next-page");
 
       document.getElementById("reader-kicker").textContent = `${chapter.volume} • ${chapter.chapter}`;
       document.getElementById("reader-title").textContent = chapter.title;
       document.getElementById("reader-content").innerHTML = chapter.pages[activePage];
       document.getElementById("page-indicator").textContent = `Page ${activePage + 1} / ${totalPages}`;
-      document.getElementById("prev-page").disabled = activePage === 0;
-      document.getElementById("next-page").disabled = activePage === totalPages - 1;
+      prevButton.disabled = activePage === 0 && !hasPrevChapter;
+      nextButton.disabled = activePage === totalPages - 1 && !hasNextChapter;
+      prevButton.textContent = activePage === 0 && hasPrevChapter ? "Previous Chapter" : "Previous";
+      nextButton.textContent = activePage === totalPages - 1 && hasNextChapter ? "Next Chapter" : "Next";
       renderChapterJump();
       document.getElementById("page-jump").innerHTML = chapter.pages
         .map((_, index) => `<option value="${index}" ${index === activePage ? "selected" : ""}>Page ${index + 1}</option>`)
@@ -4587,7 +4592,19 @@ legacyEpisodes.push({
 
     function changePage(direction) {
       const chapter = chapters[activeChapter];
-      activePage = Math.max(0, Math.min(activePage + direction, chapter.pages.length - 1));
+      if (direction > 0 && activePage >= chapter.pages.length - 1) {
+        if (activeChapter < chapters.length - 1) {
+          activeChapter += 1;
+          activePage = 0;
+        }
+      } else if (direction < 0 && activePage <= 0) {
+        if (activeChapter > 0) {
+          activeChapter -= 1;
+          activePage = Math.max(0, chapters[activeChapter].pages.length - 1);
+        }
+      } else {
+        activePage = Math.max(0, Math.min(activePage + direction, chapter.pages.length - 1));
+      }
       stopSpeech(false);
       renderPage();
     }
