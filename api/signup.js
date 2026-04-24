@@ -25,27 +25,10 @@ function parseJsonBody(req) {
   });
 }
 
-function verifyPassword(rawPassword, storedPassword, storedPasswordHash) {
-  if (storedPasswordHash && storedPasswordHash.startsWith("scrypt$")) {
-    const parts = storedPasswordHash.split("$");
-    if (parts.length !== 3) {
-      return false;
-    }
-
-    const salt = Buffer.from(parts[1], "hex");
-    const expectedKey = Buffer.from(parts[2], "hex");
-    const derivedKey = crypto.scryptSync(rawPassword, salt, expectedKey.length);
-    return crypto.timingSafeEqual(derivedKey, expectedKey);
-  }
-
-  if (storedPassword) {
-    return crypto.timingSafeEqual(
-      Buffer.from(String(rawPassword)),
-      Buffer.from(String(storedPassword))
-    );
-  }
-
-  return false;
+function makePasswordHash(rawPassword) {
+  const salt = crypto.randomBytes(16);
+  const key = crypto.scryptSync(rawPassword, salt, 64);
+  return `scrypt$${salt.toString("hex")}$${key.toString("hex")}`;
 }
 
 module.exports = async (req, res) => {
@@ -67,52 +50,45 @@ module.exports = async (req, res) => {
     const body = await parseJsonBody(req);
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
+    const displayName = String(body.displayName || "").trim();
+    const avatarDataUrl = String(body.avatarDataUrl || "").trim();
 
-    if (!email || !password) {
+    if (!email || !password || !displayName) {
       res.statusCode = 400;
       res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify({ error: "Email and password are required" }));
+      res.end(JSON.stringify({ error: "Display name, email and password are required" }));
       return;
     }
 
-    const query = `
-      select id, email, password, password_hash, display_name, avatar_url
-      from users
-      where lower(email) = $1
-      limit 1
-    `;
-    const { rows } = await pool.query(query, [email]);
-
-    if (!rows.length) {
-      res.statusCode = 401;
+    const existing = await pool.query("select id from users where lower(email) = $1 limit 1", [email]);
+    if (existing.rows.length) {
+      res.statusCode = 409;
       res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify({ error: "Invalid credentials" }));
+      res.end(JSON.stringify({ error: "Email already registered" }));
       return;
     }
 
-    const user = rows[0];
-    const valid = verifyPassword(password, user.password, user.password_hash);
-    if (!valid) {
-      res.statusCode = 401;
-      res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify({ error: "Invalid credentials" }));
-      return;
-    }
+    const passwordHash = makePasswordHash(password);
+    const insert = await pool.query(
+      "insert into users (email, password_hash, display_name, avatar_url) values ($1, $2, $3, $4) returning id, email, display_name, avatar_url",
+      [email, passwordHash, displayName, avatarDataUrl || null]
+    );
 
-    res.statusCode = 200;
+    const user = insert.rows[0];
+    res.statusCode = 201;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({
       ok: true,
       user: {
         id: user.id,
         email: user.email,
-        displayName: user.display_name || "",
-        avatarUrl: user.avatar_url || ""
+        displayName: user.display_name || displayName,
+        avatarUrl: user.avatar_url || avatarDataUrl || ""
       }
     }));
   } catch (error) {
     res.statusCode = 500;
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ error: "Login failed", details: error.message }));
+    res.end(JSON.stringify({ error: "Signup failed", details: error.message }));
   }
 };

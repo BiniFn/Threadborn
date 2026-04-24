@@ -166,6 +166,34 @@
       color: var(--bone);
     }
 
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px 7px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--bone);
+      font-size: 12px;
+      max-width: 240px;
+    }
+
+    .user-chip img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .user-chip .user-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     main {
       max-width: var(--content);
       margin: 0 auto;
@@ -688,6 +716,54 @@
       gap: 8px;
     }
 
+    .comments-shell {
+      margin-top: 20px;
+    }
+
+    .comment-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .comment-form textarea,
+    .comment-form select {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--bone);
+      padding: 10px 12px;
+      font-family: "Bricolage Grotesque", sans-serif;
+    }
+
+    .comment-form textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+
+    .comment-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .comment-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .comment-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--mist);
+      margin-bottom: 6px;
+    }
+
     .chapter-label span,
     .chip {
       padding: 6px 10px;
@@ -1163,6 +1239,7 @@
         rgba(255, 255, 255, 0.04);
       color: var(--mist);
       font-size: 13px;
+      touch-action: auto;
     }
 
     .toolbar-pill span {
@@ -1196,6 +1273,8 @@
       background: rgba(255, 255, 255, 0.05);
       color: var(--bone);
       font-family: "Bricolage Grotesque", sans-serif;
+      touch-action: auto;
+      pointer-events: auto;
     }
 
     .toolbar-pill select:focus,
@@ -1664,8 +1743,9 @@
         grid-template-columns: 1fr;
         gap: 8px;
         padding: 10px 12px;
-        max-height: min(42vh, 360px);
+        max-height: min(66vh, 520px);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .reader-toolbar::-webkit-scrollbar,
@@ -1732,7 +1812,7 @@
       }
 
       .reader-body {
-        padding: 22px 16px calc(126px + env(safe-area-inset-bottom));
+        padding: 22px 16px calc(154px + env(safe-area-inset-bottom));
       }
 
       .reader-footer {
@@ -1918,9 +1998,13 @@
         <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">Drawings</button>
         <button class="nav-btn" data-view="credits" onclick="switchView('credits')">Credits</button>
         <a class="nav-btn" href="./login.html">Login</a>
+        <a class="nav-btn" href="./signup.html">Sign Up</a>
       </nav>
 
-      <div class="status-pill">Threadborn • Volume 2 live</div>
+      <div class="user-chip" id="user-chip">
+        <img id="user-avatar" alt="Profile picture" />
+        <span class="user-name" id="user-name">Guest reader</span>
+      </div>
     </div>
   </header>
 
@@ -2038,6 +2122,19 @@
         </div>
       </div>
       <div id="volumes-grid" class="grid volumes-grid"></div>
+      <article class="card comments-shell">
+        <strong>Volume Comments</strong>
+        <p>Leave feedback on any volume. Comments are saved on your device.</p>
+        <form class="comment-form" onsubmit="submitVolumeComment(event)">
+          <select id="comment-volume" aria-label="Volume to comment on">
+            <option value="Volume 1">Volume 1</option>
+            <option value="Volume 2">Volume 2</option>
+          </select>
+          <textarea id="comment-text" maxlength="380" placeholder="Share what you think about this volume..." required></textarea>
+          <button class="btn btn-primary" type="submit">Post Comment</button>
+        </form>
+        <div id="comment-list" class="comment-list"></div>
+      </article>
     </section>
 
     <section id="view-chapters" class="view">
@@ -2351,6 +2448,7 @@
     <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">Art</button>
     <button class="nav-btn" data-view="credits" onclick="switchView('credits')">Credits</button>
     <a class="nav-btn" href="./login.html">Login</a>
+    <a class="nav-btn" href="./signup.html">Sign Up</a>
   </nav>
 
   <div id="reader" class="reader" aria-hidden="true">
@@ -3374,6 +3472,91 @@ legacyEpisodes.push({
     let ttsVoices = [];
     let deferredInstallPrompt = null;
     const progressKey = "novelverse_reader_progress";
+    const activeUserKey = "threadborn_user";
+    const commentKey = "threadborn_volume_comments";
+
+    function getActiveUser() {
+      try {
+        return JSON.parse(localStorage.getItem(activeUserKey) || "null");
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function renderUserChip() {
+      const user = getActiveUser();
+      const nameEl = document.getElementById("user-name");
+      const avatarEl = document.getElementById("user-avatar");
+      if (!nameEl || !avatarEl) {
+        return;
+      }
+
+      const displayName = user && (user.displayName || user.email) ? (user.displayName || user.email) : "Guest reader";
+      const avatar = user && user.avatarUrl ? user.avatarUrl : "assets/threadborn-logo.png";
+      nameEl.textContent = displayName;
+      avatarEl.src = avatar;
+    }
+
+    function readComments() {
+      try {
+        return JSON.parse(localStorage.getItem(commentKey) || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function writeComments(comments) {
+      localStorage.setItem(commentKey, JSON.stringify(comments));
+    }
+
+    function renderVolumeComments() {
+      const list = document.getElementById("comment-list");
+      if (!list) {
+        return;
+      }
+      const comments = readComments().slice().reverse();
+      if (!comments.length) {
+        list.innerHTML = "<div class=\"comment-item\">No comments yet. Be the first to drop one.</div>";
+        return;
+      }
+
+      list.innerHTML = comments.map(comment => `
+        <article class="comment-item">
+          <div class="comment-head">
+            <span>${comment.author}</span>
+            <span>${comment.volume} • ${comment.createdAt}</span>
+          </div>
+          <div>${comment.text}</div>
+        </article>
+      `).join("");
+    }
+
+    function submitVolumeComment(event) {
+      event.preventDefault();
+      const volumeEl = document.getElementById("comment-volume");
+      const textEl = document.getElementById("comment-text");
+      if (!volumeEl || !textEl) {
+        return;
+      }
+
+      const text = textEl.value.trim();
+      if (!text) {
+        return;
+      }
+
+      const user = getActiveUser();
+      const author = user ? (user.displayName || user.email || "Reader") : "Guest";
+      const comments = readComments();
+      comments.push({
+        volume: volumeEl.value,
+        text,
+        author,
+        createdAt: new Date().toLocaleString()
+      });
+      writeComments(comments);
+      textEl.value = "";
+      renderVolumeComments();
+    }
 
     function getThemeLabel(theme) {
       return ({
@@ -3740,6 +3923,9 @@ legacyEpisodes.push({
     }
 
     function openChapter(index, page = 0) {
+      if (!chapters[index]) {
+        index = 0;
+      }
       activeChapter = index;
       activePage = page;
       stopSpeech(false);
@@ -3748,7 +3934,8 @@ legacyEpisodes.push({
       document.getElementById("reader").setAttribute("aria-hidden", "false");
       document.body.classList.add("reader-open");
       document.body.style.overflow = "hidden";
-      toggleReaderTools(false);
+      const shouldOpenTools = window.matchMedia("(max-width: 820px)").matches;
+      toggleReaderTools(shouldOpenTools);
     }
 
     function openLatestChapter() {
@@ -3766,6 +3953,9 @@ legacyEpisodes.push({
 
     function renderPage() {
       const chapter = chapters[activeChapter];
+      if (!chapter || !chapter.pages || !chapter.pages.length) {
+        return;
+      }
       const totalPages = chapter.pages.length;
 
       document.getElementById("reader-kicker").textContent = `${chapter.volume} • ${chapter.chapter}`;
@@ -4580,6 +4770,8 @@ legacyEpisodes.push({
     renderCharacters();
     renderPowers();
     renderLore();
+    renderUserChip();
+    renderVolumeComments();
     renderHomeChapters();
     applyReaderSize();
     applyReaderTheme();
