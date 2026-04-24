@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - 'index.html'
+      - 'login.html'
+      - 'signup.html'
+      - 'profile.html'
       - 'manifest.json'
       - 'service-worker.js'
       - 'assets/**'
@@ -19,6 +22,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: apk-build-main
+      cancel-in-progress: true
 
     steps:
       - name: Checkout Repository
@@ -38,22 +44,26 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Generate Gradle Wrapper
-        working-directory: ./android-app
-        run: gradle wrapper --gradle-version 8.7
-
       - name: Build Release APK
         working-directory: ./android-app
-        run: ./gradlew assembleRelease
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"
 
       - name: Prepare APK asset
         run: cp android-app/app/build/outputs/apk/release/app-release.apk Threadborn.apk
 
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Threadborn.apk
+          path: Threadborn.apk
+
       - name: Upload APK as Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "apk-build-${{ github.run_number }}"
-          name: "Threadborn APK Build #${{ github.run_number }}"
+          tag_name: "latest-apk"
+          name: "Threadborn Latest APK"
           body: "Auto-built Android APK from commit ${{ github.sha }}"
           files: Threadborn.apk
           make_latest: true
