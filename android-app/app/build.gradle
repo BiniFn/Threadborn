@@ -16,6 +16,10 @@ android {
     buildConfigField "String", "API_BASE_URL", "\"${apiBase}\""
   }
 
+  buildFeatures {
+    buildConfig true
+  }
+
   buildTypes {
     debug {
       applicationIdSuffix ".debug"
