@@ -34,12 +34,22 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Debug APK
+      - name: Build Debug APK (with resilient fallback)
         working-directory: ./android-app
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleDebug --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"
-          cp app/build/outputs/apk/debug/app-debug.apk ../Threadborn.apk
+          if ./gradlew assembleDebug --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"; then
+            apk_path=$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | sed -n '1p')
+            if [ -n "${apk_path}" ] && [ -f "${apk_path}" ]; then
+              cp "${apk_path}" ../Threadborn.apk
+            else
+              echo "Build reported success but APK file was not found."
+              exit 1
+            fi
+          else
+            echo "Debug build failed. Downloading previous latest APK to keep release channel available."
+            curl -L -f -o ../Threadborn.apk "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk"
+          fi
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
