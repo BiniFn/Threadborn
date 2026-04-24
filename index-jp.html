@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 <head>
   <script>
     (function() {
@@ -2271,8 +2271,8 @@
   <div id="loading-screen" class="loading-screen" aria-hidden="true">
     <div class="loading-shell">
       <img class="loading-logo" src="assets/threadborn-logo.png" alt="Threadborn loading logo" />
-      <h2>Entering Lumera</h2>
-      <p>Loading the reader, chapters, and collector tools.</p>
+      <h2>ルメラにアクセス中</h2>
+      <p>リーダー、チャプター、コレクターツールを読み込んでいます。</p>
       <div class="loading-bar" aria-hidden="true">
         <div class="loading-fill"></div>
       </div>
@@ -2292,26 +2292,26 @@
       </a>
 
       <nav class="nav-row">
-        <button class="nav-btn active" data-view="home" onclick="switchView('home')">Home</button>
-        <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">Volumes</button>
-        <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">Chapters</button>
-        <button class="nav-btn" data-view="app" onclick="switchView('app')">App</button>
-        <button class="nav-btn" data-view="characters" onclick="switchView('characters')">Characters</button>
-        <button class="nav-btn" data-view="powers" onclick="switchView('powers')">Powers</button>
-        <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">Leaks</button>
-        <button class="nav-btn" data-view="lore" onclick="switchView('lore')">Lore</button>
-        <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">Drawings</button>
-        <button class="nav-btn" data-view="credits" onclick="switchView('credits')">Credits</button>
-        <a class="nav-btn" id="nav-login" href="./login.html">Login</a>
-        <a class="nav-btn" id="nav-signup" href="./signup.html">Sign Up</a>
-        <a class="nav-btn" id="nav-profile" href="./profile.html" style="display:none;">Profile</a>
-        <button class="nav-btn" id="nav-logout" onclick="logoutUser()" style="display:none;">Logout</button>
-        <a class="nav-btn" id="lang-jp" href="./index-jp.html" onclick="localStorage.setItem('threadborn_lang', 'ja')">JP</a>
+        <button class="nav-btn active" data-view="home" onclick="switchView('home')">ホーム</button>
+        <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">巻数</button>
+        <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
+        <button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
+        <button class="nav-btn" data-view="characters" onclick="switchView('characters')">キャラクター</button>
+        <button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
+        <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
+        <button class="nav-btn" data-view="lore" onclick="switchView('lore')">設定・伝承</button>
+        <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">イラスト</button>
+        <button class="nav-btn" data-view="credits" onclick="switchView('credits')">クレジット</button>
+        <a class="nav-btn" id="nav-login" href="./login.html">ログイン</a>
+        <a class="nav-btn" id="nav-signup" href="./signup.html">サインアップ</a>
+        <a class="nav-btn" id="nav-profile" href="./profile.html" style="display:none;">プロフィール</a>
+        <button class="nav-btn" id="nav-logout" onclick="logoutUser()" style="display:none;">ログアウト</button>
+        <a class="nav-btn" id="lang-en" href="./index.html" onclick="localStorage.setItem('threadborn_lang', 'en')">EN</a>
       </nav>
 
       <div class="user-chip" id="user-chip">
         <img id="user-avatar" alt="Profile picture" />
-        <span class="user-name" id="user-name">Guest reader</span>
+        <span class="user-name" id="user-name">ゲスト読者</span>
       </div>
     </div>
   </header>
@@ -2331,7 +2331,8 @@
             </div>
             <div class="hero-actions">
               <button class="btn btn-primary" onclick="openChapter(0)">Start Reading</button>
-              <button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'ja'); window.location.href='./index-jp.html'">🇯🇵 Switch to Japanese</button>
+              <button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'en'); window.location.href='./index.html'">🇺🇸 English Version</button></button>
+              <button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'en'); window.location.href='./index.html'">🇺🇸 English Version</button>
             </div>
           </div>
           <div class="hero-media">
@@ -2346,7 +2347,7 @@
     <section id="view-app" class="view">
       <div class="section-head">
         <div>
-          <h2>App</h2>
+          <h2>アプリ</h2>
           <p class="section-copy">Install Threadborn as a web app or download the offline Android build.</p>
         </div>
       </div>
@@ -2426,7 +2427,7 @@
     <section id="view-volumes" class="view">
       <div class="section-head">
         <div>
-          <h2>Volumes</h2>
+          <h2>巻数</h2>
           <p class="section-copy">Volume 1 covers Yono's rebirth and the forest door reveal. Volume 2 begins when Velkor starts pushing back from the seal.</p>
         </div>
       </div>
@@ -2449,7 +2450,7 @@
     <section id="view-chapters" class="view">
       <div class="section-head">
         <div>
-          <h2>Chapters</h2>
+          <h2>チャプター</h2>
           <p class="section-copy">Read every chapter in order across both volumes of Threadborn.</p>
         </div>
       </div>
@@ -2459,7 +2460,7 @@
     <section id="view-characters" class="view">
       <div class="section-head">
         <div>
-          <h2>Characters</h2>
+          <h2>キャラクター</h2>
           <p class="section-copy">Meet the full cast currently named across the released chapters, from the core party to side characters and major threats.</p>
         </div>
       </div>
@@ -2483,12 +2484,12 @@
     <section id="view-leaks" class="view">
       <div class="section-head">
         <div>
-          <h2>Leaks</h2>
+          <h2>リーク</h2>
           <p class="section-copy">Heavy spoilers and overpowered Yono reveals. These powers are gained one by one every chapter as Yono keeps climbing higher.</p>
         </div>
       </div>
       <div class="subtabs" id="leaks-tabs">
-        <button class="subtab-btn active" data-leaks-tab="powers" onclick="switchLeaksTab('powers')">Powers</button>
+        <button class="subtab-btn active" data-leaks-tab="powers" onclick="switchLeaksTab('powers')">能力</button>
         <button class="subtab-btn" data-leaks-tab="contracts" onclick="switchLeaksTab('contracts')">Contracts</button>
         <button class="subtab-btn" data-leaks-tab="matchups" onclick="switchLeaksTab('matchups')">Matchups</button>
       </div>
@@ -2614,7 +2615,7 @@
     <section id="view-drawings" class="view">
       <div class="section-head">
         <div>
-          <h2>Drawings</h2>
+          <h2>イラスト</h2>
           <p class="section-copy">Character art for Threadborn will be shown here.</p>
         </div>
       </div>
@@ -2684,7 +2685,7 @@
     <section id="view-credits" class="view">
       <div class="section-head">
         <div>
-          <h2>Credits</h2>
+          <h2>クレジット</h2>
           <p class="section-copy">Core project credits, official links, and export attribution for <em>Threadborn</em>.</p>
         </div>
       </div>
@@ -2750,28 +2751,28 @@
         <p>Official reader and chapter export hub for <em>Threadborn — Starting Life Beyond the Covenant Door</em>.</p>
       </div>
       <div>
-        <strong>Credits</strong>
+        <strong>クレジット</strong>
         <p>Created by BiniFn. Export edition, site credits, and offline branding are preserved across the page, PDF, and EPUB.</p>
       </div>
     </div>
   </footer>
 
   <nav class="mobile-nav">
-    <button class="nav-btn active" data-view="home" onclick="switchView('home')">Home</button>
+    <button class="nav-btn active" data-view="home" onclick="switchView('home')">ホーム</button>
     <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">Vols</button>
-    <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">Chapters</button>
-    <button class="nav-btn" data-view="app" onclick="switchView('app')">App</button>
+    <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
+    <button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
     <button class="nav-btn" data-view="characters" onclick="switchView('characters')">Cast</button>
-    <button class="nav-btn" data-view="powers" onclick="switchView('powers')">Powers</button>
-    <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">Leaks</button>
-    <button class="nav-btn" data-view="lore" onclick="switchView('lore')">Lore</button>
+    <button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
+    <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
+    <button class="nav-btn" data-view="lore" onclick="switchView('lore')">設定・伝承</button>
     <button class="nav-btn" data-view="drawings" onclick="switchView('drawings')">Art</button>
-    <button class="nav-btn" data-view="credits" onclick="switchView('credits')">Credits</button>
-    <a class="nav-btn" id="mobile-nav-login" href="./login.html">Login</a>
-    <a class="nav-btn" id="mobile-nav-signup" href="./signup.html">Sign Up</a>
-    <a class="nav-btn" id="mobile-nav-profile" href="./profile.html" style="display:none;">Profile</a>
-    <button class="nav-btn" id="mobile-nav-logout" onclick="logoutUser()" style="display:none;">Logout</button>
-    <a class="nav-btn" id="lang-jp" href="./index-jp.html" onclick="localStorage.setItem('threadborn_lang', 'ja')">JP</a>
+    <button class="nav-btn" data-view="credits" onclick="switchView('credits')">クレジット</button>
+    <a class="nav-btn" id="mobile-nav-login" href="./login.html">ログイン</a>
+    <a class="nav-btn" id="mobile-nav-signup" href="./signup.html">サインアップ</a>
+    <a class="nav-btn" id="mobile-nav-profile" href="./profile.html" style="display:none;">プロフィール</a>
+    <button class="nav-btn" id="mobile-nav-logout" onclick="logoutUser()" style="display:none;">ログアウト</button>
+    <a class="nav-btn" id="lang-en" href="./index.html" onclick="localStorage.setItem('threadborn_lang', 'en')">EN</a>
       </nav>
 
   <div id="reader" class="reader" aria-hidden="true">
@@ -5826,7 +5827,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
       window.location.replace(path.replace('-jp.html', '.html'));
     }
   })();
-</script>\n  <title>${bookTitle} - Credits</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="credits-page">\n    <div class="credits-card">\n      <p class="eyebrow">Credits</p>\n      <h1>Release Credits</h1>\n      <ul>${exportCredits.map(line => `<li>${escapeXml(line)}</li>`).join("")}</ul>\n      <p class="note">Please keep the BiniFn credit attached if this EPUB is reposted or shared.</p>\n    </div>\n  </section>\n</body>\n</html>`;
+</script>\n  <title>${bookTitle} - Credits</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="credits-page">\n    <div class="credits-card">\n      <p class="eyebrow">クレジット</p>\n      <h1>Release Credits</h1>\n      <ul>${exportCredits.map(line => `<li>${escapeXml(line)}</li>`).join("")}</ul>\n      <p class="note">Please keep the BiniFn credit attached if this EPUB is reposted or shared.</p>\n    </div>\n  </section>\n</body>\n</html>`;
 
       const pageFiles = chapter.pages.map((pageHtml, index) => ({
         name: `OEBPS/text/page-${index + 1}.xhtml`,
@@ -5866,7 +5867,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
       const navLinks = [
         `<li><a href="cover.xhtml">Cover</a></li>`,
         ...pageFiles.map((page, index) => `<li><a href="text/page-${index + 1}.xhtml">${escapeXml(page.title)}</a></li>`),
-        `<li><a href="credits.xhtml">Credits</a></li>`
+        `<li><a href="credits.xhtml">クレジット</a></li>`
       ].join("");
 
       const files = [
@@ -5889,7 +5890,7 @@ Last chapter's ceiling is always this chapter's floor.</div>
       window.location.replace(path.replace('-jp.html', '.html'));
     }
   })();
-</script>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="nav-page">\n    <div class="nav-card">\n      <p class="eyebrow">Contents</p>\n      <nav epub:type="toc" id="toc">\n        <h1>${bookTitle}</h1>\n        <ol>${navLinks}</ol>\n        <a class="nav-btn" id="lang-jp" href="./index-jp.html" onclick="localStorage.setItem('threadborn_lang', 'ja')">JP</a>
+</script>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="nav-page">\n    <div class="nav-card">\n      <p class="eyebrow">Contents</p>\n      <nav epub:type="toc" id="toc">\n        <h1>${bookTitle}</h1>\n        <ol>${navLinks}</ol>\n        <a class="nav-btn" id="lang-en" href="./index.html" onclick="localStorage.setItem('threadborn_lang', 'en')">EN</a>
       </nav>\n    </div>\n  </section>\n</body>\n</html>`) },
         { name: "OEBPS/content.opf", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id">\n  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n    <dc:identifier id="book-id">${escapeXml(bookId)}</dc:identifier>\n    <dc:title>${bookTitle}</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator>BiniFn</dc:creator>\n    <dc:publisher>BiniFn</dc:publisher>\n    <dc:description>${escapeXml(chapter.summary)}</dc:description>\n    <meta property="dcterms:modified">${modifiedAt}</meta>\n  </metadata>\n  <manifest>\n    ${manifestItems}\n  </manifest>\n  <spine>\n    ${spineItems}\n  </spine>\n</package>`) },
         ...pageFiles.map(page => ({ name: page.name, data: encoder.encode(page.content) }))

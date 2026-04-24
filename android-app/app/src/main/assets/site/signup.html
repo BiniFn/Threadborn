@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      var savedLang = localStorage.getItem('threadborn_lang');
+      var path = window.location.pathname;
+      if (path.endsWith('/')) path += 'index.html';
+      var isJp = path.indexOf('-jp.html') !== -1;
+      if (savedLang === 'ja' && !isJp) {
+        window.location.replace(path.replace('.html', '-jp.html'));
+      } else if (savedLang === 'en' && isJp) {
+        window.location.replace(path.replace('-jp.html', '.html'));
+      }
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Threadborn Sign Up</title>

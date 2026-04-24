@@ -1,6 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      var savedLang = localStorage.getItem('threadborn_lang');
+      var path = window.location.pathname;
+      if (path.endsWith('/')) path += 'index.html';
+      var isJp = path.indexOf('-jp.html') !== -1;
+      if (savedLang === 'ja' && !isJp) {
+        window.location.replace(path.replace('.html', '-jp.html'));
+      } else if (savedLang === 'en' && isJp) {
+        window.location.replace(path.replace('-jp.html', '.html'));
+      }
+    })();
+  </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Threadborn — Starting Life Beyond the Covenant Door</title>
@@ -347,9 +360,9 @@
 
     .hero-title {
       margin: 0;
-      max-width: 12ch;
+      max-width: 20ch;
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(2.4rem, 5.4vw, 4.1rem);
+      font-size: clamp(1.4rem, 2.5vw, 2.2rem);
       line-height: 0.9;
       letter-spacing: -0.03em;
     }
@@ -2165,7 +2178,7 @@
       }
 
       .hero-title {
-        font-size: clamp(2.5rem, 13vw, 3.5rem);
+        font-size: clamp(1.6rem, 7vw, 2.2rem);
       }
 
       .hero-actions .btn,
@@ -2293,6 +2306,7 @@
         <a class="nav-btn" id="nav-signup" href="./signup.html">Sign Up</a>
         <a class="nav-btn" id="nav-profile" href="./profile.html" style="display:none;">Profile</a>
         <button class="nav-btn" id="nav-logout" onclick="logoutUser()" style="display:none;">Logout</button>
+        <a class="nav-btn" id="lang-jp" href="./index-jp.html" onclick="localStorage.setItem('threadborn_lang', 'ja')">JP</a>
       </nav>
 
       <div class="user-chip" id="user-chip">
@@ -2317,6 +2331,7 @@
             </div>
             <div class="hero-actions">
               <button class="btn btn-primary" onclick="openChapter(0)">Start Reading</button>
+              <button class="btn btn-secondary" onclick="localStorage.setItem('threadborn_lang', 'ja'); window.location.href='./index-jp.html'">🇯🇵 Switch to Japanese</button>
             </div>
           </div>
           <div class="hero-media">
@@ -2756,7 +2771,8 @@
     <a class="nav-btn" id="mobile-nav-signup" href="./signup.html">Sign Up</a>
     <a class="nav-btn" id="mobile-nav-profile" href="./profile.html" style="display:none;">Profile</a>
     <button class="nav-btn" id="mobile-nav-logout" onclick="logoutUser()" style="display:none;">Logout</button>
-  </nav>
+    <a class="nav-btn" id="lang-jp" href="./index-jp.html" onclick="localStorage.setItem('threadborn_lang', 'ja')">JP</a>
+      </nav>
 
   <div id="reader" class="reader" aria-hidden="true">
     <div class="reader-top">
@@ -5782,15 +5798,54 @@ Last chapter's ceiling is always this chapter's floor.</div>
         volumeCover = null;
       }
 
-      const coverPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="cover">\n    <div class="cover-card">\n      <p class="eyebrow">Threadborn Collector EPUB</p>\n      <h1 class="cover-title">${bookTitle}</h1>\n      ${volumeCover ? `<img class="cover-art" src="images/volume-cover.jpg" alt="${chapter.volume} cover art" />` : ""}\n      <p class="cover-summary">${escapeXml(chapter.summary)}</p>\n      <div class="tag-row">${chapter.tags.map(tag => `<span class="tag">${escapeXml(tag)}</span>`).join("")}</div>\n      <p class="credit-line">Created by BiniFn</p>\n      <p class="note">Official offline chapter export from the Threadborn web reader.</p>\n    </div>\n  </section>\n</body>\n</html>`;
+      const coverPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>
+  <script>
+  (function() {
+    var savedLang = localStorage.getItem('threadborn_lang');
+    var path = window.location.pathname;
+    if (path.endsWith('/')) path += 'index.html';
+    var isJp = path.indexOf('-jp.html') !== -1;
+    if (savedLang === 'ja' && !isJp) {
+      window.location.replace(path.replace('.html', '-jp.html'));
+    } else if (savedLang === 'en' && isJp) {
+      window.location.replace(path.replace('-jp.html', '.html'));
+    }
+  })();
+</script>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="cover">\n    <div class="cover-card">\n      <p class="eyebrow">Threadborn Collector EPUB</p>\n      <h1 class="cover-title">${bookTitle}</h1>\n      ${volumeCover ? `<img class="cover-art" src="images/volume-cover.jpg" alt="${chapter.volume} cover art" />` : ""}\n      <p class="cover-summary">${escapeXml(chapter.summary)}</p>\n      <div class="tag-row">${chapter.tags.map(tag => `<span class="tag">${escapeXml(tag)}</span>`).join("")}</div>\n      <p class="credit-line">Created by BiniFn</p>\n      <p class="note">Official offline chapter export from the Threadborn web reader.</p>\n    </div>\n  </section>\n</body>\n</html>`;
 
-      const creditsPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n  <title>${bookTitle} - Credits</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="credits-page">\n    <div class="credits-card">\n      <p class="eyebrow">Credits</p>\n      <h1>Release Credits</h1>\n      <ul>${exportCredits.map(line => `<li>${escapeXml(line)}</li>`).join("")}</ul>\n      <p class="note">Please keep the BiniFn credit attached if this EPUB is reposted or shared.</p>\n    </div>\n  </section>\n</body>\n</html>`;
+      const creditsPage = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>
+  <script>
+  (function() {
+    var savedLang = localStorage.getItem('threadborn_lang');
+    var path = window.location.pathname;
+    if (path.endsWith('/')) path += 'index.html';
+    var isJp = path.indexOf('-jp.html') !== -1;
+    if (savedLang === 'ja' && !isJp) {
+      window.location.replace(path.replace('.html', '-jp.html'));
+    } else if (savedLang === 'en' && isJp) {
+      window.location.replace(path.replace('-jp.html', '.html'));
+    }
+  })();
+</script>\n  <title>${bookTitle} - Credits</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="credits-page">\n    <div class="credits-card">\n      <p class="eyebrow">Credits</p>\n      <h1>Release Credits</h1>\n      <ul>${exportCredits.map(line => `<li>${escapeXml(line)}</li>`).join("")}</ul>\n      <p class="note">Please keep the BiniFn credit attached if this EPUB is reposted or shared.</p>\n    </div>\n  </section>\n</body>\n</html>`;
 
       const pageFiles = chapter.pages.map((pageHtml, index) => ({
         name: `OEBPS/text/page-${index + 1}.xhtml`,
         mediaType: "application/xhtml+xml",
         title: `${chapter.title} - Page ${index + 1}`,
-        content: `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n  <title>${escapeXml(`${chapter.title} - Page ${index + 1}`)}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="../styles.css" />\n</head>\n<body>\n  <section class="page">\n    <div class="page-frame">\n      <p class="page-eyebrow"><span>${escapeXml(`${chapter.volume} • ${chapter.chapter}`)}</span><span>Page ${index + 1} of ${chapter.pages.length}</span></p>\n      ${chapter.pages[index]}\n      <p class="page-footer-note">Created by BiniFn • Official Threadborn EPUB export</p>\n    </div>\n  </section>\n</body>\n</html>`
+        content: `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>
+  <script>
+  (function() {
+    var savedLang = localStorage.getItem('threadborn_lang');
+    var path = window.location.pathname;
+    if (path.endsWith('/')) path += 'index.html';
+    var isJp = path.indexOf('-jp.html') !== -1;
+    if (savedLang === 'ja' && !isJp) {
+      window.location.replace(path.replace('.html', '-jp.html'));
+    } else if (savedLang === 'en' && isJp) {
+      window.location.replace(path.replace('-jp.html', '.html'));
+    }
+  })();
+</script>\n  <title>${escapeXml(`${chapter.title} - Page ${index + 1}`)}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="../styles.css" />\n</head>\n<body>\n  <section class="page">\n    <div class="page-frame">\n      <p class="page-eyebrow"><span>${escapeXml(`${chapter.volume} • ${chapter.chapter}`)}</span><span>Page ${index + 1} of ${chapter.pages.length}</span></p>\n      ${chapter.pages[index]}\n      <p class="page-footer-note">Created by BiniFn • Official Threadborn EPUB export</p>\n    </div>\n  </section>\n</body>\n</html>`
       }));
 
       const manifestItems = [
@@ -5821,7 +5876,21 @@ Last chapter's ceiling is always this chapter's floor.</div>
         { name: "OEBPS/cover.xhtml", data: encoder.encode(coverPage) },
         ...(volumeCover ? [{ name: "OEBPS/images/volume-cover.jpg", data: volumeCover.bytes }] : []),
         { name: "OEBPS/credits.xhtml", data: encoder.encode(creditsPage) },
-        { name: "OEBPS/nav.xhtml", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">\n<head>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="nav-page">\n    <div class="nav-card">\n      <p class="eyebrow">Contents</p>\n      <nav epub:type="toc" id="toc">\n        <h1>${bookTitle}</h1>\n        <ol>${navLinks}</ol>\n      </nav>\n    </div>\n  </section>\n</body>\n</html>`) },
+        { name: "OEBPS/nav.xhtml", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">\n<head>
+  <script>
+  (function() {
+    var savedLang = localStorage.getItem('threadborn_lang');
+    var path = window.location.pathname;
+    if (path.endsWith('/')) path += 'index.html';
+    var isJp = path.indexOf('-jp.html') !== -1;
+    if (savedLang === 'ja' && !isJp) {
+      window.location.replace(path.replace('.html', '-jp.html'));
+    } else if (savedLang === 'en' && isJp) {
+      window.location.replace(path.replace('-jp.html', '.html'));
+    }
+  })();
+</script>\n  <title>${bookTitle}</title>\n  <meta charset="utf-8" />\n  <link rel="stylesheet" type="text/css" href="styles.css" />\n</head>\n<body>\n  <section class="nav-page">\n    <div class="nav-card">\n      <p class="eyebrow">Contents</p>\n      <nav epub:type="toc" id="toc">\n        <h1>${bookTitle}</h1>\n        <ol>${navLinks}</ol>\n        <a class="nav-btn" id="lang-jp" href="./index-jp.html" onclick="localStorage.setItem('threadborn_lang', 'ja')">JP</a>
+      </nav>\n    </div>\n  </section>\n</body>\n</html>`) },
         { name: "OEBPS/content.opf", data: encoder.encode(`<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id">\n  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n    <dc:identifier id="book-id">${escapeXml(bookId)}</dc:identifier>\n    <dc:title>${bookTitle}</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator>BiniFn</dc:creator>\n    <dc:publisher>BiniFn</dc:publisher>\n    <dc:description>${escapeXml(chapter.summary)}</dc:description>\n    <meta property="dcterms:modified">${modifiedAt}</meta>\n  </metadata>\n  <manifest>\n    ${manifestItems}\n  </manifest>\n  <spine>\n    ${spineItems}\n  </spine>\n</package>`) },
         ...pageFiles.map(page => ({ name: page.name, data: encoder.encode(page.content) }))
       ];
