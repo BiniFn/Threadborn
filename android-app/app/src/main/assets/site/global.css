@@ -344,13 +344,35 @@
       font-family: "Space Mono", monospace;
     }
 
+    .series-title {
+      margin: 0;
+      color: var(--bone);
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(3.4rem, 7vw, 6.8rem);
+      line-height: 0.82;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      text-shadow: 0 20px 54px rgba(207, 47, 47, 0.2);
+    }
+
+    .series-subtitle {
+      margin: 14px 0 18px;
+      color: #ff4b5f;
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
     .hero-title {
       margin: 0;
-      max-width: 20ch;
+      max-width: 26ch;
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(1.4rem, 2.5vw, 2.2rem);
-      line-height: 0.9;
-      letter-spacing: -0.03em;
+      font-size: clamp(1.35rem, 2.2vw, 2rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+      font-weight: 700;
     }
 
     .hero-title .blood {
@@ -407,8 +429,12 @@
       width: min(100%, 420px);
     }
 
+    .series-title {
+      max-width: 10ch;
+    }
+
     .hero-title {
-      max-width: 9ch;
+      max-width: 24ch;
     }
 
     .hero-copy {
@@ -2301,6 +2327,15 @@
 
       .hero-title {
         font-size: clamp(1.6rem, 7vw, 2.2rem);
+      }
+
+      .series-title {
+        font-size: clamp(2.7rem, 15vw, 4.4rem);
+      }
+
+      .series-subtitle {
+        font-size: 10px;
+        line-height: 1.5;
       }
 
       .hero-actions .btn,
