@@ -320,8 +320,8 @@
         gap: 36px;
       }
 
-      .reader-toolbar {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      .reader-toolbar .toolbar-pill {
+        flex-basis: 260px;
       }
     }
 
@@ -1465,8 +1465,8 @@
     }
 
     .reader-toolbar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 12px;
       padding: 14px 22px;
       border-bottom: 1px solid var(--line);
@@ -1474,6 +1474,7 @@
       backdrop-filter: blur(18px);
       align-content: start;
       align-items: start;
+      justify-content: stretch;
     }
 
     .reader:not(.tools-open) .reader-toolbar {
@@ -1485,8 +1486,12 @@
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
+      flex: 1 1 280px;
       min-height: 0;
+      min-width: 0;
       height: auto;
+      max-width: 100%;
+      box-sizing: border-box;
       padding: 14px;
       border-radius: 22px;
       border: 1px solid var(--line);
@@ -1496,6 +1501,16 @@
       color: var(--mist);
       font-size: 13px;
       touch-action: auto;
+    }
+
+    .toolbar-pill.export-card,
+    .toolbar-pill.bookmark-card {
+      flex-basis: 340px;
+    }
+
+    .toolbar-pill.chapter-card,
+    .toolbar-pill.status {
+      flex-basis: 300px;
     }
 
     .reader-toolbar .toolbar-pill:not(.status) .toolbar-note {
@@ -1624,7 +1639,7 @@
     }
 
     .reader.tools-open .reader-toolbar {
-      display: grid;
+      display: flex;
       position: fixed;
       left: max(20px, env(safe-area-inset-left));
       right: max(20px, env(safe-area-inset-right));
@@ -1635,6 +1650,7 @@
       border: 1px solid var(--line-strong);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
       overflow-y: auto;
+      overflow-x: hidden;
       align-content: start;
     }
 
@@ -2153,7 +2169,9 @@
       }
 
       .reader-toolbar {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
         padding: 12px;
         max-height: min(66vh, 520px);
         overflow-y: auto;
@@ -2179,14 +2197,23 @@
       }
 
       .toolbar-pill {
+        flex: 0 0 auto;
         width: 100%;
         min-width: 0;
         min-height: auto;
+        max-width: none;
         border-radius: 16px;
         padding: 12px;
         gap: 8px;
         font-size: 12px;
         margin-bottom: 10px;
+      }
+
+      .toolbar-pill.export-card,
+      .toolbar-pill.bookmark-card,
+      .toolbar-pill.chapter-card,
+      .toolbar-pill.status {
+        flex-basis: auto;
       }
 
       .toolbar-pill:last-child {
@@ -2233,14 +2260,14 @@
       }
 
       .toolbar-actions {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
       }
 
       .toolbar-actions .ghost-btn {
         min-height: 40px;
-        flex: 1 1 calc(50% - 3px);
+        width: 100%;
       }
 
       .reader-progress-bar {
@@ -2344,10 +2371,6 @@
         width: 100%;
       }
 
-      .toolbar-actions .ghost-btn {
-        flex-basis: 100%;
-      }
-
       .chapter-card strong,
       .power-card strong,
       .lore-card strong,
@@ -2360,7 +2383,8 @@
       }
 
       .reader-toolbar {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        flex-wrap: nowrap;
       }
 
       .reader-top-main {
@@ -2418,9 +2442,6 @@
         padding: 22px 16px 20px;
       }
 
-      .toolbar-actions .ghost-btn {
-        flex-basis: 100%;
-      }
     }
 /* --- Added Authentication & Profile Styles --- */
 

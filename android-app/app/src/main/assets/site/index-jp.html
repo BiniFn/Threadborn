@@ -44,9 +44,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="./global.css" />
-  <link rel="stylesheet" href="./global.css" />
+  <link rel="stylesheet" href="./global.css?v=14" />
 </head>
 <body>
 
@@ -4190,6 +4188,10 @@
     let ttsVoices = [];
     let ttsKeepReading = false;
     let ttsRenderTick = 0;
+    let ttsSegments = [];
+    let ttsSegmentIndex = 0;
+    let ttsHighlightFallback = null;
+    let ttsBoundaryActive = false;
     let deferredInstallPrompt = null;
     const progressKey = "novelverse_reader_progress";
     const activeUserKey = "threadborn_user";
@@ -5159,6 +5161,13 @@
       document.getElementById("tts-status").textContent = text;
     }
 
+    function clearTtsHighlightTimer() {
+      if (ttsHighlightFallback) {
+        clearInterval(ttsHighlightFallback);
+        ttsHighlightFallback = null;
+      }
+    }
+
     function getSpeechBoundaryLength(text, charIndex, eventName) {
       const start = Math.max(0, Number(charIndex) || 0);
       if (!text || start >= text.length) {
@@ -5176,6 +5185,8 @@
     }
 
     function clearTtsHighlight() {
+      clearTtsHighlightTimer();
+      const container = document.getElementById("reader-content");
       const marks = document.querySelectorAll("#reader-content .tts-highlight");
       marks.forEach(mark => {
         const parent = mark.parentNode;
@@ -5185,14 +5196,26 @@
         }
         parent.removeChild(mark);
       });
+      if (container) {
+        container.normalize();
+      }
     }
 
     function highlightSpokenRange(charIndex = 0, charLength = 1) {
       const container = document.getElementById("reader-content");
       if (!container) return;
 
-      const startIndex = Math.max(0, Number(charIndex) || 0);
-      const endIndex = startIndex + Math.max(1, Number(charLength) || 1);
+      const fullText = container.textContent || "";
+      let startIndex = Math.max(0, Number(charIndex) || 0);
+      let endIndex = Math.min(fullText.length, startIndex + Math.max(1, Number(charLength) || 1));
+
+      while (startIndex < fullText.length && /\s/.test(fullText[startIndex])) {
+        startIndex += 1;
+      }
+      while (endIndex > startIndex && /\s/.test(fullText[endIndex - 1])) {
+        endIndex -= 1;
+      }
+      if (startIndex >= endIndex) return;
 
       clearTtsHighlight();
 
@@ -5208,7 +5231,7 @@
         const length = node.textContent.length;
         const next = cursor + length;
 
-        if (!startNode && startIndex <= next) {
+        if (!startNode && startIndex < next) {
           startNode = node;
           startOffset = Math.max(0, startIndex - cursor);
         }
@@ -5234,22 +5257,128 @@
       mark.className = "tts-highlight";
       mark.dataset.startIndex = startIndex;
       mark.dataset.endIndex = endIndex;
-      
+
       try {
         const fragment = range.extractContents();
         mark.appendChild(fragment);
         range.insertNode(mark);
-        
-        // Smooth scroll to highlight if it is outside the reader viewport.
+
         const rect = mark.getBoundingClientRect();
         const scrollBox = document.querySelector(".reader-body");
         const containerRect = scrollBox ? scrollBox.getBoundingClientRect() : container.getBoundingClientRect();
         if (rect.top < containerRect.top + 40 || rect.bottom > containerRect.bottom - 40) {
-          mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          mark.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       } catch (e) {
         console.warn("TTS highlight error:", e);
       }
+    }
+
+    function pushTtsSegment(segments, pageText, start, end) {
+      const raw = pageText.slice(start, end);
+      const first = raw.search(/\S/);
+      if (first < 0) return;
+      const trimmedEnd = raw.replace(/\s+$/, "").length;
+      const actualStart = start + first;
+      const actualEnd = start + trimmedEnd;
+      if (actualEnd <= actualStart) return;
+      segments.push({
+        start: actualStart,
+        end: actualEnd,
+        text: pageText.slice(actualStart, actualEnd)
+      });
+    }
+
+    function getCurrentPageSpeechSegments(mode = getReadingMode()) {
+      const container = document.getElementById("reader-content");
+      const pageText = getCurrentPageText();
+      const segments = [];
+      if (!container || !pageText.trim()) {
+        return segments;
+      }
+
+      const blocks = Array.from(container.querySelectorAll("h1, h2, h3, h4, p, li, blockquote, .story-callout"))
+        .filter(block => (block.textContent || "").trim());
+      const ranges = [];
+      let cursor = 0;
+
+      blocks.forEach(block => {
+        const blockText = block.textContent || "";
+        const found = pageText.indexOf(blockText, cursor);
+        const start = found >= 0 ? found : cursor;
+        ranges.push({ start, text: blockText });
+        cursor = start + blockText.length;
+      });
+
+      if (!ranges.length) {
+        ranges.push({ start: 0, text: pageText });
+      }
+
+      ranges.forEach(range => {
+        if (mode === "word") {
+          const wordPattern = /\S+/g;
+          let match;
+          while ((match = wordPattern.exec(range.text))) {
+            pushTtsSegment(segments, pageText, range.start + match.index, range.start + match.index + match[0].length);
+          }
+          return;
+        }
+
+        const sentencePattern = /[^.!?。！？]+(?:[.!?。！？]+["'”’））」』]*)?|[^.!?。！？]+$/g;
+        let match;
+        while ((match = sentencePattern.exec(range.text))) {
+          pushTtsSegment(segments, pageText, range.start + match.index, range.start + match.index + match[0].length);
+        }
+      });
+
+      if (!segments.length) {
+        pushTtsSegment(segments, pageText, 0, pageText.length);
+      }
+      return segments;
+    }
+
+    function getWordsForSegment(segment) {
+      const words = [];
+      const pattern = /\S+/g;
+      let match;
+      while ((match = pattern.exec(segment.text))) {
+        words.push({
+          start: segment.start + match.index,
+          length: match[0].length
+        });
+      }
+      return words;
+    }
+
+    function startTtsFallbackHighlight(segment, tick) {
+      clearTtsHighlightTimer();
+      if (!segment || tick !== ttsRenderTick) return;
+
+      const words = getWordsForSegment(segment);
+      if (!words.length) {
+        highlightSpokenRange(segment.start, segment.end - segment.start);
+        return;
+      }
+
+      let wordIndex = 0;
+      const rate = Math.max(0.5, Number(document.getElementById("rate-range").value) || 1);
+      const delay = Math.max(180, Math.min(780, 420 / rate));
+      highlightSpokenRange(words[wordIndex].start, words[wordIndex].length);
+
+      if (words.length === 1) {
+        return;
+      }
+
+      ttsHighlightFallback = setInterval(() => {
+        if (tick !== ttsRenderTick || !ttsKeepReading || window.speechSynthesis.paused) {
+          return;
+        }
+        wordIndex = Math.min(wordIndex + 1, words.length - 1);
+        highlightSpokenRange(words[wordIndex].start, words[wordIndex].length);
+        if (wordIndex >= words.length - 1) {
+          clearTtsHighlightTimer();
+        }
+      }, delay);
     }
 
     function loadVoices() {
@@ -5290,6 +5419,98 @@
       }
     }
 
+    function applySpeechSettings(utterance) {
+      const selectedVoice = document.getElementById("voice-select").value;
+      const matchedVoice = ttsVoices.find(voice => voice.name === selectedVoice);
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+      utterance.rate = Number(document.getElementById("rate-range").value);
+      utterance.pitch = Number(document.getElementById("pitch-range").value);
+    }
+
+    function finishTtsPage(tick) {
+      if (tick !== ttsRenderTick) return;
+      clearTtsHighlight();
+      const chapter = chapters[activeChapter];
+      const atLastPage = activePage >= (chapter.pages.length - 1);
+      const atLastChapter = activeChapter >= (chapters.length - 1);
+      if (!ttsKeepReading) {
+        updateTtsStatus("TTS ready");
+        ttsKeepReading = false;
+        return;
+      }
+      if (atLastPage && atLastChapter) {
+        updateTtsStatus("End of story reached");
+        ttsKeepReading = false;
+        return;
+      }
+      if (atLastPage) {
+        activeChapter += 1;
+        activePage = 0;
+        updateTtsStatus("Next chapter...");
+      } else {
+        activePage += 1;
+        updateTtsStatus("Next page...");
+      }
+      renderPage();
+      setTimeout(() => speakCurrentPage(true), 180);
+    }
+
+    function speakNextTtsSegment(tick) {
+      if (tick !== ttsRenderTick || !ttsKeepReading) {
+        return;
+      }
+      if (ttsSegmentIndex >= ttsSegments.length) {
+        finishTtsPage(tick);
+        return;
+      }
+
+      const segment = ttsSegments[ttsSegmentIndex];
+      const utterance = new SpeechSynthesisUtterance(segment.text);
+      ttsUtterance = utterance;
+      ttsBoundaryActive = false;
+      applySpeechSettings(utterance);
+
+      utterance.onstart = () => {
+        if (tick !== ttsRenderTick) return;
+        updateTtsStatus(`Reading ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
+        startTtsFallbackHighlight(segment, tick);
+      };
+
+      utterance.onboundary = event => {
+        if (tick !== ttsRenderTick || typeof event.charIndex !== "number") {
+          return;
+        }
+        ttsBoundaryActive = true;
+        clearTtsHighlightTimer();
+        const length = event.charLength || getSpeechBoundaryLength(segment.text, event.charIndex, event.name);
+        highlightSpokenRange(segment.start + event.charIndex, length);
+      };
+
+      utterance.onend = () => {
+        if (tick !== ttsRenderTick) return;
+        clearTtsHighlightTimer();
+        ttsSegmentIndex += 1;
+        const pause = getReadingMode() === "word" ? 35 : 90;
+        setTimeout(() => speakNextTtsSegment(tick), pause);
+      };
+
+      utterance.onerror = () => {
+        if (tick !== ttsRenderTick) return;
+        clearTtsHighlight();
+        updateTtsStatus("TTS error");
+        ttsKeepReading = false;
+      };
+
+      window.speechSynthesis.speak(utterance);
+      setTimeout(() => {
+        if (tick === ttsRenderTick && ttsUtterance === utterance && !ttsBoundaryActive) {
+          startTtsFallbackHighlight(segment, tick);
+        }
+      }, 120);
+    }
+
     function speakCurrentPage(isContinuation = false) {
       if (!("speechSynthesis" in window)) {
         updateTtsStatus("TTS unavailable");
@@ -5300,69 +5521,17 @@
       ttsKeepReading = true;
       ttsRenderTick += 1;
       const tick = ttsRenderTick;
-      ttsUtterance = new SpeechSynthesisUtterance(getCurrentPageText());
-
-      const selectedVoice = document.getElementById("voice-select").value;
-      const matchedVoice = ttsVoices.find(voice => voice.name === selectedVoice);
-      if (matchedVoice) {
-        ttsUtterance.voice = matchedVoice;
-      }
-
-      ttsUtterance.rate = Number(document.getElementById("rate-range").value);
-      ttsUtterance.pitch = Number(document.getElementById("pitch-range").value);
-      const readingMode = getReadingMode();
-      const spokenText = ttsUtterance.text || "";
-      
-      ttsUtterance.onstart = () => updateTtsStatus("Reading aloud");
-      ttsUtterance.onboundary = event => {
-        const mode = getReadingMode();
-        if (typeof event.charIndex !== "number") {
-          return;
-        }
-        const length = event.charLength || getSpeechBoundaryLength(spokenText, event.charIndex, event.name);
-        if (mode === "word" && event.name === "word") {
-          highlightSpokenRange(event.charIndex, length);
-        } else if (mode === "sentence" && event.name === "sentence") {
-          highlightSpokenRange(event.charIndex, length);
-        } else if (mode === "continuous" && (event.name === "word" || event.name === "sentence" || typeof event.charIndex === "number")) {
-          highlightSpokenRange(event.charIndex, length);
-        }
-      };
-      ttsUtterance.onend = () => {
-        if (tick !== ttsRenderTick) return;
-        clearTtsHighlight();
-        const chapter = chapters[activeChapter];
-        const atLastPage = activePage >= (chapter.pages.length - 1);
-        const atLastChapter = activeChapter >= (chapters.length - 1);
-        if (!ttsKeepReading) {
-          updateTtsStatus("TTS ready");
-          ttsKeepReading = false;
-          return;
-        }
-        if (atLastPage && atLastChapter) {
-          updateTtsStatus("End of story reached");
-          ttsKeepReading = false;
-          return;
-        }
-        if (atLastPage) {
-          activeChapter += 1;
-          activePage = 0;
-          updateTtsStatus("Next chapter...");
-        } else {
-          activePage += 1;
-          updateTtsStatus("Next page...");
-        }
-        renderPage();
-        setTimeout(() => speakCurrentPage(true), 160);
-      };
-      ttsUtterance.onerror = () => {
-        clearTtsHighlight();
-        updateTtsStatus("TTS error");
+      ttsSegments = getCurrentPageSpeechSegments(getReadingMode());
+      ttsSegmentIndex = 0;
+      ttsBoundaryActive = false;
+      if (!ttsSegments.length) {
+        updateTtsStatus("Nothing to read");
         ttsKeepReading = false;
-      };
-      window.speechSynthesis.speak(ttsUtterance);
+        return;
+      }
+      speakNextTtsSegment(tick);
       if (!isContinuation) {
-        highlightSpokenRange(0, 10);
+        startTtsFallbackHighlight(ttsSegments[0], tick);
       }
     }
 
@@ -5375,8 +5544,13 @@
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
         updateTtsStatus("Reading aloud");
+        const segment = ttsSegments[ttsSegmentIndex];
+        if (segment && !ttsBoundaryActive) {
+          startTtsFallbackHighlight(segment, ttsRenderTick);
+        }
       } else if (window.speechSynthesis.speaking) {
         window.speechSynthesis.pause();
+        clearTtsHighlightTimer();
         updateTtsStatus("Paused");
       } else {
         speakCurrentPage();
@@ -5387,6 +5561,9 @@
       ttsKeepReading = false;
       clearTtsHighlight();
       ttsRenderTick += 1;
+      ttsSegments = [];
+      ttsSegmentIndex = 0;
+      ttsBoundaryActive = false;
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
