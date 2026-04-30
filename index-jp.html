@@ -32,7 +32,14 @@
   <title>スレッドボーン：運命が断ち切れる場所での再生</title>
   <meta name="description" content="Official Threadborn light novel reader with chapter browsing, offline-friendly reading, collector PDF and styled EPUB exports, and Android app downloads." />
   <meta name="theme-color" content="#090607" />
-  <link rel="icon" type="image/png" href="assets/threadborn-logo.png" />
+  <meta property="og:title" content="スレッドボーン：運命が断ち切れる場所での再生" />
+  <meta property="og:description" content="Official Threadborn light novel reader with chapter browsing, offline reading, collector PDF and styled EPUB exports." />
+  <meta property="og:image" content="https://threadborn.vercel.app/assets/threadborn-og-jp.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://threadborn.vercel.app/assets/threadborn-og-jp.png" />
+  <link rel="icon" type="image/png" href="assets/threadborn-favicon-jp.png" />
+  <link rel="apple-touch-icon" href="assets/threadborn-logo-jp.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +54,7 @@
     <div class="header-shell">
       <a class="brand" onclick="switchView('home')">
         <div class="brand-mark" aria-hidden="true">
-          <img src="assets/threadborn-logo.png" alt="Threadborn" />
+          <img src="assets/threadborn-logo-jp-header.png" alt="Threadborn" />
         </div>
         <div class="brand-copy">
           <strong>Threadborn</strong>
@@ -74,7 +81,7 @@
       </nav>
 
       <div class="user-chip" id="user-chip">
-        <img id="user-avatar" alt="Profile picture" src="assets/threadborn-logo.png" />
+        <img id="user-avatar" alt="Profile picture" src="assets/threadborn-logo-jp.png" />
         <span class="user-name" id="user-name">Guest reader</span>
       </div>
     </div>
@@ -85,8 +92,10 @@
       <article class="hero-card" style="margin-bottom: 24px;">
         <div class="hero-shell">
           <div class="hero-copy-block">
-            <p class="eyebrow">スレッドボーン：運命が断ち切れる場所での再生 • dark fantasy • romance • gore • cosmic horror</p>
-            <h1 class="hero-title">少年は死に、ルメラで目覚め、生き残るはずのない世界へ足を踏み入れる。</h1>
+            <p class="eyebrow">アニメ / ライトノベル • ダークファンタジー • ロマンス • ゴア • コズミックホラー</p>
+            <h1 class="series-title">スレッドボーン</h1>
+            <p class="series-subtitle">運命は与えられない。断ち切るもの。</p>
+            <h2 class="hero-title">少年は死に、ルメラで目覚め、生き残るはずのない世界へ足を踏み入れる。</h2>
             <p class="hero-copy">
               <strong>Threadborn</strong> は、突然の死によってバイオレットと共にルメラへ放り込まれた<strong>風嶋ヨノ</strong>の物語。生き残るための戦いは、ダークファンタジー、ロマンス、そして章を追うごとに凶悪になる封印された怪物たちとの遭遇へ変わっていく。
             </p>
@@ -100,7 +109,7 @@
           </div>
           <div class="hero-media">
             <div class="hero-logo-wrap">
-              <img class="hero-logo" src="assets/threadborn-logo.png" alt="Threadborn logo" />
+              <img class="hero-logo" src="assets/threadborn-logo-jp-wide.png" alt="Threadborn logo" />
             </div>
           </div>
         </div>
@@ -4264,7 +4273,7 @@
       }
 
       const displayName = user && (user.displayName || user.email) ? (user.displayName || user.email) : "Guest reader";
-      const avatar = "assets/threadborn-logo.png";
+      const avatar = "assets/threadborn-logo-jp.png";
       nameEl.textContent = displayName;
       avatarEl.src = avatar;
     }
@@ -4385,7 +4394,7 @@
       feed.innerHTML = posts.map(post => `
         <article class="community-post">
           <div class="community-head">
-            <img src="${post.avatar_url || "assets/threadborn-logo.png"}" alt="${post.username || "User"} avatar" />
+            <img src="${post.avatar_url || "assets/threadborn-logo-jp.png"}" alt="${post.username || "User"} avatar" />
             <div>
               <strong>${post.username || "Reader"}${renderNameBadges(post)}</strong>
               <div class="community-meta">${post.category.replace("_", " ")} • ${formatCommunityTime(post.created_at)}</div>

@@ -32,7 +32,14 @@
   <title>Threadborn: Reborn Where Fate Snaps</title>
   <meta name="description" content="Official Threadborn light novel reader with chapter browsing, offline-friendly reading, collector PDF and styled EPUB exports, and Android app downloads." />
   <meta name="theme-color" content="#090607" />
-  <link rel="icon" type="image/png" href="assets/threadborn-logo.png" />
+  <meta property="og:title" content="Threadborn: Reborn Where Fate Snaps" />
+  <meta property="og:description" content="Official Threadborn light novel reader with chapter browsing, offline reading, collector PDF and styled EPUB exports." />
+  <meta property="og:image" content="https://threadborn.vercel.app/assets/threadborn-og-en.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://threadborn.vercel.app/assets/threadborn-og-en.png" />
+  <link rel="icon" type="image/png" href="assets/threadborn-favicon.png" />
+  <link rel="apple-touch-icon" href="assets/threadborn-apple-touch.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +54,7 @@
     <div class="header-shell">
       <a class="brand" onclick="switchView('home')">
         <div class="brand-mark" aria-hidden="true">
-          <img src="assets/threadborn-logo.png" alt="Threadborn" />
+          <img src="assets/threadborn-logo-en-header.png" alt="Threadborn" />
         </div>
         <div class="brand-copy">
           <strong>Threadborn</strong>
@@ -74,7 +81,7 @@
       </nav>
 
       <div class="user-chip" id="user-chip">
-        <img id="user-avatar" alt="Profile picture" src="assets/threadborn-logo.png" />
+        <img id="user-avatar" alt="Profile picture" src="assets/threadborn-app-icon.png" />
         <span class="user-name" id="user-name">Guest reader</span>
       </div>
     </div>
@@ -85,8 +92,10 @@
       <article class="hero-card" style="margin-bottom: 24px;">
         <div class="hero-shell">
           <div class="hero-copy-block">
-            <p class="eyebrow">Threadborn: Reborn Where Fate Snaps • dark fantasy • romance • gore • cosmic horror</p>
-            <h1 class="hero-title">A boy dies, wakes in Lumera, and steps into a world that was never meant to survive him.</h1>
+            <p class="eyebrow">Anime / Light Novel • dark fantasy • romance • gore • cosmic horror</p>
+            <h1 class="series-title">Threadborn</h1>
+            <p class="series-subtitle">Fate isn't given. It's severed.</p>
+            <h2 class="hero-title">A boy dies, wakes in Lumera, and steps into a world that was never meant to survive him.</h2>
             <p class="hero-copy">
               <strong>Threadborn</strong> follows <strong>Yono Kazeshima</strong> after a sudden death throws him into Lumera beside Violet. Survival turns into dark fantasy, romance, and sealed monsters that get worse each chapter.
             </p>
@@ -100,7 +109,7 @@
           </div>
           <div class="hero-media">
             <div class="hero-logo-wrap">
-              <img class="hero-logo" src="assets/threadborn-logo.png" alt="Threadborn logo" />
+              <img class="hero-logo" src="assets/threadborn-logo-en-wide.png" alt="Threadborn logo" />
             </div>
           </div>
         </div>
@@ -4264,7 +4273,7 @@
       }
 
       const displayName = user && (user.displayName || user.email) ? (user.displayName || user.email) : "Guest reader";
-      const avatar = "assets/threadborn-logo.png";
+      const avatar = "assets/threadborn-app-icon.png";
       nameEl.textContent = displayName;
       avatarEl.src = avatar;
     }
@@ -4385,7 +4394,7 @@
       feed.innerHTML = posts.map(post => `
         <article class="community-post">
           <div class="community-head">
-            <img src="${post.avatar_url || "assets/threadborn-logo.png"}" alt="${post.username || "User"} avatar" />
+            <img src="${post.avatar_url || "assets/threadborn-app-icon.png"}" alt="${post.username || "User"} avatar" />
             <div>
               <strong>${post.username || "Reader"}${renderNameBadges(post)}</strong>
               <div class="community-meta">${post.category.replace("_", " ")} • ${formatCommunityTime(post.created_at)}</div>

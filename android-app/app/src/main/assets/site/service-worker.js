@@ -1,4 +1,4 @@
-const CACHE_NAME = "threadborn-static-v10";
+const CACHE_NAME = "threadborn-static-v11";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -11,7 +11,21 @@ const CORE_ASSETS = [
   "./profile-jp.html",
   "./runtime-config.js",
   "./manifest.json",
-  "./assets/threadborn-logo.png"
+  "./assets/threadborn-logo.png",
+  "./assets/threadborn-logo-en.png",
+  "./assets/threadborn-logo-en-header.png",
+  "./assets/threadborn-logo-en-wide.png",
+  "./assets/threadborn-logo-jp.png",
+  "./assets/threadborn-logo-jp-header.png",
+  "./assets/threadborn-logo-jp-wide.png",
+  "./assets/threadborn-app-icon.png",
+  "./assets/threadborn-icon-192.png",
+  "./assets/threadborn-icon-512.png",
+  "./assets/threadborn-favicon.png",
+  "./assets/threadborn-favicon-jp.png",
+  "./assets/threadborn-apple-touch.png",
+  "./assets/threadborn-og-en.png",
+  "./assets/threadborn-og-jp.png"
 ];
 
 self.addEventListener("install", event => {
