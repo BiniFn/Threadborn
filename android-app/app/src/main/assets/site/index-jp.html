@@ -594,13 +594,18 @@
         </div>
       </div>
 
-      <div class="toolbar-pill">
+      <div class="toolbar-pill bookmark-card">
         <span class="pill-label">Bookmarks</span>
         <div class="toolbar-value">Quick jumps</div>
         <p class="toolbar-note">Saved moments for this novel.</p>
         <select id="bookmark-jump" onchange="jumpToBookmark(this.value)" aria-label="Jump to bookmark">
           <option value="">Select a bookmark</option>
         </select>
+        <div class="toolbar-actions">
+          <button class="ghost-btn" onclick="createBookmark()">Save current</button>
+          <button class="ghost-btn" onclick="deleteSelectedBookmark()">Delete selected</button>
+        </div>
+        <div id="bookmark-status" class="toolbar-note bookmark-status">Bookmarks save on this device.</div>
       </div>
 
       <label class="toolbar-pill chapter-card">
@@ -4168,6 +4173,7 @@
     let readerSize = 18;
     let activeHomeVolume = "第1巻";
     let readerTheme = "night";
+    const readerThemes = ["night", "paper", "ember", "forest", "ocean", "sunset", "midnight"];
     let readerToolsOpen = false;
     let currentLanguage = "en";
     let bilingualMode = false;
@@ -4179,7 +4185,54 @@
     const progressKey = "novelverse_reader_progress";
     const activeUserKey = "threadborn_user";
     const commentKey = "threadborn_volume_comments";
+    const bookmarkKey = "threadborn_bookmarks_v2";
+    const legacyBookmarkKey = "threadborn_bookmarks";
     const communityImageState = { dataUrl: "" };
+
+    Object.defineProperties(window, {
+      chapters: { configurable: true, get: () => chapters },
+      activeChapter: {
+        configurable: true,
+        get: () => activeChapter,
+        set: value => {
+          const next = Number(value);
+          if (Number.isFinite(next) && chapters[next]) {
+            activeChapter = next;
+          }
+        }
+      },
+      activePage: {
+        configurable: true,
+        get: () => activePage,
+        set: value => {
+          const chapter = chapters[activeChapter];
+          const next = Number(value);
+          if (Number.isFinite(next) && chapter) {
+            activePage = Math.max(0, Math.min(Math.floor(next), chapter.pages.length - 1));
+          }
+        }
+      },
+      readerSize: {
+        configurable: true,
+        get: () => readerSize,
+        set: value => {
+          const next = Number(value);
+          if (Number.isFinite(next)) {
+            readerSize = Math.max(15, Math.min(24, next));
+          }
+        }
+      },
+      readerTheme: {
+        configurable: true,
+        get: () => readerTheme,
+        set: value => {
+          if (typeof value === "string") {
+            readerTheme = value;
+          }
+        }
+      }
+    });
+
     function resolveApiBase() {
       const configured = (window.__THREADBORN_API_BASE || localStorage.getItem("threadborn_api_base") || "").replace(/\/$/, "");
       if (configured) {
@@ -4539,7 +4592,7 @@
     }
 
     function setReaderTheme(theme) {
-      if (!["night", "paper", "ember"].includes(theme)) {
+      if (!readerThemes.includes(theme)) {
         return;
       }
       readerTheme = theme;
@@ -4548,9 +4601,8 @@
     }
 
     function cycleReaderTheme() {
-      const themes = ["night", "paper", "ember"];
-      const nextIndex = (themes.indexOf(readerTheme) + 1) % themes.length;
-      setReaderTheme(themes[nextIndex]);
+      const nextIndex = (readerThemes.indexOf(readerTheme) + 1) % readerThemes.length;
+      setReaderTheme(readerThemes[nextIndex]);
     }
 
     function toggleReaderTools(force) {
@@ -5098,6 +5150,22 @@
       document.getElementById("tts-status").textContent = text;
     }
 
+    function getSpeechBoundaryLength(text, charIndex, eventName) {
+      const start = Math.max(0, Number(charIndex) || 0);
+      if (!text || start >= text.length) {
+        return 1;
+      }
+      if (eventName === "sentence") {
+        const sentenceEnd = text.slice(start).search(/[.!?。！？]\s|[.!?。！？]$/);
+        return sentenceEnd >= 0 ? Math.max(1, sentenceEnd + 1) : Math.min(80, text.length - start);
+      }
+      const word = text.slice(start).match(/^\s*([^\s.,!?;:"()、。！？「」『』]+)/);
+      if (word && word[1]) {
+        return word[0].length;
+      }
+      return Math.min(8, text.length - start);
+    }
+
     function clearTtsHighlight() {
       const marks = document.querySelectorAll("#reader-content .tts-highlight");
       marks.forEach(mark => {
@@ -5113,16 +5181,11 @@
     function highlightSpokenRange(charIndex = 0, charLength = 1) {
       const container = document.getElementById("reader-content");
       if (!container) return;
-      
-      // Smooth transition: don't clear immediately if highlighting the same area
-      const currentHighlight = container.querySelector(".tts-highlight");
+
       const startIndex = Math.max(0, Number(charIndex) || 0);
       const endIndex = startIndex + Math.max(1, Number(charLength) || 1);
-      
-      // Only clear if this is a significantly different position
-      if (!currentHighlight || Math.abs(startIndex - (currentHighlight.dataset.startIndex || 0)) > 10) {
-        clearTtsHighlight();
-      }
+
+      clearTtsHighlight();
 
       const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
       let node;
@@ -5168,10 +5231,11 @@
         mark.appendChild(fragment);
         range.insertNode(mark);
         
-        // Smooth scroll to highlight if it's outside viewport
+        // Smooth scroll to highlight if it is outside the reader viewport.
         const rect = mark.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
+        const scrollBox = document.querySelector(".reader-body");
+        const containerRect = scrollBox ? scrollBox.getBoundingClientRect() : container.getBoundingClientRect();
+        if (rect.top < containerRect.top + 40 || rect.bottom > containerRect.bottom - 40) {
           mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       } catch (e) {
@@ -5238,16 +5302,21 @@
       ttsUtterance.rate = Number(document.getElementById("rate-range").value);
       ttsUtterance.pitch = Number(document.getElementById("pitch-range").value);
       const readingMode = getReadingMode();
+      const spokenText = ttsUtterance.text || "";
       
       ttsUtterance.onstart = () => updateTtsStatus("Reading aloud");
       ttsUtterance.onboundary = event => {
         const mode = getReadingMode();
+        if (typeof event.charIndex !== "number") {
+          return;
+        }
+        const length = event.charLength || getSpeechBoundaryLength(spokenText, event.charIndex, event.name);
         if (mode === "word" && event.name === "word") {
-          highlightSpokenRange(event.charIndex, event.charLength || 8);
+          highlightSpokenRange(event.charIndex, length);
         } else if (mode === "sentence" && event.name === "sentence") {
-          highlightSpokenRange(event.charIndex, event.charLength || 20);
+          highlightSpokenRange(event.charIndex, length);
         } else if (mode === "continuous" && (event.name === "word" || event.name === "sentence" || typeof event.charIndex === "number")) {
-          highlightSpokenRange(event.charIndex, event.charLength || 8);
+          highlightSpokenRange(event.charIndex, length);
         }
       };
       ttsUtterance.onend = () => {
@@ -5255,14 +5324,26 @@
         clearTtsHighlight();
         const chapter = chapters[activeChapter];
         const atLastPage = activePage >= (chapter.pages.length - 1);
-        if (!ttsKeepReading || atLastPage) {
+        const atLastChapter = activeChapter >= (chapters.length - 1);
+        if (!ttsKeepReading) {
           updateTtsStatus("TTS ready");
           ttsKeepReading = false;
           return;
         }
-        activePage += 1;
+        if (atLastPage && atLastChapter) {
+          updateTtsStatus("End of story reached");
+          ttsKeepReading = false;
+          return;
+        }
+        if (atLastPage) {
+          activeChapter += 1;
+          activePage = 0;
+          updateTtsStatus("Next chapter...");
+        } else {
+          activePage += 1;
+          updateTtsStatus("Next page...");
+        }
         renderPage();
-        updateTtsStatus("Next page...");
         setTimeout(() => speakCurrentPage(true), 160);
       };
       ttsUtterance.onerror = () => {
@@ -5496,57 +5577,216 @@
       createBookmark();
     }
 
-    function createBookmark() {
+    function setBookmarkStatus(text) {
+      const status = document.getElementById("bookmark-status");
+      if (status) {
+        status.textContent = text;
+      }
+    }
+
+    function safeParseArray(value) {
+      try {
+        const parsed = JSON.parse(value || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function makeBookmarkId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return `local_${window.crypto.randomUUID()}`;
+      }
+      return `local_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    }
+
+    function normalizeBookmark(bookmark) {
+      if (!bookmark) {
+        return null;
+      }
+      const chapterIndex = Number.isFinite(Number(bookmark.chapterIndex))
+        ? Number(bookmark.chapterIndex)
+        : chapters.findIndex(chapter => chapter.volume === bookmark.volumeId && chapter.chapter === bookmark.chapterId);
+      if (!chapters[chapterIndex]) {
+        return null;
+      }
+      const chapter = chapters[chapterIndex];
+      const pageIndex = Math.max(0, Math.min(Number(bookmark.pageIndex ?? bookmark.scrollPosition ?? 0) || 0, chapter.pages.length - 1));
+      const createdAt = bookmark.createdAt || bookmark.created_at || new Date().toISOString();
+      return {
+        id: String(bookmark.id || makeBookmarkId()),
+        serverId: bookmark.serverId || "",
+        chapterIndex,
+        pageIndex,
+        volumeId: bookmark.volumeId || bookmark.volume_id || chapter.volume,
+        chapterId: bookmark.chapterId || bookmark.chapter_id || chapter.chapter,
+        chapterTitle: bookmark.chapterTitle || chapter.title,
+        chapterLabel: bookmark.chapterLabel || `${chapter.volume} • ${chapter.chapter}`,
+        label: String(bookmark.label || bookmark.note || "").slice(0, 90),
+        note: String(bookmark.note || "").slice(0, 140),
+        createdAt,
+        updatedAt: bookmark.updatedAt || bookmark.updated_at || createdAt,
+        synced: Boolean(bookmark.synced || bookmark.serverId)
+      };
+    }
+
+    function readLocalBookmarks() {
+      const current = safeParseArray(localStorage.getItem(bookmarkKey)).map(normalizeBookmark).filter(Boolean);
+      if (current.length) {
+        return current;
+      }
+      const legacy = safeParseArray(localStorage.getItem(legacyBookmarkKey)).map(normalizeBookmark).filter(Boolean);
+      if (legacy.length) {
+        writeLocalBookmarks(legacy);
+      }
+      return legacy;
+    }
+
+    function writeLocalBookmarks(bookmarks) {
+      const normalized = bookmarks.map(normalizeBookmark).filter(Boolean);
+      normalized.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      localStorage.setItem(bookmarkKey, JSON.stringify(normalized));
+      localStorage.setItem(legacyBookmarkKey, JSON.stringify(normalized));
+      localStorage.setItem("threadborn_bookmarks_updated_at", new Date().toISOString());
+      return normalized;
+    }
+
+    function formatBookmarkLabel(bookmark) {
+      const label = bookmark.label ? `${bookmark.label} • ` : "";
+      return `${label}${bookmark.chapterLabel} • Page ${bookmark.pageIndex + 1}${bookmark.synced ? " • synced" : ""}`;
+    }
+
+    function createBookmark(options = {}) {
       const chapter = chapters[activeChapter];
+      if (!chapter) {
+        return null;
+      }
+      const defaultLabel = `${chapter.chapter} Page ${activePage + 1}`;
+      const labelInput = options.skipPrompt
+        ? (options.label || "")
+        : prompt("Bookmark label (optional):", defaultLabel);
+      if (labelInput === null) {
+        setBookmarkStatus("Bookmark canceled.");
+        return null;
+      }
       const bookmark = {
-        id: Date.now().toString(),
+        id: makeBookmarkId(),
         chapterIndex: activeChapter,
         pageIndex: activePage,
+        volumeId: chapter.volume,
+        chapterId: chapter.chapter,
         chapterTitle: chapter.title,
-        chapterLabel: chapter.label,
+        chapterLabel: `${chapter.volume} • ${chapter.chapter}`,
+        label: String(labelInput || defaultLabel).slice(0, 90),
         timestamp: new Date().toISOString(),
-        note: prompt("Add a note for this bookmark (optional):") || ""
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        synced: false
       };
-      
-      let bookmarks = JSON.parse(localStorage.getItem("threadborn_bookmarks") || "[]");
+
+      const bookmarks = readLocalBookmarks();
       bookmarks.push(bookmark);
-      localStorage.setItem("threadborn_bookmarks", JSON.stringify(bookmarks));
-      
-      updateTtsStatus("Bookmark created");
+      writeLocalBookmarks(bookmarks);
+
+      updateTtsStatus("Bookmark saved");
+      setBookmarkStatus("Saved on this device.");
       renderBookmarks();
+      if (typeof window.syncBookmarkToAccount === "function" && options.sync !== false) {
+        window.syncBookmarkToAccount(bookmark).catch(() => {
+          setBookmarkStatus("Saved locally. Account sync will retry later.");
+        });
+      }
+      return bookmark;
     }
 
     function deleteBookmark(bookmarkId) {
-      let bookmarks = JSON.parse(localStorage.getItem("threadborn_bookmarks") || "[]");
-      bookmarks = bookmarks.filter(b => b.id !== bookmarkId);
-      localStorage.setItem("threadborn_bookmarks", JSON.stringify(bookmarks));
-      
+      const bookmarks = readLocalBookmarks();
+      const deleted = bookmarks.find(bookmark => bookmark.id === bookmarkId);
+      writeLocalBookmarks(bookmarks.filter(bookmark => bookmark.id !== bookmarkId));
+
       updateTtsStatus("Bookmark deleted");
+      setBookmarkStatus("Bookmark deleted.");
       renderBookmarks();
+      if (deleted && typeof window.deleteBookmarkFromAccount === "function") {
+        window.deleteBookmarkFromAccount(deleted).catch(() => {
+          setBookmarkStatus("Deleted locally. Account sync will catch up later.");
+        });
+      }
+    }
+
+    function deleteSelectedBookmark() {
+      const bookmarkJump = document.getElementById("bookmark-jump");
+      const bookmarkId = bookmarkJump ? bookmarkJump.value : "";
+      if (!bookmarkId) {
+        setBookmarkStatus("Choose a bookmark first.");
+        return;
+      }
+      deleteBookmark(bookmarkId);
     }
 
     function jumpToBookmark(bookmarkId) {
-      const bookmarks = JSON.parse(localStorage.getItem("threadborn_bookmarks") || "[]");
+      const bookmarks = readLocalBookmarks();
       const bookmark = bookmarks.find(b => b.id === bookmarkId);
-      
+
       if (bookmark) {
-        activeChapter = bookmark.chapterIndex;
-        activePage = bookmark.pageIndex;
-        renderPage();
+        const chapterIndex = chapters[bookmark.chapterIndex]
+          ? bookmark.chapterIndex
+          : chapters.findIndex(chapter => chapter.volume === bookmark.volumeId && chapter.chapter === bookmark.chapterId);
+        if (chapterIndex < 0) {
+          setBookmarkStatus("That bookmark no longer matches a chapter.");
+          return;
+        }
+        openChapter(chapterIndex, bookmark.pageIndex);
         updateTtsStatus(`Jumped to bookmark: ${bookmark.chapterTitle}`);
+        setBookmarkStatus(`Opened ${bookmark.chapterLabel}, page ${bookmark.pageIndex + 1}.`);
       }
     }
 
     function renderBookmarks() {
-      const bookmarks = JSON.parse(localStorage.getItem("threadborn_bookmarks") || "[]");
+      const bookmarks = readLocalBookmarks();
       const bookmarkJump = document.getElementById("bookmark-jump");
-      
+
       if (bookmarkJump) {
-        bookmarkJump.innerHTML = '<option value="">Select a bookmark</option>' +
-          bookmarks.map(bookmark => 
-            `<option value="${bookmark.id}">${bookmark.chapterLabel} - Page ${bookmark.pageIndex + 1}${bookmark.note ? ' 📝' : ''}</option>`
-          ).join('');
+        const current = bookmarkJump.value;
+        bookmarkJump.replaceChildren(new Option(bookmarks.length ? "Select a bookmark" : "No bookmarks saved", ""));
+        bookmarks.forEach(bookmark => {
+          bookmarkJump.add(new Option(formatBookmarkLabel(bookmark), bookmark.id));
+        });
+        if (bookmarks.some(bookmark => bookmark.id === current)) {
+          bookmarkJump.value = current;
+        }
       }
+      setBookmarkStatus(bookmarks.length ? `${bookmarks.length} bookmark${bookmarks.length === 1 ? "" : "s"} saved on this device.` : "Bookmarks save on this device.");
+    }
+
+    function mergeServerBookmarks(serverBookmarks = []) {
+      const local = readLocalBookmarks();
+      const byServerId = new Map(local.filter(bookmark => bookmark.serverId).map(bookmark => [bookmark.serverId, bookmark]));
+      const byPlace = new Map(local.map(bookmark => [`${bookmark.volumeId}|${bookmark.chapterId}|${bookmark.pageIndex}|${bookmark.label}`, bookmark]));
+      serverBookmarks.forEach(serverBookmark => {
+        const converted = normalizeBookmark({
+          id: `server_${serverBookmark.id}`,
+          serverId: serverBookmark.id,
+          volumeId: serverBookmark.volume_id,
+          chapterId: serverBookmark.chapter_id,
+          pageIndex: Number(serverBookmark.scroll_position || 0),
+          label: serverBookmark.label || "",
+          createdAt: serverBookmark.created_at,
+          updatedAt: serverBookmark.updated_at,
+          synced: true
+        });
+        if (!converted) {
+          return;
+        }
+        const existing = byServerId.get(converted.serverId) || byPlace.get(`${converted.volumeId}|${converted.chapterId}|${converted.pageIndex}|${converted.label}`);
+        if (existing) {
+          Object.assign(existing, converted, { id: existing.id, serverId: converted.serverId, synced: true });
+        } else {
+          local.push(converted);
+        }
+      });
+      writeLocalBookmarks(local);
+      renderBookmarks();
     }
 
     function normalizeAscii(text) {
@@ -6353,7 +6593,7 @@
         if (typeof saved.size === "number") {
           readerSize = Math.max(15, Math.min(24, saved.size));
         }
-        if (typeof saved.theme === "string" && ["night", "paper", "ember"].includes(saved.theme)) {
+        if (typeof saved.theme === "string" && readerThemes.includes(saved.theme)) {
           readerTheme = saved.theme;
         }
       } catch (error) {
