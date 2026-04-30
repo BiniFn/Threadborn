@@ -79,6 +79,16 @@
             method: "PUT",
             body: JSON.stringify(item.payload)
           });
+        } else if (item.type === "bookmark") {
+          await apiFetch("/api/reader/bookmarks", {
+            method: "POST",
+            body: JSON.stringify(item.payload)
+          });
+        } else if (item.type === "bookmark_delete") {
+          await apiFetch("/api/reader/bookmarks", {
+            method: "DELETE",
+            body: JSON.stringify(item.payload)
+          });
         } else if (item.type === "analytics") {
           await apiFetch("/api/reader/analytics", {
             method: "POST",
@@ -194,6 +204,10 @@
   }
 
   function renderBookmarkSelect() {
+    if (typeof window.mergeServerBookmarks === "function") {
+      window.mergeServerBookmarks(bookmarkCache);
+      return;
+    }
     const select = document.getElementById("bookmark-jump");
     if (!select) {
       return;
@@ -208,8 +222,12 @@
 
   async function loadBookmarks() {
     if (!authUser) {
-      bookmarkCache = [];
-      renderBookmarkSelect();
+      if (typeof window.renderBookmarks === "function") {
+        window.renderBookmarks();
+      } else {
+        bookmarkCache = [];
+        renderBookmarkSelect();
+      }
       return;
     }
     try {
@@ -222,8 +240,11 @@
   }
 
   window.addBookmarkFromReader = async function addBookmarkFromReader() {
+    if (typeof window.createBookmark === "function") {
+      window.createBookmark();
+      return;
+    }
     if (!authUser) {
-      alert("Login first to sync bookmarks.");
       return;
     }
     const payload = getChapterMeta();
@@ -241,6 +262,83 @@
       alert("Could not save bookmark.");
     }
   };
+
+  window.syncBookmarkToAccount = async function syncBookmarkToAccount(bookmark) {
+    if (!authUser || !bookmark) {
+      return;
+    }
+    const payload = {
+      novelId: "threadborn",
+      volumeId: bookmark.volumeId,
+      chapterId: bookmark.chapterId,
+      scrollPosition: Number(bookmark.pageIndex || 0),
+      label: bookmark.label || ""
+    };
+    try {
+      const data = await apiFetch("/api/reader/bookmarks", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      if (data.bookmark && typeof window.mergeServerBookmarks === "function") {
+        window.mergeServerBookmarks([data.bookmark]);
+      }
+      const status = document.getElementById("bookmark-status");
+      if (status) {
+        status.textContent = "Bookmark saved and synced.";
+      }
+    } catch (error) {
+      enqueue({ type: "bookmark", payload });
+      const status = document.getElementById("bookmark-status");
+      if (status) {
+        status.textContent = "Bookmark saved locally. Sync queued.";
+      }
+    }
+  };
+
+  window.deleteBookmarkFromAccount = async function deleteBookmarkFromAccount(bookmark) {
+    if (!authUser || !bookmark || !bookmark.serverId) {
+      return;
+    }
+    const payload = { id: bookmark.serverId };
+    try {
+      await apiFetch("/api/reader/bookmarks", {
+        method: "DELETE",
+        body: JSON.stringify(payload)
+      });
+    } catch (error) {
+      enqueue({ type: "bookmark_delete", payload });
+    }
+  };
+
+  async function syncLocalBookmarks() {
+    if (!authUser || typeof window.readLocalBookmarks !== "function" || typeof window.mergeServerBookmarks !== "function") {
+      return;
+    }
+    const localBookmarks = window.readLocalBookmarks();
+    for (const bookmark of localBookmarks) {
+      if (bookmark.synced || bookmark.serverId) {
+        continue;
+      }
+      const payload = {
+        novelId: "threadborn",
+        volumeId: bookmark.volumeId,
+        chapterId: bookmark.chapterId,
+        scrollPosition: Number(bookmark.pageIndex || 0),
+        label: bookmark.label || ""
+      };
+      try {
+        const data = await apiFetch("/api/reader/bookmarks", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        if (data.bookmark) {
+          window.mergeServerBookmarks([data.bookmark]);
+        }
+      } catch (error) {
+        enqueue({ type: "bookmark", payload });
+      }
+    }
+  }
 
   window.jumpToBookmark = function jumpToBookmark(id) {
     if (!id) {
@@ -289,6 +387,7 @@
       localStorage.removeItem("threadborn_csrf_token");
     }
     toggleAuthNav();
+    await syncLocalBookmarks();
     await loadBookmarks();
   }
 
