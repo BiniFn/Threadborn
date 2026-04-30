@@ -1,14 +1,17 @@
 {
-  "name": "Threadborn — Starting Life Beyond the Covenant Door",
+  "name": "Threadborn: Reborn Where Fate Snaps",
   "short_name": "Threadborn",
-  "description": "Official reading hub for the Threadborn dark fantasy light novel. Read chapters, export collector PDFs, and download styled EPUBs — fully offline.",
+  "description": "Official reading hub for Threadborn. Read updated chapters, export collector PDFs, and download styled EPUBs fully offline.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#050505",
   "theme_color": "#090607",
-  "categories": ["books", "entertainment"],
+  "categories": [
+    "books",
+    "entertainment"
+  ],
   "id": "./index.html",
   "icons": [
     {

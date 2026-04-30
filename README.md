@@ -1,4 +1,4 @@
-# Threadborn – Starting Life Beyond the Covenant Door
+# Threadborn: Reborn Where Fate Snaps
 
 Official reader and chapter export hub for **Threadborn**, an original dark fantasy light novel by **BiniFn**.
 

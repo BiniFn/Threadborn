@@ -7,8 +7,8 @@ def fix_hero(filepath):
 
     # Replacements
     content = content.replace(
-        'Threadborn — Starting Life Beyond the Covenant Door • dark fantasy • romance • gore • cosmic horror',
-        'Threadborn — 契約の扉の向こうから始まる生活 • ダークファンタジー • ロマンス • ゴア • コズミックホラー'
+        'Threadborn: Reborn Where Fate Snaps • dark fantasy • romance • gore • cosmic horror',
+        'スレッドボーン：運命が断ち切れる場所での再生 • ダークファンタジー • ロマンス • ゴア • コズミックホラー'
     )
     content = content.replace(
         'A boy dies, wakes in Lumera, and steps into a world that was never meant to survive him.',
@@ -16,11 +16,11 @@ def fix_hero(filepath):
     )
     content = content.replace(
         '<strong>Threadborn</strong> follows <strong>Yono Kazeshima</strong> after a sudden death throws him into Lumera beside Violet. Survival turns into dark fantasy, romance, and sealed monsters that get worse each chapter.',
-        '<strong>Threadborn</strong> は、突然の死によってヴァイオレットと共にルメラへと放り込まれた<strong>風島夜乃</strong>の物語。生き残るための戦いは、ダークファンタジー、ロマンス、そして章を追うごとに凶悪になる封印された怪物たちとの遭遇へと変わっていく。'
+        '<strong>Threadborn</strong> は、突然の死によってバイオレットと共にルメラへと放り込まれた<strong>風嶋ヨノ</strong>の物語。生き残るための戦いは、ダークファンタジー、ロマンス、そして章を追うごとに凶悪になる封印された怪物たちとの遭遇へと変わっていく。'
     )
     content = content.replace(
         '<strong>Volume 1:</strong> Yono learns Lumera’s rules, survives the Shade debt arc, and reaches the forest door hiding Velkor’s prison.',
-        '<strong>第1巻:</strong> 夜乃はルメラの法則を学び、シェイドの借金編を生き延び、ヴェルコールの牢獄を隠す森の扉に到達する。'
+        '<strong>第1巻:</strong> ヨノはルメラの法則を学び、シェイドの借金編を生き延び、ヴェルコールの牢獄を隠す森の扉に到達する。'
     )
     content = content.replace(
         '<button class="btn btn-secondary" onclick="localStorage.setItem(\'threadborn_lang\', \'en\'); window.location.href=\'./index.html\'">🇺🇸 English Version</button></button>\n              <button class="btn btn-secondary" onclick="localStorage.setItem(\'threadborn_lang\', \'en\'); window.location.href=\'./index.html\'">🇺🇸 English Version</button>',

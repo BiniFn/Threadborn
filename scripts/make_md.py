@@ -116,7 +116,7 @@ vol2_meta = [
 
 # ── assemble MD ───────────────────────────────────────────────────────────
 def build_md(all_pages, meta, vol_title, vol_sub):
-    lines = [f"# Threadborn — {vol_title}", f"*{vol_sub}*", "", "---", ""]
+    lines = [f"# Threadborn: {vol_title}", f"*{vol_sub}*", "", "***", ""]
     for i, pages in enumerate(all_pages):
         ch_num, ch_title = meta[i] if i < len(meta) else (f"Chapter {i+1}", "")
         lines.append(f"## {ch_num}: {ch_title}")
@@ -125,7 +125,7 @@ def build_md(all_pages, meta, vol_title, vol_sub):
             lines.append(strip_html(page))
             lines.append("")
             if j < len(pages) - 1:
-                lines.append("<!-- page break -->")
+                lines.append("*** page break ***")
                 lines.append("")
         lines.append("")
         lines.append("---")
