@@ -1,4 +1,4 @@
-const CACHE_NAME = "threadborn-static-v24";
+const CACHE_NAME = "threadborn-static-v25";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -11,12 +11,13 @@ const CORE_ASSETS = [
   "./profile-jp.html",
   "./runtime-config.js",
   "./manifest.json",
-  "./global.css?v=24",
+  "./global.css?v=25",
   "./assets/threadborn-logo.png",
   "./assets/threadborn-logo-en.png",
   "./assets/threadborn-logo-en-header.png",
   "./assets/threadborn-logo-en-wide.png",
   "./assets/threadborn-logo-jp.png",
+  "./assets/phase1-client.js?v=25",
   "./assets/threadborn-logo-jp-header.png",
   "./assets/threadborn-logo-jp-wide.png",
   "./assets/threadborn-app-icon.png",
@@ -30,6 +31,7 @@ const CORE_ASSETS = [
 ];
 
 self.addEventListener("install", event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS))
   );
