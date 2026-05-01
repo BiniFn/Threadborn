@@ -610,7 +610,7 @@
           notifContainer.innerHTML = ownerNotifs.map((n, idx) => `
             <div class="announcement-item" style="display:flex; gap:8px; margin-bottom:8px;">
               <input type="text" class="dashboard-announcement-input" value="${escapeHtml(n)}" style="flex:1;" />
-              <button class="ghost-btn" type="button" onclick="this.parentElement.remove()">Remove</button>
+              <button class="ghost-btn" type="button" onclick="this.parentElement.remove(); saveDashboardConfig();">Remove</button>
             </div>
           `).join("");
         }
@@ -621,10 +621,17 @@
           cdContainer.innerHTML = ownerCountdowns.map((cd, idx) => `
             <div class="countdown-item" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px; padding:12px; background:#2a2a35; border-radius:8px;">
               <input type="text" class="dashboard-cd-title" value="${escapeHtml(cd.title)}" placeholder="Title..." style="width:100%;" />
-              <input type="datetime-local" class="dashboard-cd-date" value="${escapeHtml(cd.target_date)}" style="width:100%; padding:8px;" />
-              <button class="ghost-btn" type="button" onclick="this.parentElement.remove()" style="align-self:flex-end;">Remove</button>
+              <input type="text" class="dashboard-cd-date" value="${escapeHtml(cd.target_date)}" placeholder="Select Date & Time..." style="width:100%; padding:8px;" />
+              <button class="ghost-btn" type="button" onclick="this.parentElement.remove(); saveDashboardConfig();" style="align-self:flex-end;">Remove</button>
             </div>
           `).join("");
+          if (typeof flatpickr !== "undefined") {
+            flatpickr(".dashboard-cd-date", {
+              enableTime: true,
+              dateFormat: "Y-m-d H:i",
+              time_24hr: false
+            });
+          }
         }
       }
 
@@ -655,6 +662,17 @@
     }
   };
 
+  window.clearAllDashboardData = async function() {
+    if (!confirm("Are you sure you want to completely WIPE ALL announcements, timers, and polls? This cannot be undone.")) return;
+    try {
+      await apiFetch(`/api/dashboard?action=clear_all`, { method: "POST" });
+      alert("All data wiped successfully.");
+      window.location.reload(true);
+    } catch(e) {
+      alert("Failed to wipe data: " + e.message);
+    }
+  };
+
   window.addDashboardAnnouncement = function() {
     const container = document.getElementById("dashboard-announcements-list");
     if (!container) return;
@@ -665,7 +683,7 @@
     div.style.marginBottom = "8px";
     div.innerHTML = `
       <input type="text" class="dashboard-announcement-input" placeholder="New announcement..." style="flex:1;" />
-      <button class="ghost-btn" type="button" onclick="this.parentElement.remove()">Remove</button>
+      <button class="ghost-btn" type="button" onclick="this.parentElement.remove(); saveDashboardConfig();">Remove</button>
     `;
     container.appendChild(div);
   };
@@ -684,10 +702,17 @@
     div.style.borderRadius = "8px";
     div.innerHTML = `
       <input type="text" class="dashboard-cd-title" placeholder="Title..." style="width:100%;" />
-      <input type="datetime-local" class="dashboard-cd-date" style="width:100%; padding:8px;" />
-      <button class="ghost-btn" type="button" onclick="this.parentElement.remove()" style="align-self:flex-end;">Remove</button>
+      <input type="text" class="dashboard-cd-date" placeholder="Select Date & Time..." style="width:100%; padding:8px;" />
+      <button class="ghost-btn" type="button" onclick="this.parentElement.remove(); saveDashboardConfig();" style="align-self:flex-end;">Remove</button>
     `;
     container.appendChild(div);
+    if (typeof flatpickr !== "undefined") {
+      flatpickr(div.querySelector(".dashboard-cd-date"), {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: false
+      });
+    }
   };
 
   // Polls Logic

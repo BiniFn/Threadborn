@@ -527,7 +527,10 @@
           <p>Set persistent banners at the top of the main menus. Stack multiple announcements.</p>
           <div id="dashboard-announcements-list"></div>
           <button class="btn btn-secondary" onclick="addDashboardAnnouncement()" style="margin-bottom:12px; width:100%;">+ Add Announcement</button>
-          <button class="nav-btn" onclick="saveDashboardConfig()">Save Config</button>
+          <div style="display:flex; gap:10px;">
+            <button class="nav-btn" onclick="saveDashboardConfig()" style="flex:1;">Save Config</button>
+            <button class="ghost-btn" onclick="clearAllDashboardData()" style="color:#ff6b6b; flex:1;">Wipe All Data</button>
+          </div>
         </article>
         
         <article class="card">
