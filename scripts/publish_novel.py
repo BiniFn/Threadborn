@@ -196,12 +196,15 @@ def parse_chapters(md: str):
 def main():
     en_md = (ROOT / "Threadborn-Complete.md").read_text(encoding="utf-8")
     ex_md = (ROOT / "Threadborn-EX.md").read_text(encoding="utf-8")
-    # Make EX md look like a volume
-    ex_md = ex_md.replace("## EX NOVEL VOL 1", "# EX Novel Vol 1", 1)
+    # Make EX md look like a volume with a single chapter
+    ex_md = ex_md.replace("## EX NOVEL VOL 1", "# EX Novel Vol 1\n\n## Chapter 1: The Chronicle Beyond the Chapter", 1)
+    # Downgrade all other chapters in EX so they aren't parsed as separate chapters
+    ex_md = re.sub(r"^##\s+CHAPTER", "### CHAPTER", ex_md, flags=re.MULTILINE | re.IGNORECASE)
     
     ja_md = (ROOT / "Threadborn-Complete-JP.md").read_text(encoding="utf-8")
     ex_ja_md = (ROOT / "Threadborn-EX-JP.md").read_text(encoding="utf-8")
-    ex_ja_md = ex_ja_md.replace("## EX小説 第1巻", "# EX小説 第1巻", 1)
+    ex_ja_md = ex_ja_md.replace("## EX小説 第1巻", "# EX小説 第1巻\n\n## 第1章：章を超えたクロニクル", 1)
+    ex_ja_md = re.sub(r"^##\s+第\s*\d+\s*章", "### 第", ex_ja_md, flags=re.MULTILINE)
 
     en_combined = en_md + "\n\n" + ex_md
     ja_combined = ja_md + "\n\n" + ex_ja_md
