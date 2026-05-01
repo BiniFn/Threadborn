@@ -16,8 +16,11 @@ module.exports = async (req, res) => {
     const action = req.query.action || "config";
 
     if (action === "config") {
+      const lang = req.query.lang || "en";
+      const configKey = lang === "ja" ? "global_settings_jp" : "global_settings";
+
       if (req.method === "GET") {
-        const { rows } = await pool.query("select value from dashboard_config where key = 'global_settings'");
+        const { rows } = await pool.query("select value from dashboard_config where key = $1", [configKey]);
         if (!rows.length) {
           return success(res, { notification: "", countdown: { title: "", target_date: "" } });
         }
@@ -43,9 +46,9 @@ module.exports = async (req, res) => {
 
         await pool.query(
           `insert into dashboard_config (key, value, updated_at) 
-           values ('global_settings', $1, now()) 
-           on conflict (key) do update set value = $1, updated_at = now()`,
-          [payload]
+           values ($1, $2, now()) 
+           on conflict (key) do update set value = $2, updated_at = now()`,
+          [configKey, payload]
         );
 
         return success(res, payload);
