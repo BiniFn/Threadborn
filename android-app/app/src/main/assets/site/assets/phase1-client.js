@@ -586,6 +586,11 @@
             const timerEl = document.getElementById(`global-countdown-timer-${idx}`);
             if (!timerEl) return;
             
+            if (isNaN(target)) {
+              timerEl.textContent = "Timer Not Set";
+              return;
+            }
+            
             if (distance < 0) {
               timerEl.textContent = "RELEASED";
               return;
@@ -650,7 +655,7 @@
       const countdowns = Array.from(cdItems).map(item => ({
         title: item.querySelector(".dashboard-cd-title").value.trim(),
         target_date: item.querySelector(".dashboard-cd-date").value
-      })).filter(cd => cd.title && cd.target_date);
+      }));
       
       await apiFetch(`/api/dashboard?action=config&lang=${lang}`, {
         method: "PUT",
