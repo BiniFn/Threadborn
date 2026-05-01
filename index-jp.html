@@ -70,6 +70,7 @@
         <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">巻</button>
         <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">チャプター</button>
         <button class="nav-btn" data-view="app" onclick="switchView('app')">アプリ</button>
+        <button class="nav-btn" data-view="community" onclick="switchView('community')">コミュニティ</button>
         <button class="nav-btn" data-view="characters" onclick="switchView('characters')">キャラクター</button>
         <button class="nav-btn" data-view="powers" onclick="switchView('powers')">能力</button>
         <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">リーク</button>
@@ -93,11 +94,7 @@
 
   <main>
 
-    <div id="global-announcement-banner" class="global-banner" style="display:none;"></div>
-    <div id="global-countdown-banner" class="global-banner" style="display:none; background:#222; color:#fff; padding:10px; text-align:center; margin-bottom:16px; border-radius:8px; border:1px solid rgba(255, 107, 107, 0.4);">
-      <strong id="global-countdown-title"></strong>: <span id="global-countdown-timer" style="color:#ff6b6b; font-family: 'Space Mono', monospace;"></span>
-    </div>
-    <div id="global-polls-container"></div>
+
 
     <section id="view-home" class="view active">
       <article class="hero-card" style="margin-bottom: 24px;">
@@ -115,6 +112,7 @@
             </div>
             <div class="hero-actions">
               <button class="btn btn-primary" onclick="openChapter(0)">読み始める</button>
+              <button class="btn btn-secondary" onclick="switchView('community')">コミュニティと更新情報</button>
               <button class="btn btn-secondary" onclick="switchLanguage()">🌐 Switch to English</button>
             </div>
           </div>
@@ -127,18 +125,32 @@
       </article>
     </section>
 
+    <section id="view-community" class="view">
+      <div class="section-head">
+        <div>
+          <h2>コミュニティと更新情報</h2>
+          <p class="section-copy">最新のアンケート、お知らせ、リリースまでのカウントダウン。</p>
+        </div>
+      </div>
+      <div id="global-announcement-banner" class="global-banner" style="display:none; margin-bottom: 24px;"></div>
+      <div id="global-countdown-banner" class="global-banner" style="display:none; background:#222; color:#fff; padding:10px; text-align:center; margin-bottom:24px; border-radius:8px; border:1px solid rgba(255, 107, 107, 0.4);">
+        <strong id="global-countdown-title"></strong>: <span id="global-countdown-timer" style="color:#ff6b6b; font-family: 'Space Mono', monospace;"></span>
+      </div>
+      <div id="global-polls-container" style="display: grid; gap: 16px;"></div>
+    </section>
+
     <section id="view-app" class="view">
       <div class="section-head">
         <div>
           <h2>アプリ</h2>
-          <p class="section-copy">Install Threadborn as a web app or download the offline Android build.</p>
+          <p class="section-copy">Threadbornをウェブアプリとしてインストールするか、オフライン用Androidアプリをダウンロードします。</p>
         </div>
       </div>
       <article class="app-dashboard" id="app-dashboard" aria-hidden="true"></article>
       <div class="grid app-grid web-app-promo">
         <article class="card app-card">
-          <strong>Install Web App</strong>
-          <p>Use the lighter installable version for quick home-screen access on supported browsers.</p>
+          <strong>ウェブアプリをインストール</strong>
+          <p>対応ブラウザからホーム画面に追加して、軽量なアプリ版を素早く起動します。</p>
           <div class="link-cluster" style="margin-top:18px;">
             <button class="btn btn-primary" id="install-btn" onclick="installWebApp()">Install App</button>
           </div>
@@ -5733,161 +5745,161 @@
 
     const characters = [
       {
-        role: "Latest chapter lead",
+        role: "最新章の主人公",
         age: "19",
-        name: "Yono Kazeshima",
-        bio: "From the Covenant Door onward, the newest version of Yono is always his strongest one. Every broken seal turns the previous peak into his next floor.",
-        chips: ["time control origin", "thread cut", "latest-chapter strongest", "rocket racket"]
+        name: "風嶋ヨノ",
+        bio: "契約の扉以降、ヨノの最新バージョンは常に彼の最強の姿となる。封印が解かれるたびに、以前の頂点が彼の次の底辺へと変わる。",
+        chips: ["時間操作の起源", "糸の切断", "最新章最強", "ロケットラケット"]
       },
       {
-        role: "Goddess / girlfriend",
-        age: "appears 19",
-        name: "Violet Arden",
-        bio: "The flower goddess who caused Yono's death, followed him into Lumera, and now refuses to let his power climb cost him his humanity or his relationship with her.",
-        chips: ["thread sight", "divine rune magic", "romance lead", "door arc secret"]
+        role: "女神 / ガールフレンド",
+        age: "見かけは19",
+        name: "バイオレット・アーデン",
+        bio: "ヨノの死の原因となった花の女神。彼を追ってルメラにやって来た彼女は、力の向上が彼の人間性や彼女との関係を損なうことを断固として許さない。",
+        chips: ["糸の視覚", "神聖なルーン魔法", "ロマンスの主役", "扉の秘密"]
       },
       {
-        role: "Warrior",
+        role: "戦士",
         age: "21",
-        name: "Serah Nightbloom",
-        bio: "Twin-saber frontline force and one of the first people in Lumera to decide Yono was worth fighting beside instead of around.",
-        chips: ["twin sabers", "combat form", "night alarm first", "field backbone"]
+        name: "セーラ・ナイトブルーム",
+        bio: "双剣を振るう前線の要。ルメラにおいて、ヨノを避けるのではなく、共に戦う価値があると最初に決断した人物の一人。",
+        chips: ["双剣", "戦闘形態", "夜間警報の要", "前線の支柱"]
       },
       {
-        role: "Elite knight",
+        role: "エリート騎士",
         age: "22",
-        name: "Kael Thornhart",
-        bio: "A quiet archer in silver armor whose tactical instincts keep saving the group before anybody has time to thank him properly.",
-        chips: ["precision bow", "silver armor", "tactical sight", "silent loyalty"]
+        name: "カエル・ソーンハート",
+        bio: "銀の鎧をまとった静かな弓兵。誰も感謝の言葉を伝える暇もないほど、彼の戦術的な直感が何度もグループを救っている。",
+        chips: ["精密な弓", "銀の鎧", "戦術的視界", "静かなる忠誠"]
       },
       {
-        role: "Court mage",
+        role: "宮廷魔術師",
         age: "24",
-        name: "Mirika Solenne",
-        bio: "Former Covenant mage, oath scholar, and one of the only people alive who can read the legal architecture holding Velkor's prison together.",
-        chips: ["oath lore", "amber aura", "seal work", "old covenant"]
+        name: "ミリカ・ソレンヌ",
+        bio: "元コヴナントの魔術師であり誓約の学者。ヴェルコールの牢獄を維持している法的な構造を読み解くことができる、生きている数少ない人物の一人。",
+        chips: ["誓約の伝承", "琥珀のオーラ", "封印作業", "旧コヴナント"]
       },
       {
-        role: "Safehouse anchor",
+        role: "隠れ家の支柱",
         age: "31",
-        name: "Elder Meryn",
-        bio: "Healer, cook, and emotional center of the party. Her warmth field can buy the others precious seconds against powers that should ignore ordinary defense.",
-        chips: ["healing", "warmth field", "triage", "steady hand"]
+        name: "長老メリン",
+        bio: "ヒーラーであり料理人、そしてパーティーの感情的な中心。彼女の温もりのフィールドは、通常の防御を無視するような力に対しても、仲間に貴重な数秒の猶予を与えることができる。",
+        chips: ["治癒", "温もりのフィールド", "トリアージ", "安定した手"]
       },
       {
-        role: "Veil guide",
+        role: "ヴェイルの案内人",
         age: "23",
-        name: "Lyra Voss",
-        bio: "An information broker who reads consequence lines faster than most people read a room. She is usually the first person to notice when the plan has become a myth.",
-        chips: ["consequence logic", "thread reading", "route control", "sharp tongue"]
+        name: "ライラ・ヴォス",
+        bio: "ほとんどの人が空気を読むよりも早く結果の線を読み取る情報屋。計画が神話に変わったとき、彼女はたいてい最初に気付く人物である。",
+        chips: ["結果論理", "糸の読み取り", "ルート制御", "辛辣な舌"]
       },
       {
-        role: "Safehouse heart",
+        role: "隠れ家の心",
         age: "10",
-        name: "Liri",
-        bio: "A quiet but emotionally precise child at Meryn's safehouse whose small gestures keep landing with the force of vows.",
-        chips: ["safehouse child", "ribbon promise", "chapter 4", "chapter 6"]
+        name: "リリ",
+        bio: "メリンの隠れ家にいる、物静かだが感情的に正確な子供。彼女の小さな行動は、誓いのような力強さを持って心に響き続ける。",
+        chips: ["隠れ家の子供", "リボンの約束", "第4章", "第6章"]
       },
       {
-        role: "Memorial presence",
-        age: "unknown",
-        name: "Cael",
-        bio: "The ribbon-maker's apprentice whose death turns the Shade conflict personal and whose map helps lead the cast toward the forest prison.",
-        chips: ["ribbon stall", "memorial", "map clue", "chapter 3 legacy"]
+        role: "記念碑的な存在",
+        age: "不明",
+        name: "カエル",
+        bio: "リボン職人の見習い。彼の死がシェードとの対立を個人的なものに変え、彼の残した地図がキャストを森の牢獄へと導く手助けとなる。",
+        chips: ["リボン屋台", "記念碑", "地図のヒント", "第3章の遺産"]
       },
       {
-        role: "Debt enforcer",
-        age: "unknown",
-        name: "Shade Warden",
-        bio: "A hulking debt-collection monster made of shadow and armor, sent to hunt through old promises until the cast turns the oath against it.",
-        chips: ["shade debt", "market attack", "chapter 2", "chapter 3"]
+        role: "借金の執行者",
+        age: "不明",
+        name: "シェードウォーデン",
+        bio: "影と鎧でできた巨大な借金取り立ての怪物。キャストが誓約を彼らに逆手に取るまで、古い約束を通じて狩りをするために送られてきた。",
+        chips: ["影の借金", "市場の襲撃", "第2章", "第3章"]
       },
       {
-        role: "Off-page 著者ity",
-        age: "ancient",
-        name: "The Registrar",
-        bio: "A feared legal power in the Veil Quarter whose 著者ity can formalize debts, nullify fraud, and redirect who is allowed to hunt whom.",
-        chips: ["veil quarter", "oath 著者ity", "chapter 4", "chapter 5 lead-in"]
+        role: "画面外の権威",
+        age: "古代",
+        name: "レジストラー",
+        bio: "ヴェイル地区で恐れられている法的権力。その権威は借金を正式なものにし、詐欺を無効にし、誰が誰を狩ることを許されるかを変更することができる。",
+        chips: ["ヴェイル地区", "誓約の権威", "第4章", "第5章への導入"]
       },
       {
-        role: "Runners",
-        age: "unknown",
-        name: "Rin & Rina",
-        bio: "Quick-moving helpers tied to the safehouse network, mentioned when Liri sends for Cael's ribbon at first light.",
-        chips: ["safehouse network", "chapter 4", "support cast", "off-screen assist"]
+        role: "ランナー",
+        age: "不明",
+        name: "リン & リナ",
+        bio: "隠れ家ネットワークに結びついた素早い助手たち。リリが夜明けにカエルのリボンを取りに行かせるときに言及される。",
+        chips: ["隠れ家ネットワーク", "第4章", "サポートキャスト", "画面外の支援"]
       },
       {
-        role: "第2巻 villain",
+        role: "第2巻の悪役",
         age: "300+",
-        name: "Velkor",
-        bio: "A former Covenant Elder who learned to eat life-threads and grow from what he stole. The forest door was built to keep him in; Yono is the reason it no longer feels permanent.",
-        chips: ["thread devouring", "hunger field", "seal prisoner", "old covenant elder"]
+        name: "ヴェルコール",
+        bio: "生命の糸を食らい、奪ったもので成長することを学んだ元コヴナントの長老。森の扉は彼を閉じ込めるために作られたが、それがもはや永久的ではないと感じられるのはヨノのせいである。",
+        chips: ["糸の貪食", "飢餓フィールド", "封印の囚人", "旧コヴナントの長老"]
       }
     ];
 
     const powers = [
       {
-        name: "Latest-Chapter Supremacy",
-        text: "From 第2巻 onward, Yono's newest chapter is always his strongest version. The story treats every previous peak as draft material."
+        name: "最新章の絶対性",
+        text: "第2巻以降、ヨノの最新章は常に彼の最強のバージョンである。物語はそれ以前のすべての頂点を下書きとして扱う。"
       },
       {
-        name: "Seal Harvest",
-        text: "Whenever Yono breaks one of his old self-imposed seals, the gain stays. He does not power down after the moment passes."
+        name: "封印の収穫",
+        text: "ヨノが自ら課した古い封印を破るたびに、その力は定着する。その瞬間が過ぎても彼の力が低下することはない。"
       },
       {
-        name: "Pre-Definition Authority",
-        text: "Before a law, title, attack, or limitation fully becomes real, Yono can allow it, blank it out, or reject it entirely."
+        name: "事前定義の権限",
+        text: "法則、称号、攻撃、または制限が完全に現実のものとなる前に、ヨノはそれを許可するか、無効にするか、あるいは完全に拒絶することができる。"
       },
       {
-        name: "Thread Cut",
-        text: "He can sever the link between a concept and what it normally does: hunger without gain, death without finality, attack without impact."
+        name: "糸の切断",
+        text: "彼は概念とそれが通常もたらす結果とのつながりを断ち切ることができる：得られるもののない飢餓、終わりのない死、衝撃のない攻撃。"
       },
       {
-        name: "Narrative Overwrite",
-        text: "If a scene tries to trap him inside a fixed outcome, Yono can rewrite the terms the scene is operating on."
+        name: "物語の書き換え",
+        text: "もしシーンが彼を固定された結果に閉じ込めようとした場合、ヨノはそのシーンが機能している条件そのものを書き換えることができる。"
       },
       {
-        name: "All-Power Adjacency",
-        text: "Other fictional powers do not feel foreign to him. They register as lower expressions of possibility that he can stand above without borrowing."
+        name: "全能の隣接",
+        text: "他のフィクションの力であっても彼には異質なものとは感じられない。それらは彼が借りるまでもなく超えられる、可能性の低い表現として認識される。"
       },
       {
-        name: "Deathless Continuance",
-        text: "Killing Yono no longer guarantees an ending. He can return by checkpoint, by refusal, or by simply not letting the death finish the sentence."
+        name: "不死の継続",
+        text: "ヨノを殺すことはもはや終わりを保証しない。彼はチェックポイントによる復帰、拒絶、あるいは単にその死にピリオドを打たせないことによって戻ってくることができる。"
       },
       {
-        name: "Observer Anchor",
-        text: "The story stays alive because Yono still needs to be noticed. If nobody sees him, thinks about him, or anchors him, he goes quiet."
+        name: "観測者の錨",
+        text: "物語が生き続けるのは、ヨノがまだ注目される必要があるからだ。誰も彼を見ず、彼のことを考えず、彼を繋ぎ止める者がいなければ、彼は静かになる。"
       },
       {
-        name: "Violet Link",
-        text: "Violet is more than the romance lead. She is one of the clearest emotional anchors keeping Yono connected to people instead of vanishing upward into pure scale."
+        name: "バイオレット・リンク",
+        text: "バイオレットは単なるロマンスのヒロイン以上の存在である。彼女は、ヨノが純粋なスケールの拡大へと消え去るのではなく、人々と繋がり続けるための最も明確な感情の錨の一つである。"
       }
     ];
 
     const loreEntries = [
       {
-        title: "The Tokyo Bridge",
-        text: "Yono Kazeshima dies in modern Japan after Violet accidentally kills him while saving a cat, then gets reincarnated into Lumera with absurd starter powers."
+        title: "東京の橋",
+        text: "風嶋ヨノは現代の日本で、バイオレットが猫を助けようとして誤って彼を死なせてしまった後、とんでもない初期能力を持った状態でルメラに転生する。"
       },
       {
-        title: "The Shade Debt Arc",
-        text: "第1巻 is not just setup. It is the full debt-and-oath story where Yono, Violet, Meryn, Mirika, and the others turn the Shade's claim back on itself."
+        title: "シェードの借金編",
+        text: "第1巻は単なるセットアップではない。ヨノ、バイオレット、メリン、ミリカたちが、シェードの要求を逆手に取るという、借金と誓約の完全な物語である。"
       },
       {
-        title: "The Forest Confession",
-        text: "Yono and Violet become fully real as a couple in the forest shelter before they find Velkor's sealed prison the next morning."
+        title: "森での告白",
+        text: "翌朝、ヴェルコールが封印された牢獄を見つける前に、森の隠れ家でヨノとバイオレットはカップルとして完全に結ばれる。"
       },
       {
-        title: "Velkor's Prison",
-        text: "The stone door in the forest is an Old Covenant seal built to hold Velkor, a thread-eating Elder who kept growing stronger even while imprisoned."
+        title: "ヴェルコールの牢獄",
+        text: "森にある石の扉は、旧コヴナントの封印であり、幽閉されている間も強くなり続ける糸を食らう長老ヴェルコールを閉じ込めるために作られた。"
       },
       {
-        title: "Why Yono Keeps Climbing",
-        text: "His old life was not erased. It was layered under self-made seals. Every new chapter can cut another one, which is why the latest Yono is always the strongest Yono."
+        title: "ヨノが登り続ける理由",
+        text: "彼の過去の人生は消去されたわけではない。自ら作り出した封印の下に層として重なっている。新しい章ごとにその封印を一つ解くことができるため、最新のヨノが常に最強のヨノとなる。"
       },
       {
-        title: "Why Violet Still Matters",
-        text: "Yono's power trend is infinite on purpose, so the story's emotional counterweight is Violet keeping him seen, chosen, and attached to a human scale of love."
+        title: "バイオレットが今も重要な理由",
+        text: "ヨノの力のインフレは意図的に無限に設定されているため、彼が人間の愛のスケールに留まり、選ばれ、繋ぎ止められるための物語における感情的なカウンターウェイトがバイオレットである。"
       }
     ];
 

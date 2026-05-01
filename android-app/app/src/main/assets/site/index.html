@@ -70,6 +70,7 @@
         <button class="nav-btn" data-view="volumes" onclick="switchView('volumes')">Volumes</button>
         <button class="nav-btn" data-view="chapters" onclick="switchView('chapters')">Chapters</button>
         <button class="nav-btn" data-view="app" onclick="switchView('app')">App</button>
+        <button class="nav-btn" data-view="community" onclick="switchView('community')">Community</button>
         <button class="nav-btn" data-view="characters" onclick="switchView('characters')">Characters</button>
         <button class="nav-btn" data-view="powers" onclick="switchView('powers')">Powers</button>
         <button class="nav-btn" data-view="leaks" onclick="switchView('leaks')">Leaks</button>
@@ -93,11 +94,7 @@
 
   <main>
 
-    <div id="global-announcement-banner" class="global-banner" style="display:none;"></div>
-    <div id="global-countdown-banner" class="global-banner" style="display:none; background:#222; color:#fff; padding:10px; text-align:center; margin-bottom:16px; border-radius:8px; border:1px solid rgba(255, 107, 107, 0.4);">
-      <strong id="global-countdown-title"></strong>: <span id="global-countdown-timer" style="color:#ff6b6b; font-family: 'Space Mono', monospace;"></span>
-    </div>
-    <div id="global-polls-container"></div>
+
 
     <section id="view-home" class="view active">
       <article class="hero-card" style="margin-bottom: 24px;">
@@ -115,6 +112,7 @@
             </div>
             <div class="hero-actions">
               <button class="btn btn-primary" onclick="openChapter(0)">Start Reading</button>
+              <button class="btn btn-secondary" onclick="switchView('community')">Community & Updates</button>
               <button class="btn btn-secondary" onclick="switchLanguage()">🌐 Switch to Japanese</button>
             </div>
           </div>
@@ -125,6 +123,20 @@
           </div>
         </div>
       </article>
+    </section>
+
+    <section id="view-community" class="view">
+      <div class="section-head">
+        <div>
+          <h2>Community & Updates</h2>
+          <p class="section-copy">Latest polls, announcements, and release countdowns.</p>
+        </div>
+      </div>
+      <div id="global-announcement-banner" class="global-banner" style="display:none; margin-bottom: 24px;"></div>
+      <div id="global-countdown-banner" class="global-banner" style="display:none; background:#222; color:#fff; padding:10px; text-align:center; margin-bottom:24px; border-radius:8px; border:1px solid rgba(255, 107, 107, 0.4);">
+        <strong id="global-countdown-title"></strong>: <span id="global-countdown-timer" style="color:#ff6b6b; font-family: 'Space Mono', monospace;"></span>
+      </div>
+      <div id="global-polls-container" style="display: grid; gap: 16px;"></div>
     </section>
 
     <section id="view-app" class="view">
