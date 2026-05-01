@@ -1,8 +1,8 @@
 # THREADBORN: REBORN WHERE FATE SNAPS
-## VOLUME EX — THE CHRONICLE BEYOND THE CHAPTER
+## EX NOVEL VOL 1 — THE CHRONICLE BEYOND THE CHAPTER
 ### *World Lore, Character Truths, Power Archive, and the IF Routes*
 
-> *Review draft. Not yet added to the public site or app library.*
+> *Published as EX Novel Vol 1 in the reader library.*
 
 ---
 

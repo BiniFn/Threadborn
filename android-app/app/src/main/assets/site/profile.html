@@ -33,7 +33,7 @@
   <link rel="icon" type="image/png" href="./assets/threadborn-favicon.png" />
   <link rel="apple-touch-icon" href="./assets/threadborn-apple-touch.png" />
   
-  <link rel="stylesheet" href="./global.css?v=14" />
+  <link rel="stylesheet" href="./global.css?v=16" />
 </head>
 <body>
   <main class="auth-shell">
@@ -87,6 +87,11 @@
       <div id="bookmarks" class="muted">Loading bookmarks...</div>
     </article>
 
+    <article class="card" style="text-align: left; margin-bottom: 24px;">
+      <h2 style="margin-top:0; font-family: 'Cormorant Garamond', serif;">Reader Ratings & Comments</h2>
+      <div id="profile-reactions" class="muted">Loading reactions...</div>
+    </article>
+
     <article class="card" style="text-align: left;">
       <h2 style="margin-top:0; font-family: 'Cormorant Garamond', serif;">Reading Analytics</h2>
       <div id="analytics" class="muted">Loading analytics...</div>
@@ -103,13 +108,40 @@
         return configured;
       }
       const host = window.location.hostname;
-      if (host === "appassets.androidplatform.net") {
+      if (host === "appassets.androidplatform.net" || window.location.protocol === "file:") {
         return "https://threadborn.vercel.app";
       }
       return "";
     }
 
     const API_BASE = resolveApiBase();
+    const APP_SESSION_KEY = "threadborn_app_session";
+
+    function getAppMode() {
+      return String(window.__THREADBORN_APP_MODE || localStorage.getItem("threadborn_app_mode") || "").trim().toLowerCase();
+    }
+
+    function authHeaders() {
+      const headers = { "Content-Type": "application/json" };
+      const appMode = getAppMode();
+      const appSession = localStorage.getItem(APP_SESSION_KEY) || "";
+      if (appMode) {
+        headers["X-Threadborn-App-Mode"] = appMode;
+        localStorage.setItem("threadborn_app_mode", appMode);
+      }
+      if (appSession) {
+        headers.Authorization = `Bearer ${appSession}`;
+      }
+      return headers;
+    }
+
+    function saveAuthSession(data) {
+      localStorage.setItem("threadborn_csrf_token", data.csrfToken || "");
+      if (data.sessionToken) {
+        localStorage.setItem(APP_SESSION_KEY, data.sessionToken);
+      }
+    }
+
     const avatarEl = document.getElementById("avatar");
     const nameEl = document.getElementById("name");
     const metaEl = document.getElementById("meta");
@@ -119,7 +151,7 @@
     let csrfToken = "";
 
     async function apiFetch(path, options = {}) {
-      const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+      const headers = Object.assign(authHeaders(), options.headers || {});
       if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
       const response = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { credentials: "include", headers }));
       const json = await response.json();
@@ -172,6 +204,23 @@
       }
     });
 
+    function renderProfileReactions(reactions) {
+      const box = document.getElementById("profile-reactions");
+      if (!box) return;
+      if (!Array.isArray(reactions) || !reactions.length) {
+        box.textContent = "No reader ratings or comments yet.";
+        return;
+      }
+      box.innerHTML = reactions.map(item => {
+        const target = item.targetType === "chapter"
+          ? `${item.volumeId} • ${item.chapterId}`
+          : `${item.volumeId}`;
+        const rating = item.rating ? ` • ${"★".repeat(item.rating)}${"☆".repeat(5 - item.rating)}` : "";
+        const category = item.category ? ` • ${item.category}` : "";
+        return `<div class="post-comment"><strong>${target}</strong>${rating}${category}<br>${String(item.content || "Rating only.").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c])}</div>`;
+      }).join("");
+    }
+
     async function loadProfile() {
       let user;
       try {
@@ -207,6 +256,7 @@
       try {
         const profile = await apiFetch("/api/user/profile");
         const posts = Array.isArray(profile.posts) ? profile.posts : [];
+          renderProfileReactions(profile.reactions || []);
         if (posts.length) {
           const lines = posts.map(post => `<div>• ${post.title} (${post.category || "post"})</div>`).join("");
           document.getElementById("analytics").insertAdjacentHTML("beforebegin", `<article class="card" style="text-align: left; margin-bottom: 24px;"><h2 style="margin-top:0; font-family: 'Cormorant Garamond', serif;">User Posts</h2>${lines}</article>`);

@@ -33,7 +33,7 @@ html
 <link rel="icon" type="image/png" href="./assets/threadborn-favicon-jp.png"/>
 <link rel="apple-touch-icon" href="./assets/threadborn-logo-jp.png"/>
 
-  <link rel="stylesheet" href="./global.css?v=14" />
+  <link rel="stylesheet" href="./global.css?v=16" />
 </head>
 <body>
 <main class="auth-shell">
@@ -65,13 +65,40 @@ html
         return configured;
       }
       const host = window.location.hostname;
-      if (host === "appassets.androidplatform.net") {
+      if (host === "appassets.androidplatform.net" || window.location.protocol === "file:") {
         return "https://threadborn.vercel.app";
       }
       return "";
     }
 
     const API_BASE = resolveApiBase();
+    const APP_SESSION_KEY = "threadborn_app_session";
+
+    function getAppMode() {
+      return String(window.__THREADBORN_APP_MODE || localStorage.getItem("threadborn_app_mode") || "").trim().toLowerCase();
+    }
+
+    function authHeaders() {
+      const headers = { "Content-Type": "application/json" };
+      const appMode = getAppMode();
+      const appSession = localStorage.getItem(APP_SESSION_KEY) || "";
+      if (appMode) {
+        headers["X-Threadborn-App-Mode"] = appMode;
+        localStorage.setItem("threadborn_app_mode", appMode);
+      }
+      if (appSession) {
+        headers.Authorization = `Bearer ${appSession}`;
+      }
+      return headers;
+    }
+
+    function saveAuthSession(data) {
+      localStorage.setItem("threadborn_csrf_token", data.csrfToken || "");
+      if (data.sessionToken) {
+        localStorage.setItem(APP_SESSION_KEY, data.sessionToken);
+      }
+    }
+
     const ACTIVE_USER_KEY = "threadborn_user";
     const form = document.getElementById("signup-form");
     const statusEl = document.getElementById("status");
@@ -125,13 +152,13 @@ html
         const response = await fetch(`${API_BASE}/api/auth/signup`, {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: authHeaders(),
           body: JSON.stringify(payload)
         });
         const result = await response.json();
 
         if (response.ok && result.success) {
-          localStorage.setItem("threadborn_csrf_token", result.data.csrfToken || "");
+          saveAuthSession(result.data);
           localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify({
             id: result.data.user.id,
             email: result.data.user.email,
@@ -141,7 +168,7 @@ html
             role: result.data.user.role
           }));
           setStatus("Account created. Redirecting...", "ok");
-          setTimeout(() => { window.location.href = "./index.html"; }, 700);
+          setTimeout(() => { window.location.href = "./index-jp.html"; }, 700);
           return;
         }
 

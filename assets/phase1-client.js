@@ -5,7 +5,7 @@
       return configured;
     }
     const host = window.location.hostname;
-    if (host === "appassets.androidplatform.net") {
+    if (host === "appassets.androidplatform.net" || window.location.protocol === "file:") {
       return "https://threadborn.vercel.app";
     }
     return "";
@@ -14,6 +14,7 @@
   const API_BASE = resolveApiBase();
   const QUEUE_KEY = "threadborn_sync_queue_v1";
   const FALLBACK_PROGRESS_KEY = "novelverse_reader_progress";
+  const APP_SESSION_KEY = "threadborn_app_session";
   let csrfToken = "";
   let authUser = null;
   let bookmarkCache = [];
@@ -27,8 +28,26 @@
     return `${API_BASE}${path}`;
   }
 
+  function getAppMode() {
+    return String(window.__THREADBORN_APP_MODE || localStorage.getItem("threadborn_app_mode") || "").trim().toLowerCase();
+  }
+
+  function buildAuthHeaders(headers = {}) {
+    const next = Object.assign({ "Content-Type": "application/json" }, headers);
+    const appMode = getAppMode();
+    const appSession = localStorage.getItem(APP_SESSION_KEY) || "";
+    if (appMode) {
+      next["X-Threadborn-App-Mode"] = appMode;
+      localStorage.setItem("threadborn_app_mode", appMode);
+    }
+    if (appSession) {
+      next.Authorization = `Bearer ${appSession}`;
+    }
+    return next;
+  }
+
   async function apiFetch(path, options = {}) {
-    const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+    const headers = buildAuthHeaders(options.headers || {});
     if (csrfToken) {
       headers["X-CSRF-Token"] = csrfToken;
     }
@@ -362,6 +381,9 @@
     }
     authUser = null;
     csrfToken = "";
+    localStorage.removeItem(APP_SESSION_KEY);
+    localStorage.removeItem("threadborn_csrf_token");
+    localStorage.removeItem("threadborn_user");
     toggleAuthNav();
   };
 
@@ -385,6 +407,7 @@
       authConfigMissing = String(error.message || "").includes("Missing DATABASE_URL");
       localStorage.removeItem("threadborn_user");
       localStorage.removeItem("threadborn_csrf_token");
+      localStorage.removeItem(APP_SESSION_KEY);
     }
     toggleAuthNav();
     await syncLocalBookmarks();

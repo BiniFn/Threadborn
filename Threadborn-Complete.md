@@ -18,11 +18,11 @@
 
 Yono Kazeshima had two great talents.
 
-First, he could turn a five minute walk to the convenience store into a full story in his head.
+First, he could make buying snacks sound like the opening scene of a heroic quest.
 
-Second, he could ignore every danger sign in the real world while doing it.
+Second, he could miss the actual danger standing right behind the speech.
 
-That was not a useful combination.
+That was not a useful combination, but it was very Yono.
 
 The Tokyo evening was wet with spring rain. Neon signs blurred on the road below the pedestrian bridge. Cars hissed past. Yono walked with a plastic bag in one hand, loaded with instant ramen, two energy drinks, and a cream bun he had been saving money for since Tuesday.
 
@@ -32,9 +32,7 @@ It had custard in the middle.
 
 It had a limited edition sticker.
 
-It had survived the register line, the rain, and the old man who almost crushed it with a pack of batteries.
-
-Yono looked at it through the bag and whispered, "Tonight, we become legends."
+Yono looked at it through the bag and whispered, "Tonight, we become one."
 
 "Meow."
 
@@ -42,9 +40,7 @@ He stopped.
 
 A gray cat sat on the rail of the bridge.
 
-It was small, wet, and proud in the way only cats can be proud while looking like a soaked towel. One paw hung over the edge. Below it, traffic moved in fast silver lines.
-
-Yono forgot the cream bun.
+It was small, wet, and proud in the way only cats can be proud while looking like a soaked towel. One paw hung over the edge.
 
 "Hey," he said softly. "That is a very bad place to sit."
 
@@ -58,9 +54,9 @@ Yono took one careful step closer.
 
 The cat hissed.
 
-"Okay. Fair. We are strangers."
+"Okay, fair. We are strangers, but I promise I am not a zoophile."
 
-He put the bag down. The rain tapped on the plastic. His phone buzzed in his pocket, but he ignored it. He held out both hands like he had seen animal rescue people do online.
+He put the bag down. The rain tapped on the plastic. His phone buzzed in his pocket, but he ignored it.
 
 "Come here. I have a cream bun. You cannot have it, but you can smell it from a respectful distance."
 
@@ -68,17 +64,13 @@ The cat leaned away from him.
 
 Yono leaned forward.
 
-The world made one tiny clicking sound.
-
 His shoe slipped on the wet bridge.
-
-His hand caught the plastic bag.
-
-The bag caught his ankle.
 
 His balance vanished.
 
-For one strange second he saw everything clearly. The neon signs. The gray cat. The cream bun spinning free. The street below. The delivery truck passing under the bridge with a load of blank faced mannequins in the back.
+The world made one tiny clicking sound.
+
+For one second he saw everything clearly. The neon signs. The gray cat. The cream bun spinning free. The street below. His tiny apartment with laundry still unfolded on the chair. The empty message thread he kept pretending he would answer later. A memory of his mother telling him kindness only counted when it cost something.
 
 Then a glowing hand hit him between the shoulder blades.
 
@@ -88,23 +80,17 @@ Not a mistake.
 
 A push.
 
-Yono went over the railing.
+The cat's pupils widened, reflecting Yono as he went over the railing.
 
-"WHAT WAS THAT?"
-
-The cat watched him fall.
-
-The truck rose up.
-
-The mannequins looked shocked, which was impressive for objects with no faces.
+The mannequins in the passing truck looked shocked, which was impressive for objects with no faces.
 
 Yono had one last thought.
 
-I never ate the cream bun.
+"I never ate the cream bun."
 
-Then the world ended with a crash.
+Then impact stole the rest of the sentence.
 
-For a moment after the crash, Yono still thought he was alive.
+For a moment after the impact, Yono thought he was still alive.
 
 That was the cruel part.
 
@@ -120,7 +106,7 @@ He tried to breathe.
 
 Nothing happened.
 
-People shouted above him, but the voices sounded far away, like he was underwater. Someone said ambulance. Someone else said do not look. A child started crying. The cat from the bridge walked along the rail above, dry now for reasons Yono did not have the strength to resent.
+People moved above him in broken shapes, their voices muffled like he was underwater. He could only watch as they pointed in terror, unsure of how to act. The cat from the bridge walked along the rail above, dry now for reasons Yono did not have the strength to resent.
 
 Then the glowing hand appeared over the edge.
 
@@ -134,7 +120,7 @@ Red eyes.
 
 Beautiful enough that even dying, Yono had one tiny, useless thought.
 
-That person is trouble.
+That person is hot.
 
 The woman looked at the road.
 

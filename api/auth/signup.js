@@ -2,10 +2,28 @@ const pool = require("../../lib/api/db");
 const { allowCors, success, fail } = require("../../lib/api/http");
 const { parseJsonBody, getClientIp } = require("../../lib/api/request");
 const { takeRateLimitToken } = require("../../lib/api/rate-limit");
-const { makePasswordHash, createSession, SESSION_COOKIE, SESSION_TTL_MS, makeCookie, getSessionCookieOptions } = require("../../lib/api/auth");
+const { makePasswordHash, createSession, SESSION_COOKIE, SESSION_TTL_MS, makeCookie, getSessionCookieOptions, shouldExposeSessionToken } = require("../../lib/api/auth");
 
 function validUsername(value) {
   return /^[a-zA-Z0-9_]{3,24}$/.test(value);
+}
+
+function authPayload(user, session, req) {
+  const payload = {
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatar_url || "",
+      verified: user.verified,
+      role: user.role
+    },
+    csrfToken: session.csrfToken
+  };
+  if (shouldExposeSessionToken(req)) {
+    payload.sessionToken = session.token;
+  }
+  return payload;
 }
 
 module.exports = async (req, res) => {
@@ -67,17 +85,7 @@ module.exports = async (req, res) => {
       "Set-Cookie",
       makeCookie(SESSION_COOKIE, session.token, Math.floor(SESSION_TTL_MS / 1000), getSessionCookieOptions(req))
     );
-    success(res, {
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        avatarUrl: user.avatar_url || "",
-        verified: user.verified,
-        role: user.role
-      },
-      csrfToken: session.csrfToken
-    }, 201);
+    success(res, authPayload(user, session, req), 201);
   } catch (error) {
     fail(res, 500, "Signup failed");
   }
