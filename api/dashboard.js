@@ -237,7 +237,8 @@ module.exports = async (req, res) => {
         if (!session || session.role !== "owner") {
           return fail(res, 403, "Only owner can clear data");
         }
-        await pool.query("truncate dashboard_config; truncate polls cascade;");
+        await pool.query("truncate dashboard_config");
+        await pool.query("truncate polls cascade");
         return success(res, { cleared: true });
       }
     }
