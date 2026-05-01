@@ -155,9 +155,9 @@ def parse_chapters(md: str):
             if (
                 re.match(r"^##\s+Chapter\s+\d+:", lines[i], re.I)
                 or re.match(r"^##\s+第\s*\d+\s*章", lines[i])
-                or re.match(r"^#\s+.+Volume\s+\d+", lines[i])
-                or re.match(r"^#\s+.+第\s*\d+\s*巻", lines[i])
-                or re.match(r"^#\s+.+EX", lines[i])
+                or re.match(r"^#\s+.*Volume\s+\d+", lines[i], re.I)
+                or re.match(r"^#\s+.*第\s*\d+\s*巻", lines[i])
+                or re.match(r"^#\s+.*EX", lines[i], re.I)
             ):
                 break
             section.append(lines[i])
@@ -196,15 +196,16 @@ def parse_chapters(md: str):
 def main():
     en_md = (ROOT / "Threadborn-Complete.md").read_text(encoding="utf-8")
     ex_md = (ROOT / "Threadborn-EX.md").read_text(encoding="utf-8")
-    # Make EX md look like a volume with a single chapter
-    ex_md = ex_md.replace("## EX NOVEL VOL 1", "# EX Novel Vol 1\n\n## Chapter 1: The Chronicle Beyond the Chapter", 1)
     # Downgrade all other chapters in EX so they aren't parsed as separate chapters
     ex_md = re.sub(r"^##\s+CHAPTER", "### CHAPTER", ex_md, flags=re.MULTILINE | re.IGNORECASE)
+    # Make EX md look like a volume with a single chapter
+    ex_md = ex_md.replace("### CHAPTER 1: Before Lumera", "### CHAPTER 1: Before Lumera", 1) # just in case
+    ex_md = ex_md.replace("## EX NOVEL VOL 1", "# EX Novel Vol 1\n\n## Chapter 1: The Chronicle Beyond the Chapter", 1)
     
     ja_md = (ROOT / "Threadborn-Complete-JP.md").read_text(encoding="utf-8")
     ex_ja_md = (ROOT / "Threadborn-EX-JP.md").read_text(encoding="utf-8")
-    ex_ja_md = ex_ja_md.replace("## EX小説 第1巻", "# EX小説 第1巻\n\n## 第1章：章を超えたクロニクル", 1)
     ex_ja_md = re.sub(r"^##\s+第\s*\d+\s*章", "### 第", ex_ja_md, flags=re.MULTILINE)
+    ex_ja_md = ex_ja_md.replace("## EX小説 第1巻", "# EX小説 第1巻\n\n## 第1章：章を超えたクロニクル", 1)
 
     en_combined = en_md + "\n\n" + ex_md
     ja_combined = ja_md + "\n\n" + ex_ja_md
