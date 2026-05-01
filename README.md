@@ -133,10 +133,7 @@ Native wrapper note:
    ```bash
    npm run db:migrate
    ```
-5. Bootstrap owner once:
-   ```bash
-   curl -X POST http://localhost:3000/api/auth/bootstrap-owner
-   ```
+5. The first time you attempt to log in using the `OWNER_EMAIL` and `OWNER_PASSWORD`, your owner account will be automatically created. You don't need to manually bootstrap it!
 6. Run local Vercel dev server:
    ```bash
    npx vercel dev
@@ -169,7 +166,6 @@ vercel env add API_BASE_URL development
 - `POST /api/auth/signup`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
-- `POST /api/auth/bootstrap-owner`
 - `GET|PATCH /api/user/profile`
 - `GET|PUT /api/user/settings`
 - `GET|PUT /api/reader/progress`

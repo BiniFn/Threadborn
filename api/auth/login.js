@@ -57,6 +57,20 @@ module.exports = async (req, res) => {
       return;
     }
 
+    if (process.env.OWNER_EMAIL && process.env.OWNER_PASSWORD && email === process.env.OWNER_EMAIL.trim().toLowerCase()) {
+      const existing = await pool.query("select id from users where role = 'owner'::user_role limit 1");
+      if (!existing.rows.length) {
+        const { makePasswordHash } = require("../../lib/api/auth");
+        const ownerUsername = email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 24) || "owner";
+        await pool.query(
+          `insert into users (email, username, password_hash, role, verified, updated_at)
+           values ($1, $2, $3, 'owner', true, now())
+           on conflict (email) do nothing`,
+          [email, ownerUsername, makePasswordHash(process.env.OWNER_PASSWORD)]
+        );
+      }
+    }
+
     const { rows } = await pool.query(
       "select id, email, username, password_hash, avatar_url, verified, role from users where lower(email)= $1 limit 1",
       [email]
