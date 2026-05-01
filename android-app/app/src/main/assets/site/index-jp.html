@@ -44,7 +44,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./global.css?v=14" />
+  <link rel="stylesheet" href="./global.css?v=15" />
 </head>
 <body>
 
@@ -121,7 +121,8 @@
           <p class="section-copy">Install Threadborn as a web app or download the offline Android build.</p>
         </div>
       </div>
-      <div class="grid app-grid">
+      <article class="app-dashboard" id="app-dashboard" aria-hidden="true"></article>
+      <div class="grid app-grid web-app-promo">
         <article class="card app-card">
           <strong>Install Web App</strong>
           <p>Use the lighter installable version for quick home-screen access on supported browsers.</p>
@@ -156,7 +157,7 @@
           <p class="apk-note" id="mac-download-note">Checking latest macOS build...</p>
         </article>
       </div>
-      <article class="card app-start">
+      <article class="card app-start web-app-promo">
         <div class="app-start-head">
           <div>
             <h3>Get Started</h3>
@@ -4666,6 +4667,184 @@
       button.textContent = deferredInstallPrompt ? "Install App" : "Install App";
     }
 
+
+    function getAppMode() {
+      const query = new URLSearchParams(window.location.search);
+      const explicitMode = window.__THREADBORN_APP_MODE || query.get("app") || "";
+      if (explicitMode === "1" || explicitMode === "true") {
+        return "desktop";
+      }
+      if (explicitMode === "desktop" || explicitMode === "android") {
+        return explicitMode;
+      }
+      if (window.location.hostname === "appassets.androidplatform.net") {
+        return "android";
+      }
+      return "";
+    }
+
+    function isNativeAppMode() {
+      return Boolean(getAppMode());
+    }
+
+    function isJapaneseSite() {
+      return document.documentElement.lang === "ja" || window.location.pathname.includes("index-jp");
+    }
+
+    function appText(en, ja) {
+      return isJapaneseSite() ? ja : en;
+    }
+
+    function getPlainChapterTitle(chapter) {
+      if (!chapter) {
+        return "";
+      }
+      const title = getLocalizedContent(chapter.title, isJapaneseSite() ? "ja" : "en");
+      const volume = getLocalizedContent(chapter.volume, isJapaneseSite() ? "ja" : "en");
+      const chapterName = getLocalizedContent(chapter.chapter, isJapaneseSite() ? "ja" : "en");
+      return `${volume} • ${chapterName} • ${title}`;
+    }
+
+    function getAppProgressLabel() {
+      const chapter = chapters[activeChapter] || chapters[0];
+      const totalPages = chapter && chapter.pages ? chapter.pages.length : 1;
+      const pagePercent = Math.round(((activePage + 1) / Math.max(1, totalPages)) * 100);
+      return appText(
+        `${pagePercent}% through this chapter`,
+        `この章の ${pagePercent}% まで読了`
+      );
+    }
+
+    function getDashboardChapters() {
+      const indexes = [activeChapter, 0, findVolumeStartIndex("Volume 2"), chapters.length - 1]
+        .filter(index => Number.isInteger(index) && index >= 0 && chapters[index]);
+      return [...new Set(indexes)].slice(0, 5);
+    }
+
+    function openDashboardChapter(index) {
+      openChapter(index, 0);
+      toggleReaderTools(false);
+    }
+
+    function openReaderToolsFromDashboard() {
+      openChapter(activeChapter, activePage);
+      window.setTimeout(() => toggleReaderTools(true), 80);
+    }
+
+    function saveAppDataNow() {
+      saveProgress();
+      renderBookmarks();
+      renderAppDashboard();
+      updateTtsStatus(appText("App data saved on this device", "アプリデータをこの端末に保存しました"));
+    }
+
+    function renderAppDashboard() {
+      const shell = document.getElementById("app-dashboard");
+      if (!shell) {
+        return;
+      }
+
+      const appMode = getAppMode();
+      const nativeMode = Boolean(appMode);
+      shell.setAttribute("aria-hidden", nativeMode ? "false" : "true");
+      if (!nativeMode) {
+        shell.innerHTML = "";
+        return;
+      }
+
+      const chapter = chapters[activeChapter] || chapters[0];
+      const modeLabel = appMode === "android" ? "Android" : "Desktop";
+      const savedBookmarks = readLocalBookmarks();
+      const libraryItems = getDashboardChapters().map((index, itemIndex) => {
+        const current = index === activeChapter;
+        const label = current
+          ? appText("Current", "現在")
+          : itemIndex === 1
+            ? appText("Start", "最初")
+            : itemIndex === 2
+              ? appText("Volume 2", "第2巻")
+              : appText("Latest", "最新");
+        return `
+          <button class="app-list-item" type="button" onclick="openDashboardChapter(${index})">
+            <span>${label}</span>
+            <strong>${getPlainChapterTitle(chapters[index])}</strong>
+          </button>`;
+      }).join("");
+
+      shell.innerHTML = `
+        <div class="app-dashboard-hero">
+          <div>
+            <p class="eyebrow">${appText("Threadborn App", "スレッドボーン アプリ")}</p>
+            <h2>${appText("Reader Dashboard", "リーダーダッシュボード")}</h2>
+            <p>${getPlainChapterTitle(chapter)}</p>
+          </div>
+          <div class="app-dashboard-actions">
+            <button class="btn btn-primary" type="button" onclick="resumeReading()">${appText("Continue Reading", "続きを読む")}</button>
+            <button class="btn btn-secondary" type="button" onclick="openReaderToolsFromDashboard()">${appText("Reader Tools", "読書ツール")}</button>
+            <button class="btn btn-secondary" type="button" onclick="switchView('chapters')">${appText("Library", "ライブラリ")}</button>
+          </div>
+        </div>
+        <div class="app-dashboard-grid">
+          <section class="app-panel app-panel-library">
+            <span class="pill-label">${appText("Library", "ライブラリ")}</span>
+            <div class="toolbar-value">${appText("Quick chapters", "クイック章移動")}</div>
+            <div class="app-library-list">${libraryItems}</div>
+          </section>
+          <section class="app-panel">
+            <span class="pill-label">${appText("Reader Tools", "読書ツール")}</span>
+            <div class="toolbar-value">${appText("Theme and language", "テーマと言語")}</div>
+            <div class="toolbar-actions app-tool-actions">
+              <button class="ghost-btn" type="button" onclick="cycleReaderTheme(); renderAppDashboard();">${appText("Theme", "テーマ")}: ${getThemeLabel(readerTheme)}</button>
+              <button class="ghost-btn" type="button" onclick="switchLanguage()">${appText("Switch language", "言語を切替")}</button>
+              <button class="ghost-btn" type="button" onclick="openReaderToolsFromDashboard()">${appText("Open tools", "ツールを開く")}</button>
+              <button class="ghost-btn" type="button" onclick="saveAppDataNow()">${appText("Save data", "データ保存")}</button>
+            </div>
+          </section>
+          <section class="app-panel">
+            <span class="pill-label">${appText("Offline Status", "オフライン状態")}</span>
+            <div class="toolbar-value">${modeLabel} ${appText("mode", "モード")}</div>
+            <p class="app-status-copy">${appText("Bundled reader files are active.", "同梱されたリーダーファイルが有効です。")}</p>
+            <p class="app-status-copy">${savedBookmarks.length} ${appText("bookmark", "ブックマーク")}${savedBookmarks.length === 1 ? "" : appText("s", "")} • ${getAppProgressLabel()}</p>
+          </section>
+          <section class="app-panel">
+            <span class="pill-label">${appText("Export", "エクスポート")}</span>
+            <div class="toolbar-value">${appText("Current chapter", "現在の章")}</div>
+            <div class="toolbar-actions app-tool-actions">
+              <button class="ghost-btn download-btn pdf-btn" type="button" onclick="downloadChapterPdf(activeChapter, this)">${appText("Collector PDF", "保存用PDF")}</button>
+              <button class="ghost-btn download-btn epub-btn" type="button" onclick="downloadChapterEpub(activeChapter, this)">${appText("Styled EPUB", "装飾EPUB")}</button>
+              <button class="ghost-btn" type="button" onclick="copyCurrentPage()">${appText("Copy page", "ページコピー")}</button>
+            </div>
+          </section>
+        </div>`;
+    }
+
+    function applyAppMode() {
+      const appMode = getAppMode();
+      const nativeMode = Boolean(appMode);
+      document.documentElement.classList.toggle("native-app", nativeMode);
+      document.documentElement.classList.toggle("android-app", appMode === "android");
+      document.documentElement.classList.toggle("desktop-app", appMode === "desktop");
+      document.documentElement.dataset.appMode = nativeMode ? appMode : "web";
+      document.body.classList.toggle("native-app-body", nativeMode);
+
+      document.querySelectorAll(".web-app-promo").forEach(element => {
+        element.setAttribute("aria-hidden", nativeMode ? "true" : "false");
+      });
+
+      const appCopy = document.querySelector("#view-app .section-copy");
+      if (appCopy && nativeMode) {
+        appCopy.textContent = appText(
+          "Continue reading with offline files, reader tools, exports, and saved bookmarks.",
+          "オフラインファイル、読書ツール、エクスポート、保存ブックマークをここから使えます。"
+        );
+      }
+
+      renderAppDashboard();
+      if (nativeMode && !document.getElementById("reader")?.classList.contains("open")) {
+        switchView("app");
+      }
+    }
+
     async function loadDesktopDownloadLinks() {
       const releasesUrl = "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases";
       const latestApkDirect = "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk";
@@ -4998,6 +5177,10 @@
       document.querySelectorAll(".nav-btn").forEach(button => {
         button.classList.toggle("active", button.dataset.view === view);
       });
+
+      if (view === "app") {
+        renderAppDashboard();
+      }
 
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -6760,6 +6943,7 @@
 
       localStorage.setItem(progressKey, JSON.stringify(payload));
       updateResumeButton();
+      renderAppDashboard();
     }
 
     function loadProgress() {
@@ -6815,7 +6999,9 @@
     }
 
     function resumeReading() {
-      switchView("chapters");
+      if (!isNativeAppMode()) {
+        switchView("chapters");
+      }
       openChapter(activeChapter, activePage);
     }
 
@@ -6892,6 +7078,7 @@
     applyReaderSize();
     applyReaderTheme();
     updateResumeButton();
+    applyAppMode();
     loadVoices();
     loadDesktopDownloadLinks();
     updateRateLabel();

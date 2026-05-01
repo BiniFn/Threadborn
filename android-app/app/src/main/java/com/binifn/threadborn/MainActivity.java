@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends AppCompatActivity {
-  private static final String START_URL = "https://appassets.androidplatform.net/assets/site/index.html";
+  private static final String START_URL = "https://appassets.androidplatform.net/assets/site/index.html?app=android";
   private static final String APP_HOST = "https://appassets.androidplatform.net/";
   private static final String LEGACY_WEB_HOST = "https://threadborn.vercel.app";
   private static final String APP_SITE_PREFIX = "https://appassets.androidplatform.net/assets/site";
@@ -73,11 +73,14 @@ public class MainActivity extends AppCompatActivity {
         String escapedApiBase = apiBase.replace("\\", "\\\\").replace("'", "\\'");
         webView.evaluateJavascript(
           "window.__THREADBORN_API_BASE='" + escapedApiBase + "';" +
+            "window.__THREADBORN_APP_MODE='android';" +
             "try{localStorage.setItem('threadborn_api_base','" + escapedApiBase + "');}catch(e){}" +
-          "document.documentElement.classList.add('android-app');" +
+          "document.documentElement.classList.add('native-app','android-app');" +
+            "if(window.applyAppMode){window.applyAppMode();}" +
             "const apkLink=document.getElementById('apk-download-link');" +
             "if(apkLink){apkLink.textContent='Android app installed';apkLink.removeAttribute('href');apkLink.removeAttribute('download');apkLink.style.pointerEvents='none';apkLink.style.opacity='0.65';}" +
             "const installBtn=document.getElementById('install-btn');if(installBtn){installBtn.style.display='none';}" +
+            "document.querySelectorAll('.web-app-promo').forEach(function(el){el.style.display='none';});" +
             "const apkNote=document.getElementById('apk-note');if(apkNote){apkNote.textContent='You are using the offline Android app build. PDF and EPUB exports save straight to your device.';}",
           null
         );
