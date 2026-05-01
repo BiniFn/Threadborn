@@ -62,7 +62,9 @@
       payload = { success: false, error: "Invalid response" };
     }
     if (!response.ok || !payload.success) {
-      throw new Error(payload.error || "Request failed");
+      const err = new Error(payload.error || "Request failed");
+      err.status = response.status || 500;
+      throw err;
     }
     return payload.data;
   }
@@ -402,12 +404,22 @@
         role: authUser.role
       }));
     } catch (error) {
-      authUser = null;
-      csrfToken = "";
+      const isAuthError = error.status === 401 || error.status === 403;
+      if (isAuthError) {
+        authUser = null;
+        csrfToken = "";
+        localStorage.removeItem("threadborn_user");
+        localStorage.removeItem("threadborn_csrf_token");
+        localStorage.removeItem(APP_SESSION_KEY);
+      } else {
+        try {
+          const cachedUser = localStorage.getItem("threadborn_user");
+          if (cachedUser) {
+            authUser = JSON.parse(cachedUser);
+          }
+        } catch (e) {}
+      }
       authConfigMissing = String(error.message || "").includes("Missing DATABASE_URL");
-      localStorage.removeItem("threadborn_user");
-      localStorage.removeItem("threadborn_csrf_token");
-      localStorage.removeItem(APP_SESSION_KEY);
     }
     toggleAuthNav();
     await syncLocalBookmarks();
