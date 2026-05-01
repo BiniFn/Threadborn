@@ -257,8 +257,7 @@
         const profile = await apiFetch("/api/user/profile");
         const posts = Array.isArray(profile.posts) ? profile.posts : [];
           renderProfileReactions(profile.reactions || []);
-        if (posts.length) {
-          const lines = posts.map(post => `<div>• ${post.title} (${post.category || "post"})</div>`).join("");
+        (${post.category || "post"})</div>`).join("");
           document.getElementById("analytics").insertAdjacentHTML("beforebegin", `<article class="card" style="text-align: left; margin-bottom: 24px;"><h2 style="margin-top:0; font-family: 'Cormorant Garamond', serif;">User Posts</h2>${lines}</article>`);
         }
       } catch (e) {
