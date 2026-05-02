@@ -1,10 +1,15 @@
 const pool = require("../../lib/api/db");
 const { allowCors, success, fail } = require("../../lib/api/http");
-const { parseJsonBody } = require("../../lib/api/request");
+const { parseJsonBody, getClientIp } = require("../../lib/api/request");
+const { takeRateLimitToken } = require("../../lib/api/rate-limit");
 const { requireSession, validateCsrf } = require("../../lib/api/auth");
 
 module.exports = async (req, res) => {
   if (allowCors(req, res)) {
+    return;
+  }
+  if (!takeRateLimitToken(`progress:${getClientIp(req)}`, 60, 60_000)) {
+    fail(res, 429, "Too many requests");
     return;
   }
   const session = await requireSession(req, res, fail);
@@ -16,7 +21,7 @@ module.exports = async (req, res) => {
     const novelId = String(req.query?.novelId || "threadborn");
     const { rows } = await pool.query(
       "select novel_id, volume_id, chapter_id, scroll_position, updated_at from reading_progress where user_id = $1 and novel_id = $2 limit 1",
-      [session.user_id, novelId]
+      [session.user_id, novelId],
     );
     success(res, { progress: rows[0] || null });
     return;
@@ -34,7 +39,7 @@ module.exports = async (req, res) => {
   const novelId = String(body.novelId || "threadborn");
   const volumeId = String(body.volumeId || "");
   const chapterId = String(body.chapterId || "");
-  const scrollPosition = Number(body.scrollPosition || 0);
+  const scrollPosition = Math.max(0, Number(body.scrollPosition || 0));
   if (!volumeId || !chapterId) {
     fail(res, 400, "volumeId and chapterId are required");
     return;
@@ -49,7 +54,7 @@ module.exports = async (req, res) => {
        scroll_position = excluded.scroll_position,
        updated_at = now()
      returning novel_id, volume_id, chapter_id, scroll_position, updated_at`,
-    [session.user_id, novelId, volumeId, chapterId, scrollPosition]
+    [session.user_id, novelId, volumeId, chapterId, scrollPosition],
   );
   success(res, { progress: rows[0] });
 };

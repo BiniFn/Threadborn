@@ -1,14 +1,21 @@
 const pool = require("../../lib/api/db");
 const { allowCors, success, fail } = require("../../lib/api/http");
-const { parseJsonBody } = require("../../lib/api/request");
+const { parseJsonBody, getClientIp } = require("../../lib/api/request");
+const { takeRateLimitToken } = require("../../lib/api/rate-limit");
 const { requireSession, validateCsrf } = require("../../lib/api/auth");
 
 function cleanText(value, max = 2000) {
-  return String(value || "").trim().slice(0, max);
+  return String(value || "")
+    .trim()
+    .slice(0, max);
 }
 
 module.exports = async (req, res) => {
   if (allowCors(req, res)) {
+    return;
+  }
+  if (!takeRateLimitToken(`community:${getClientIp(req)}`, 30, 60_000)) {
+    fail(res, 429, "Too many requests");
     return;
   }
   const session = await requireSession(req, res, fail);
@@ -19,11 +26,15 @@ module.exports = async (req, res) => {
 
   const meResult = await pool.query(
     "select role, coalesce(verified, false) as verified, community_banned_until, community_ban_reason from users where id = $1 limit 1",
-    [session.user_id]
+    [session.user_id],
   );
   const me = meResult.rows[0] || null;
   const isModerator = !!me && (me.role === "owner" || me.role === "admin");
-  const isCommunityBanned = !!(me && me.community_banned_until && new Date(me.community_banned_until).getTime() > Date.now());
+  const isCommunityBanned = !!(
+    me &&
+    me.community_banned_until &&
+    new Date(me.community_banned_until).getTime() > Date.now()
+  );
 
   if (req.method === "GET") {
     const limit = Math.max(1, Math.min(30, Number(req.query?.limit || 12)));
@@ -47,10 +58,10 @@ module.exports = async (req, res) => {
       order by p.created_at desc
       limit $2 offset $3
       `,
-      [session.user_id, limit, offset]
+      [session.user_id, limit, offset],
     );
 
-    const ids = postsResult.rows.map(post => post.id);
+    const ids = postsResult.rows.map((post) => post.id);
     let commentsByPost = {};
     if (ids.length) {
       const commentsResult = await pool.query(
@@ -61,7 +72,7 @@ module.exports = async (req, res) => {
         where c.post_id = any($1::uuid[])
         order by c.created_at asc
         `,
-        [ids]
+        [ids],
       );
       commentsByPost = commentsResult.rows.reduce((acc, row) => {
         if (!acc[row.post_id]) {
@@ -77,12 +88,12 @@ module.exports = async (req, res) => {
         isModerator,
         isCommunityBanned,
         bannedUntil: me?.community_banned_until || null,
-        banReason: me?.community_ban_reason || ""
+        banReason: me?.community_ban_reason || "",
       },
-      posts: postsResult.rows.map(post => ({
+      posts: postsResult.rows.map((post) => ({
         ...post,
-        comments: commentsByPost[post.id] || []
-      }))
+        comments: commentsByPost[post.id] || [],
+      })),
     });
     return;
   }
@@ -109,7 +120,7 @@ module.exports = async (req, res) => {
     }
     const target = await pool.query(
       "select id, role from users where lower(username) = $1 limit 1",
-      [username]
+      [username],
     );
     if (!target.rowCount) {
       fail(res, 404, "User not found");
@@ -126,7 +137,7 @@ module.exports = async (req, res) => {
            community_ban_reason = $3,
            updated_at = now()
        where id = $1`,
-      [targetUser.id, String(hours), reason]
+      [targetUser.id, String(hours), reason],
     );
     success(res, { ok: true });
     return;
@@ -148,14 +159,23 @@ module.exports = async (req, res) => {
            community_ban_reason = null,
            updated_at = now()
        where lower(username) = $1`,
-      [username]
+      [username],
     );
     success(res, { ok: true });
     return;
   }
 
-  if (isCommunityBanned && (action === "create_post" || action === "toggle_like" || action === "add_comment")) {
-    fail(res, 403, `You are banned from community interactions until ${new Date(me.community_banned_until).toLocaleString()}`);
+  if (
+    isCommunityBanned &&
+    (action === "create_post" ||
+      action === "toggle_like" ||
+      action === "add_comment")
+  ) {
+    fail(
+      res,
+      403,
+      `You are banned from community interactions until ${new Date(me.community_banned_until).toLocaleString()}`,
+    );
     return;
   }
 
@@ -164,15 +184,19 @@ module.exports = async (req, res) => {
     const content = cleanText(body.content, 3000);
     const imageUrl = cleanText(body.imageUrl, 800);
     const category = cleanText(body.category, 30);
-    if (!title || !content || !["fan_art", "theory", "spoiler"].includes(category)) {
+    if (
+      !title ||
+      !content ||
+      !["fan_art", "theory", "spoiler"].includes(category)
+    ) {
       fail(res, 400, "Invalid post payload");
       return;
     }
     const { rows } = await pool.query(
-      `insert into posts (user_id, title, content, image_url, category, updated_at)
-       values ($1,$2,$3,$4,$5,now())
+      `insert into posts (user_id, title, content, image_url, category, created_at, updated_at)
+       values ($1,$2,$3,$4,$5,now(),now())
        returning id`,
-      [session.user_id, title, content, imageUrl || null, category]
+      [session.user_id, title, content, imageUrl || null, category],
     );
     success(res, { postId: rows[0].id }, 201);
     return;
@@ -186,13 +210,19 @@ module.exports = async (req, res) => {
     }
     const existing = await pool.query(
       "select 1 from likes where user_id = $1 and post_id = $2",
-      [session.user_id, postId]
+      [session.user_id, postId],
     );
     if (existing.rowCount) {
-      await pool.query("delete from likes where user_id = $1 and post_id = $2", [session.user_id, postId]);
+      await pool.query(
+        "delete from likes where user_id = $1 and post_id = $2",
+        [session.user_id, postId],
+      );
       success(res, { liked: false });
     } else {
-      await pool.query("insert into likes (user_id, post_id) values ($1, $2)", [session.user_id, postId]);
+      await pool.query("insert into likes (user_id, post_id) values ($1, $2)", [
+        session.user_id,
+        postId,
+      ]);
       success(res, { liked: true });
     }
     return;
@@ -206,10 +236,10 @@ module.exports = async (req, res) => {
       return;
     }
     const { rows } = await pool.query(
-      `insert into comments (post_id, user_id, content, updated_at)
-       values ($1,$2,$3,now())
+      `insert into comments (post_id, user_id, content, created_at, updated_at)
+       values ($1,$2,$3,now(),now())
        returning id`,
-      [postId, session.user_id, content]
+      [postId, session.user_id, content],
     );
     success(res, { commentId: rows[0].id }, 201);
     return;
@@ -225,9 +255,19 @@ module.exports = async (req, res) => {
       fail(res, 400, "postId is required");
       return;
     }
-    await pool.query("delete from likes where post_id = $1", [postId]);
-    await pool.query("delete from comments where post_id = $1", [postId]);
-    await pool.query("delete from posts where id = $1", [postId]);
+    const client = await pool.connect();
+    try {
+      await client.query("begin");
+      await client.query("delete from likes where post_id = $1", [postId]);
+      await client.query("delete from comments where post_id = $1", [postId]);
+      await client.query("delete from posts where id = $1", [postId]);
+      await client.query("commit");
+    } catch (txErr) {
+      await client.query("rollback");
+      throw txErr;
+    } finally {
+      client.release();
+    }
     success(res, { ok: true });
     return;
   }

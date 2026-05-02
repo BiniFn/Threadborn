@@ -1,4 +1,6 @@
 const { allowCors, success, fail } = require("../../lib/api/http");
+const { getClientIp } = require("../../lib/api/request");
+const { takeRateLimitToken } = require("../../lib/api/rate-limit");
 const { getSession } = require("../../lib/api/auth");
 
 module.exports = async (req, res) => {
@@ -7,6 +9,10 @@ module.exports = async (req, res) => {
   }
   if (req.method !== "GET") {
     fail(res, 405, "Method not allowed");
+    return;
+  }
+  if (!takeRateLimitToken(`me:${getClientIp(req)}`, 60, 60_000)) {
+    fail(res, 429, "Too many requests");
     return;
   }
   const session = await getSession(req);
@@ -21,8 +27,8 @@ module.exports = async (req, res) => {
       username: session.username,
       avatarUrl: session.avatar_url || "",
       verified: session.verified,
-      role: session.role
+      role: session.role,
     },
-    csrfToken: session.csrf_token
+    csrfToken: session.csrf_token,
   });
 };

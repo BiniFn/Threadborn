@@ -1,18 +1,24 @@
 const { put } = require("@vercel/blob");
+const pool = require("../../lib/api/db");
 const { allowCors, success, fail } = require("../../lib/api/http");
-const { parseJsonBody } = require("../../lib/api/request");
+const { parseJsonBody, getClientIp } = require("../../lib/api/request");
+const { takeRateLimitToken } = require("../../lib/api/rate-limit");
 const { requireSession, validateCsrf } = require("../../lib/api/auth");
 
 module.exports = async (req, res) => {
   if (allowCors(req, res)) {
     return;
   }
-  const session = await requireSession(req, res, fail);
-  if (!session) {
-    return;
-  }
   if (req.method !== "POST") {
     fail(res, 405, "Method not allowed");
+    return;
+  }
+  if (!takeRateLimitToken(`avatar_upload:${getClientIp(req)}`, 5, 60_000)) {
+    fail(res, 429, "Too many upload attempts");
+    return;
+  }
+  const session = await requireSession(req, res, fail);
+  if (!session) {
     return;
   }
   if (!validateCsrf(req, session)) {
@@ -50,8 +56,15 @@ module.exports = async (req, res) => {
       access: "public",
       addRandomSuffix: false,
       contentType,
-      token: process.env.BLOB_READ_WRITE_TOKEN
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
+
+    // Persist the new avatar URL to the database immediately
+    await pool.query(
+      "update users set avatar_url = $1, updated_at = now() where id = $2",
+      [blob.url, session.user_id],
+    );
+
     success(res, { url: blob.url });
   } catch (error) {
     fail(res, 500, "Upload failed");

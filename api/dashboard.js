@@ -1,7 +1,8 @@
 const { put, del } = require("@vercel/blob");
 const pool = require("../lib/api/db");
 const { allowCors, success, fail } = require("../lib/api/http");
-const { parseJsonBody } = require("../lib/api/request");
+const { parseJsonBody, getClientIp } = require("../lib/api/request");
+const { takeRateLimitToken } = require("../lib/api/rate-limit");
 const { requireSession, validateCsrf } = require("../lib/api/auth");
 
 module.exports = async (req, res) => {
@@ -11,18 +12,27 @@ module.exports = async (req, res) => {
 
   try {
     await pool.ensureMigrations();
-    
+
     // Parse action from query or default to config
     const action = req.query.action || "config";
 
     if (action === "config") {
       const lang = req.query.lang || "en";
-      const configKey = lang === "ja" ? "global_settings_jp" : "global_settings";
+      const configKey =
+        lang === "ja" ? "global_settings_jp" : "global_settings";
 
       if (req.method === "GET") {
-        const { rows } = await pool.query("select value from dashboard_config where key = $1", [configKey]);
+        const { rows } = await pool.query(
+          "select value from dashboard_config where key = $1",
+          [configKey],
+        );
         if (!rows.length) {
-          return success(res, { notification: "", notifications: [], countdowns: [], countdown: { title: "", target_date: "" } });
+          return success(res, {
+            notification: "",
+            notifications: [],
+            countdowns: [],
+            countdown: { title: "", target_date: "" },
+          });
         }
         return success(res, rows[0].value);
       }
@@ -30,27 +40,37 @@ module.exports = async (req, res) => {
       if (req.method === "POST" || req.method === "PUT") {
         const session = await requireSession(req, res, fail);
         if (!session) return;
-        
+
         if (session.role !== "owner") {
           return fail(res, 403, "Only the owner can update dashboard config");
+        }
+
+        if (!validateCsrf(req, session)) {
+          return fail(res, 403, "Invalid CSRF token");
         }
 
         const body = await parseJsonBody(req);
         const payload = {
           notification: String(body.notification || ""), // legacy fallback
-          notifications: Array.isArray(body.notifications) ? body.notifications.map(n => String(n)) : [],
-          countdowns: Array.isArray(body.countdowns) ? body.countdowns : (body.countdown && body.countdown.title ? [body.countdown] : []),
+          notifications: Array.isArray(body.notifications)
+            ? body.notifications.map((n) => String(n))
+            : [],
+          countdowns: Array.isArray(body.countdowns)
+            ? body.countdowns
+            : body.countdown && body.countdown.title
+              ? [body.countdown]
+              : [],
           countdown: {
             title: String(body.countdown?.title || ""),
-            target_date: String(body.countdown?.target_date || "")
-          }
+            target_date: String(body.countdown?.target_date || ""),
+          },
         };
 
         await pool.query(
-          `insert into dashboard_config (key, value, updated_at) 
-           values ($1, $2, now()) 
+          `insert into dashboard_config (key, value, updated_at)
+           values ($1, $2, now())
            on conflict (key) do update set value = $2, updated_at = now()`,
-          [configKey, payload]
+          [configKey, payload],
         );
 
         return success(res, payload);
@@ -60,14 +80,16 @@ module.exports = async (req, res) => {
     if (action === "art") {
       // GET: Publicly list all art
       if (req.method === "GET") {
-        const { rows } = await pool.query("select id, character_name, url, label from dashboard_art order by created_at desc");
+        const { rows } = await pool.query(
+          "select id, character_name, url, label from dashboard_art order by created_at desc",
+        );
         return success(res, { art: rows });
       }
 
       // Must be logged in as owner for POST and DELETE
       const session = await requireSession(req, res, fail);
       if (!session) return;
-      
+
       if (session.role !== "owner") {
         return fail(res, 403, "Only the owner can modify art");
       }
@@ -94,34 +116,34 @@ module.exports = async (req, res) => {
         if (!dataUrl.startsWith("data:image/")) {
           return fail(res, 400, "Invalid image payload");
         }
-        
+
         const [meta, base64] = dataUrl.split(",");
         const typeMatch = /^data:(image\/[a-zA-Z0-9.+-]+);base64$/.exec(meta);
         if (!typeMatch || !base64) {
           return fail(res, 400, "Invalid image format");
         }
-        
+
         const contentType = typeMatch[1];
         const bytes = Buffer.from(base64, "base64");
-        
+
         if (bytes.length > 5 * 1024 * 1024) {
           return fail(res, 400, "Image too large (max 5MB)");
         }
 
         const ext = contentType.includes("png") ? "png" : "jpg";
         const fileName = `art/${characterName.toLowerCase().replace(/[^a-z0-9]/g, "_")}-${Date.now()}.${ext}`;
-        
+
         const blob = await put(fileName, bytes, {
           access: "public",
           addRandomSuffix: true,
           contentType,
-          token: process.env.BLOB_READ_WRITE_TOKEN
+          token: process.env.BLOB_READ_WRITE_TOKEN,
         });
 
         const { rows } = await pool.query(
-          `insert into dashboard_art (character_name, url, label, created_at) 
+          `insert into dashboard_art (character_name, url, label, created_at)
            values ($1, $2, $3, now()) returning id, character_name, url, label`,
-          [characterName, blob.url, label]
+          [characterName, blob.url, label],
         );
 
         return success(res, { art: rows[0] });
@@ -133,11 +155,16 @@ module.exports = async (req, res) => {
         const id = String(body.id || "");
         if (!id) return fail(res, 400, "Missing art ID");
 
-        const { rows } = await pool.query("select url from dashboard_art where id = $1", [id]);
+        const { rows } = await pool.query(
+          "select url from dashboard_art where id = $1",
+          [id],
+        );
         if (rows.length > 0) {
           try {
             if (process.env.BLOB_READ_WRITE_TOKEN) {
-               await del(rows[0].url, { token: process.env.BLOB_READ_WRITE_TOKEN });
+              await del(rows[0].url, {
+                token: process.env.BLOB_READ_WRITE_TOKEN,
+              });
             }
           } catch (e) {}
           await pool.query("delete from dashboard_art where id = $1", [id]);
@@ -146,22 +173,33 @@ module.exports = async (req, res) => {
       }
     }
 
-    
     if (action === "polls") {
       // GET: Fetch active polls for a given language
       if (req.method === "GET") {
         const lang = req.query.lang || "en";
         const { rows: polls } = await pool.query(
           "select id, question, created_at from polls where is_active = true and lang = $1 order by created_at desc",
-          [lang]
+          [lang],
         );
 
-        for (const poll of polls) {
-          const { rows: options } = await pool.query(
-            "select id, option_text, votes from poll_options where poll_id = $1 order by id asc",
-            [poll.id]
+        if (polls.length > 0) {
+          const pollIds = polls.map((p) => p.id);
+          const { rows: allOptions } = await pool.query(
+            "select id, poll_id, option_text, votes from poll_options where poll_id = any($1::uuid[]) order by id asc",
+            [pollIds],
           );
-          poll.options = options;
+          const optionsByPoll = allOptions.reduce((acc, opt) => {
+            if (!acc[opt.poll_id]) acc[opt.poll_id] = [];
+            acc[opt.poll_id].push({
+              id: opt.id,
+              option_text: opt.option_text,
+              votes: opt.votes,
+            });
+            return acc;
+          }, {});
+          for (const poll of polls) {
+            poll.options = optionsByPoll[poll.id] || [];
+          }
         }
 
         return success(res, { polls });
@@ -169,22 +207,28 @@ module.exports = async (req, res) => {
 
       // POST: Vote on a poll
       if (req.method === "POST") {
+        const ip = getClientIp(req);
+        if (!takeRateLimitToken(`poll_vote:${ip}`, 10, 60_000)) {
+          return fail(res, 429, "Too many votes, please try again later");
+        }
         const body = await parseJsonBody(req);
         const optionId = String(body.optionId || "");
         if (!optionId) return fail(res, 400, "Missing option ID");
 
-        await pool.query(
+        const result = await pool.query(
           "update poll_options set votes = votes + 1 where id = $1",
-          [optionId]
+          [optionId],
         );
-        
+        if (result.rowCount === 0) {
+          return fail(res, 404, "Poll option not found");
+        }
         return success(res, { voted: true });
       }
 
       // Must be logged in as owner for PUT and DELETE
       const session = await requireSession(req, res, fail);
       if (!session) return;
-      
+
       if (session.role !== "owner") {
         return fail(res, 403, "Only the owner can modify polls");
       }
@@ -201,19 +245,23 @@ module.exports = async (req, res) => {
         const options = Array.isArray(body.options) ? body.options : [];
 
         if (!question || options.length < 2) {
-          return fail(res, 400, "Poll must have a question and at least 2 options");
+          return fail(
+            res,
+            400,
+            "Poll must have a question and at least 2 options",
+          );
         }
 
         const { rows } = await pool.query(
           "insert into polls (question, lang, is_active) values ($1, $2, true) returning id",
-          [question, lang]
+          [question, lang],
         );
         const pollId = rows[0].id;
 
         for (const opt of options) {
           await pool.query(
             "insert into poll_options (poll_id, option_text, votes) values ($1, $2, 0)",
-            [pollId, String(opt).trim()]
+            [pollId, String(opt).trim()],
           );
         }
 
@@ -237,7 +285,11 @@ module.exports = async (req, res) => {
         if (!session || session.role !== "owner") {
           return fail(res, 403, "Only owner can clear data");
         }
+        if (!validateCsrf(req, session)) {
+          return fail(res, 403, "Invalid CSRF token");
+        }
         await pool.query("truncate dashboard_config");
+        await pool.query("truncate dashboard_art");
         await pool.query("truncate polls cascade");
         return success(res, { cleared: true });
       }
