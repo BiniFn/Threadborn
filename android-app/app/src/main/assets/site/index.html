@@ -6310,6 +6310,7 @@
             let ttsSegmentIndex = 0;
             let ttsHighlightFallback = null;
             let ttsBoundaryActive = false;
+            let ttsPageText = "";
             let deferredInstallPrompt = null;
             const progressKey = "novelverse_reader_progress";
             const activeUserKey = "threadborn_user";
@@ -8182,7 +8183,13 @@
                 const container = document.getElementById("reader-content");
                 if (!container) return;
 
-                const fullText = container.textContent || "";
+                // Clear existing highlight FIRST so DOM is clean before any offset math
+                clearTtsHighlight();
+
+                // Use the cached page text snapshot for consistent character offsets.
+                // Re-reading container.textContent after DOM mutations (mark insert/remove)
+                // can produce inconsistent results across rapid boundary events.
+                const fullText = ttsPageText || container.textContent || "";
                 let startIndex = Math.max(0, Number(charIndex) || 0);
                 let endIndex = Math.min(
                     fullText.length,
@@ -8202,8 +8209,6 @@
                     endIndex -= 1;
                 }
                 if (startIndex >= endIndex) return;
-
-                clearTtsHighlight();
 
                 const walker = document.createTreeWalker(
                     container,
@@ -8434,18 +8439,26 @@
                     return;
                 }
 
-                // Show all English and Japanese voices from any provider (not Google-only)
-                let filteredVoices = ttsVoices.filter((voice) => {
+                // Google English and Google Japanese voices only
+                const filteredVoices = ttsVoices.filter((voice) => {
+                    const name = voice.name.toLowerCase();
                     const lang = voice.lang.toLowerCase();
-                    return lang.startsWith("en") || lang.startsWith("ja");
+                    return (
+                        name.includes("google") &&
+                        (lang.startsWith("en") || lang.startsWith("ja"))
+                    );
                 });
 
-                // If no EN/JA voices found, fall back to showing all available voices
                 if (!filteredVoices.length) {
-                    filteredVoices = ttsVoices.slice();
+                    select.innerHTML = `<option value="">No Google voices — use Chrome</option>`;
+                    return;
                 }
 
                 const current = select.value;
+                const isJpPage =
+                    document.documentElement.lang === "ja" ||
+                    window.location.pathname.includes("index-jp");
+
                 select.innerHTML =
                     `<option value="">Default</option>` +
                     filteredVoices
@@ -8460,8 +8473,16 @@
                     filteredVoices.some((voice) => voice.name === current)
                 ) {
                     select.value = current;
-                } else if (filteredVoices.length > 0) {
-                    select.value = filteredVoices[0].name;
+                } else {
+                    // Auto-select the right language Google voice for this page
+                    const preferred = filteredVoices.find((v) =>
+                        isJpPage
+                            ? v.lang.toLowerCase().startsWith("ja")
+                            : v.lang.toLowerCase().startsWith("en"),
+                    );
+                    select.value = preferred
+                        ? preferred.name
+                        : filteredVoices[0].name;
                 }
             }
 
@@ -8592,6 +8613,7 @@
                 ttsKeepReading = true;
                 ttsRenderTick += 1;
                 const tick = ttsRenderTick;
+                ttsPageText = getCurrentPageText();
                 ttsSegments = getCurrentPageSpeechSegments(getReadingMode());
                 ttsSegmentIndex = 0;
                 ttsBoundaryActive = false;
@@ -8635,6 +8657,7 @@
                 ttsSegments = [];
                 ttsSegmentIndex = 0;
                 ttsBoundaryActive = false;
+                ttsPageText = "";
                 if ("speechSynthesis" in window) {
                     window.speechSynthesis.cancel();
                 }
