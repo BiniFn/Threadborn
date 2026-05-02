@@ -151,6 +151,19 @@ Includes the full reader with chapter navigation, progress saving, and offline s
 
 ---
 
+## Credits
+
+**BiniFn** — Author, creator, and sole owner of Threadborn and all associated works.
+
+| Channel | Link |
+|---|---|
+| Main | [@binifn](https://www.youtube.com/@binifn) |
+| Roblox | [@binirbx](https://www.youtube.com/@binirbx) |
+| Anime | [@binirx](https://www.youtube.com/@binirx) |
+| GitHub | [BiniFn](https://github.com/BiniFn) |
+
+---
+
 ## Legal
 
 This work is protected under international copyright law.
