@@ -7944,21 +7944,21 @@
 
                         if (!apkAsset) {
                             apkAsset = release.assets.find(
-                                (asset) => asset.name === "Threadborn.apk",
+                                (asset) => asset.name === "threadborn.apk" || asset.name === "Threadborn.apk",
                             );
                         }
 
                         if (!windowsAsset) {
                             windowsAsset = release.assets.find(
                                 (asset) =>
-                                    asset.name === "Threadborn-Windows.zip",
+                                    asset.name === "windows.zip" || asset.name === "Threadborn-Windows.zip",
                             );
                         }
 
                         if (!macAsset) {
                             macAsset = release.assets.find(
                                 (asset) =>
-                                    asset.name === "Threadborn-macOS.zip",
+                                    asset.name === "mac-os.zip" || asset.name === "Threadborn-macOS.zip",
                             );
                         }
                     });
