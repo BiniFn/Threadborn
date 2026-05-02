@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS reader_feedback (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES users(id) ON DELETE SET NULL,
   page_path text NOT NULL DEFAULT '/',
-  feedback_type text NOT NULL DEFAULT 'general' CHECK (feedback_type IN ('bug','suggestion','content','other')),
+  feedback_type text NOT NULL DEFAULT 'other' CHECK (feedback_type IN ('bug','suggestion','content','other')),
   message text NOT NULL CHECK (char_length(message) BETWEEN 5 AND 2000),
   created_at timestamptz NOT NULL DEFAULT now()
 );

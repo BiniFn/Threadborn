@@ -1,14 +1,6 @@
-const CACHE_NAME = "threadborn-static-v30";
+const CACHE_NAME = "threadborn-static-v31";
 const CORE_ASSETS = [
   "./",
-  "./index.html",
-  "./index-jp.html",
-  "./login.html",
-  "./login-jp.html",
-  "./signup.html",
-  "./signup-jp.html",
-  "./profile.html",
-  "./profile-jp.html",
   "./runtime-config.js",
   "./manifest.json",
   "./global.css?v=28",
@@ -38,6 +30,14 @@ self.addEventListener("install", (event) => {
 self.addEventListener("message", (event) => {
   if (event.data && event.data.action === "skipWaiting") {
     self.skipWaiting();
+  }
+});
+
+// Periodically check for SW updates in the background so clients
+// always get the latest version without requiring a hard refresh
+self.addEventListener("periodicsync", (event) => {
+  if (event.tag === "sw-update-check") {
+    event.waitUntil(self.registration.update());
   }
 });
 
@@ -81,19 +81,18 @@ self.addEventListener("fetch", (event) => {
     .get("accept")
     ?.includes("text/html");
 
+  // HTML is ALWAYS fetched from the network — never serve stale HTML from cache.
+  // This ensures normal refreshes always get the latest deployed version.
+  // Falls back to a cached copy only when completely offline.
   if (isNavigation || isHtmlRequest) {
     event.respondWith(
       fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches
-              .open(CACHE_NAME)
-              .then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match("./index.html")),
+        .then((response) => response)
+        .catch(() =>
+          caches
+            .match(event.request)
+            .then((cached) => cached || caches.match("./index.html")),
+        ),
     );
     return;
   }

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Threadborn static site with Vercel login API",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "vercel dev",
     "db:migrate": "node db/migrate.js"
