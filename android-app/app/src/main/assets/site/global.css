@@ -291,6 +291,20 @@ main {
     filter: drop-shadow(0 18px 38px rgba(0, 0, 0, 0.45));
 }
 
+/* When the logo IS the visual title (square format), hide the text H1 visually
+   but keep it in the DOM for screen readers and search engines */
+.hero-copy-block .series-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .hero-card::after,
 .card::after,
 .quote-card::after {
@@ -343,8 +357,8 @@ main {
     }
 
     .hero-shell {
-        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.86fr);
-        gap: 36px;
+        grid-template-columns: minmax(0, 1fr) min(480px, 40vw);
+        gap: 52px;
     }
 
     .reader-toolbar .toolbar-pill {
@@ -431,9 +445,9 @@ main {
 
 .hero-shell {
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.85fr);
-    gap: 36px;
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) min(460px, 42vw);
+    gap: 48px;
+    align-items: center;
 }
 
 .hero-copy-block {
@@ -447,13 +461,29 @@ main {
 }
 
 .hero-logo-wrap {
-    margin: 0;
-    max-width: 420px;
+    margin: 0 auto;
     width: 100%;
+    max-width: 460px;
 }
 
 .hero-logo {
-    width: min(100%, 420px);
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    filter: drop-shadow(0 0 60px rgba(207, 47, 47, 0.22))
+        drop-shadow(0 0 30px rgba(138, 43, 226, 0.12))
+        drop-shadow(0 24px 50px rgba(0, 0, 0, 0.65));
+    transition:
+        filter 0.35s ease,
+        transform 0.35s ease;
+}
+
+.hero-logo:hover {
+    filter: drop-shadow(0 0 80px rgba(207, 47, 47, 0.38))
+        drop-shadow(0 0 40px rgba(138, 43, 226, 0.22))
+        drop-shadow(0 28px 56px rgba(0, 0, 0, 0.7));
+    transform: translateY(-6px) scale(1.015);
 }
 
 .series-title {
