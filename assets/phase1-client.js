@@ -1094,4 +1094,13 @@
     loadDashboardArt();
     startBackgroundSync();
   });
+
+  // Re-fetch dashboard config (announcements, countdowns) whenever the tab
+  // becomes visible again — this ensures the banner never requires a hard
+  // refresh to appear, even if the user had the tab open on an old SW.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      loadDashboardConfig();
+    }
+  });
 })();
