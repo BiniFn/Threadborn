@@ -120,7 +120,7 @@ Red eyes.
 
 Beautiful enough that even dying, Yono had one tiny, useless thought.
 
-That person is hot.
+“That Person Is Hot”
 
 The woman looked at the road.
 
