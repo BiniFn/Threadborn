@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           cd dist
-          7z a -tzip windows.zip Threadborn/*
+          7z a -tzip windows.zip Threadborn.exe
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4

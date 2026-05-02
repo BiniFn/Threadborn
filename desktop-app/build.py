@@ -56,6 +56,7 @@ def main() -> None:
     "--noconfirm",
     "--clean",
     "--windowed",
+    "--onefile",
     "--name",
     "Threadborn",
     "--icon",
