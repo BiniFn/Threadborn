@@ -38,17 +38,13 @@ jobs:
         working-directory: ./android-app
         run: |
           chmod +x ./gradlew
-          if ./gradlew assembleDebug --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"; then
-            apk_path=$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | sed -n '1p')
-            if [ -n "${apk_path}" ] && [ -f "${apk_path}" ]; then
-              cp "${apk_path}" ../threadborn.apk
-            else
-              echo "Build reported success but APK file was not found."
-              exit 1
-            fi
+          ./gradlew assembleDebug --stacktrace -PAPI_BASE_URL="${{ secrets.API_BASE_URL }}"
+          apk_path=$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | sed -n '1p')
+          if [ -n "${apk_path}" ] && [ -f "${apk_path}" ]; then
+            cp "${apk_path}" ../threadborn.apk
           else
-            echo "Debug build failed. Downloading previous latest APK to keep release channel available."
-            curl -L -f -o ../threadborn.apk "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/threadborn.apk" || curl -L -f -o ../threadborn.apk "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk"
+            echo "Build reported success but APK file was not found."
+            exit 1
           fi
 
       - name: Upload APK artifact

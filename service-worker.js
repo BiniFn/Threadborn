@@ -3,13 +3,13 @@ const CORE_ASSETS = [
   "./",
   "./runtime-config.js",
   "./manifest.json",
-  "./global.css?v=32"
+  "./global.css?v=32",
   "./assets/threadborn-logo-en-new.png",
   "./assets/threadborn-logo-jp-new.png",
   "./assets/threadborn-logo.png",
   "./assets/threadborn-logo-en.png",
   "./assets/threadborn-logo-jp.png",
-  "./assets/phase1-client.js?v=32"
+  "./assets/phase1-client.js?v=32",
   "./assets/threadborn-app-icon.png",
   "./assets/threadborn-icon-192.png",
   "./assets/threadborn-icon-512.png",

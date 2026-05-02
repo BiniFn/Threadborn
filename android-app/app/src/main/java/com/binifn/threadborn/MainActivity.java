@@ -12,6 +12,7 @@ import android.webkit.WebResourceError;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.PermissionRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -55,9 +56,16 @@ public class MainActivity extends AppCompatActivity {
     settings.setMediaPlaybackRequiresUserGesture(false);
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
     settings.setAllowFileAccessFromFileURLs(true);
+    settings.setAllowUniversalAccessFromFileURLs(true);
+    settings.setGeolocationEnabled(true);
     webView.clearCache(true);
 
-    webView.setWebChromeClient(new WebChromeClient());
+    webView.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public void onPermissionRequest(final PermissionRequest request) {
+        request.grant(request.getResources());
+      }
+    });
     webView.addJavascriptInterface(new AndroidBridge(this), "AndroidBridge");
     webView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {
       if (url != null && url.startsWith("https://appassets.androidplatform.net/")) {
