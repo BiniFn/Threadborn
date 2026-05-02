@@ -602,7 +602,7 @@
           notifBanner.innerHTML = notifs
             .map(
               (n) =>
-                `<div style="margin-bottom:8px;"><strong>BiniFn:</strong> ${n}</div>`,
+                `<div style="margin-bottom:8px;"><strong>BiniFn:</strong> ${escapeHtml(n).replace(/\n/g, "<br>")}`,
             )
             .join("");
           notifBanner.style.display = "";
@@ -688,7 +688,7 @@
             .map(
               (n, idx) => `
             <div class="announcement-item" style="display:flex; gap:8px; margin-bottom:8px;">
-              <input type="text" class="dashboard-announcement-input" value="${escapeHtml(n)}" style="flex:1;" />
+              <textarea class="dashboard-announcement-input" style="flex:1; resize:vertical; min-height:72px; padding:8px; font-family:inherit; font-size:inherit;">${escapeHtml(n)}</textarea>
               <button class="ghost-btn" type="button" onclick="this.parentElement.remove(); saveDashboardConfig();">Remove</button>
             </div>
           `,
@@ -782,7 +782,7 @@
     div.style.gap = "8px";
     div.style.marginBottom = "8px";
     div.innerHTML = `
-      <input type="text" class="dashboard-announcement-input" placeholder="New announcement..." style="flex:1;" />
+      <textarea class="dashboard-announcement-input" placeholder="New announcement..." style="flex:1; resize:vertical; min-height:72px; padding:8px; font-family:inherit; font-size:inherit;"></textarea>
       <button class="ghost-btn" type="button" onclick="this.parentElement.remove(); saveDashboardConfig();">Remove</button>
     `;
     container.appendChild(div);
