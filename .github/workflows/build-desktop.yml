@@ -5,13 +5,14 @@ on:
     branches:
       - main
     paths:
-      - '*.html'
-      - 'runtime-config.js'
-      - 'assets/**'
-      - 'manifest.json'
-      - 'service-worker.js'
-      - 'desktop-app/**'
-      - 'scripts/sync_desktop_site.sh'
+      - "*.html"
+      - "runtime-config.js"
+      - "assets/**"
+      - "manifest.json"
+      - "service-worker.js"
+      - "global.css"
+      - "desktop-app/**"
+      - "scripts/sync_desktop_site.sh"
   workflow_dispatch:
 
 permissions:
@@ -28,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Sync site
         shell: bash
@@ -65,7 +66,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Sync site
         run: |
