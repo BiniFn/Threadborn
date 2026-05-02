@@ -7,7 +7,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-import webview  # type: ignore[import-untyped]
+import webview  # type: ignore
 
 APP_TITLE = "Threadborn: Reborn Where Fate Snaps"
 DEFAULT_API_BASE = "https://threadborn.vercel.app"
