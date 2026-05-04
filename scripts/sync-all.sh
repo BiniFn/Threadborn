@@ -29,6 +29,7 @@ if [ -d "$ANDROID_SITE_DIR" ]; then
   cp "$PROJECT_ROOT/manifest.json" "$ANDROID_SITE_DIR/"
   cp "$PROJECT_ROOT/service-worker.js" "$ANDROID_SITE_DIR/"
   cp "$PROJECT_ROOT/runtime-config.js" "$ANDROID_SITE_DIR/"
+  cp "$PROJECT_ROOT/global.css" "$ANDROID_SITE_DIR/"
   
   # Sync assets
   cp -r "$PROJECT_ROOT/assets/" "$ANDROID_SITE_DIR/assets/" 2>/dev/null || true
