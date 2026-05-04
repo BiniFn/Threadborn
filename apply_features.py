@@ -37,46 +37,6 @@ for html_file in ['index.html', 'index-jp.html']:
     with open(html_file, 'r') as f:
         html_content = f.read()
     
-    # Fix TTS: Safari/Firefox often need voices to be loaded asynchronously properly
-    # Replace the loadVoices function to be more robust
-    tts_fix = """
-            function loadVoices() {
-                ttsVoices = window.speechSynthesis.getVoices();
-                const voiceSelect = document.getElementById('tts-voice');
-                if (!voiceSelect) return;
-                const currentVal = voiceSelect.value;
-                voiceSelect.innerHTML = '';
-                ttsVoices.forEach((voice, i) => {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = voice.name + ' (' + voice.lang + ')';
-                    voiceSelect.appendChild(option);
-                });
-                if (currentVal && voiceSelect.querySelector(`option[value="${currentVal}"]`)) {
-                    voiceSelect.value = currentVal;
-                }
-            }
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.onvoiceschanged = loadVoices;
-                // Polling fallback for browsers that don't fire onvoiceschanged reliably
-                let ttsPolls = 0;
-                let ttsInterval = setInterval(() => {
-                    if (window.speechSynthesis.getVoices().length > 0) {
-                        loadVoices();
-                        clearInterval(ttsInterval);
-                    } else {
-                        ttsPolls++;
-                        if (ttsPolls > 10) clearInterval(ttsInterval);
-                    }
-                }, 500);
-            }
-"""
-    # Just inject the fallback after onvoiceschanged
-    html_content = html_content.replace(
-        'window.speechSynthesis.onvoiceschanged = loadVoices;',
-        "window.speechSynthesis.onvoiceschanged = loadVoices;\n" + tts_fix
-    )
-    
     # Auto-prompt for push notifications on app open
     auto_prompt_js = """
         <script>

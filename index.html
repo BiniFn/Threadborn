@@ -11102,25 +11102,6 @@
             toggleReaderTools(false);
             if ("speechSynthesis" in window) {
                 window.speechSynthesis.onvoiceschanged = loadVoices;
-
-            function loadVoices() {
-                ttsVoices = window.speechSynthesis.getVoices();
-                const voiceSelect = document.getElementById('tts-voice');
-                if (!voiceSelect) return;
-                const currentVal = voiceSelect.value;
-                voiceSelect.innerHTML = '';
-                ttsVoices.forEach((voice, i) => {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = voice.name + ' (' + voice.lang + ')';
-                    voiceSelect.appendChild(option);
-                });
-                if (currentVal && voiceSelect.querySelector(`option[value="${currentVal}"]`)) {
-                    voiceSelect.value = currentVal;
-                }
-            }
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.onvoiceschanged = loadVoices;
                 // Polling fallback for browsers that don't fire onvoiceschanged reliably
                 let ttsPolls = 0;
                 let ttsInterval = setInterval(() => {
