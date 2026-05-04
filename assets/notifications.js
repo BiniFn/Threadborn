@@ -27,6 +27,7 @@
   let _lastChapterCount   = null;
   let _lastArtCount       = null;
   let _lastCommunityCount = null;
+  let _lastBadgeCount     = null;
 
   // In-app notification store (server-side notifications for logged-in users)
   let _notifCache  = [];
@@ -149,6 +150,22 @@
         localStorage.setItem(STORAGE_KEY_STREAK, String(now));
       }
     }
+
+    // Late night reading nudge
+    const hour = new Date().getHours();
+    if (hour >= 2 && hour <= 4) {
+      const lastNightNudge = parseInt(localStorage.getItem("threadborn_night_nudge") || "0", 10);
+      if (now - lastNightNudge > 12 * 3600000) {
+        showOsNotification(
+          isJP() ? "🌙 夜更かしですね" : "🌙 Reading Late?",
+          isJP()
+            ? "ヨノの旅は逃げません。目を休める時間かもしれません。"
+            : "Yono's journey will wait. Don't forget to rest your eyes!",
+          { tag: "threadborn-night" }
+        );
+        localStorage.setItem("threadborn_night_nudge", String(now));
+      }
+    }
   }
 
   // Periodic check every hour while the tab is open
@@ -209,6 +226,31 @@
         }
         _lastCommunityCount = commCount;
       } catch (_) {}
+
+      // ── Badges / Achievements ──────────────────────────────────────────────
+      if (_authUser) {
+        try {
+          const badgeData = await apiFetch("/api/reader/analytics?action=badges");
+          if (badgeData && badgeData.badges) {
+            const earnedCount = badgeData.badges.filter(b => b.earned).length;
+            if (_lastBadgeCount !== null && earnedCount > _lastBadgeCount && canNotify) {
+              const newBadge = badgeData.badges.filter(b => b.earned).pop();
+              showOsNotification(
+                isJP() ? "🏆 新しいバッジを獲得しました！" : "🏆 New Badge Earned!",
+                isJP()
+                  ? `「${newBadge?.label || "実績"}」を解除しました。`
+                  : `You unlocked the "${newBadge?.label || "Achievement"}" badge!`,
+                { tag: "threadborn-badge", url: "./#profile" }
+              );
+              addLocalNotif(
+                isJP() ? "実績解除" : "Achievement Unlocked",
+                isJP() ? `「${newBadge?.label || "実績"}」を獲得しました。` : `You earned the "${newBadge?.label || "Achievement"}" badge.`
+              );
+            }
+            _lastBadgeCount = earnedCount;
+          }
+        } catch (_) {}
+      }
 
       // ── New Art / Drawings ─────────────────────────────────────────────────
       // The drawings data lives in window.drawings if phase1-client has loaded it
@@ -556,6 +598,26 @@
         })
         .catch(() => {});
     }
+
+    // Network status monitoring
+    window.addEventListener("offline", () => {
+      addLocalNotif(
+        isJP() ? "📶 オフライン" : "📶 Offline Mode",
+        isJP()
+          ? "ネットワーク接続が切れました。キャッシュされた章は引き続き読めます。"
+          : "You lost connection. Cached chapters are still available to read offline."
+      );
+    });
+
+    window.addEventListener("online", () => {
+      addLocalNotif(
+        isJP() ? "🌐 オンライン" : "🌐 Back Online",
+        isJP()
+          ? "接続が回復しました。最新の進捗が同期されます。"
+          : "Connection restored. Your reading progress will now sync."
+      );
+      if (_authUser) loadServerNotifications();
+    });
 
     // Close panel on outside click
     document.addEventListener("click", (e) => {
