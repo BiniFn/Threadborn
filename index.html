@@ -532,7 +532,7 @@
                                 id="apk-download-link"
                                 href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk"
                                 download
-                                >Download APK</a
+                                >Download APK (English)</a
                             >
                         </div>
                         <p class="apk-note" id="apk-version-note">
@@ -541,6 +541,27 @@
                         <p class="apk-note" id="apk-note">
                             The APK is rebuilt to match the current website
                             layout and content.
+                        </p>
+                    </article>
+                    <article class="card app-card">
+                        <strong>Download Android APK (日本語)</strong>
+                        <p>
+                            Get the full offline Japanese Android app — bundled
+                            with the Japanese translation, local chapter files,
+                            and direct PDF/EPUB saving.
+                        </p>
+                        <div class="link-cluster" style="margin-top: 18px">
+                            <a
+                                class="btn btn-secondary"
+                                id="apk-download-jp-link"
+                                href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/threadborn-jp.apk"
+                                download
+                                >Download Japan APK</a
+                            >
+                        </div>
+                        <p class="apk-note" id="apk-jp-note">
+                            Japanese edition APK — rebuilds alongside the
+                            English build on every release.
                         </p>
                     </article>
                     <article class="card app-card">
@@ -635,7 +656,14 @@
                                     id="apk-download-link-secondary"
                                     href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk"
                                     download
-                                    >Download APK</a
+                                    >Download APK (EN)</a
+                                >
+                                <a
+                                    class="btn btn-secondary"
+                                    id="apk-download-jp-link-secondary"
+                                    href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/threadborn-jp.apk"
+                                    download
+                                    >Download APK (JP)</a
                                 >
                             </div>
                         </article>
@@ -7872,13 +7900,20 @@
                     "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases";
                 const latestApkDirect =
                     "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/Threadborn.apk";
+                const latestJpApkDirect =
+                    "https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/threadborn-jp.apk";
                 const latestReleaseApi =
                     "https://api.github.com/repos/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest";
                 const apkLink = document.getElementById("apk-download-link");
                 const apkLinkSecondary = document.getElementById(
                     "apk-download-link-secondary",
                 );
+                const apkJpLink = document.getElementById("apk-download-jp-link");
+                const apkJpLinkSecondary = document.getElementById(
+                    "apk-download-jp-link-secondary",
+                );
                 const apkNote = document.getElementById("apk-note");
+                const apkJpNote = document.getElementById("apk-jp-note");
                 const apkVersionNote =
                     document.getElementById("apk-version-note");
                 const windowsLink = document.getElementById(
@@ -7901,6 +7936,14 @@
                 if (apkLinkSecondary) {
                     apkLinkSecondary.href = latestApkDirect;
                     apkLinkSecondary.setAttribute("download", "");
+                }
+                if (apkJpLink) {
+                    apkJpLink.href = latestJpApkDirect;
+                    apkJpLink.setAttribute("download", "");
+                }
+                if (apkJpLinkSecondary) {
+                    apkJpLinkSecondary.href = latestJpApkDirect;
+                    apkJpLinkSecondary.setAttribute("download", "");
                 }
                 if (apkNote) {
                     apkNote.textContent =
@@ -7934,6 +7977,7 @@
                     }
                     releases = await response.json();
                     let apkAsset = null;
+                    let apkJpAsset = null;
                     let windowsAsset = null;
                     let macAsset = null;
 
@@ -7945,6 +7989,12 @@
                         if (!apkAsset) {
                             apkAsset = release.assets.find(
                                 (asset) => asset.name === "threadborn.apk" || asset.name === "Threadborn.apk",
+                            );
+                        }
+
+                        if (!apkJpAsset) {
+                            apkJpAsset = release.assets.find(
+                                (asset) => asset.name === "threadborn-jp.apk",
                             );
                         }
 
@@ -7992,6 +8042,34 @@
                         }
                     }
 
+                    if (apkJpAsset) {
+                        if (apkJpLink) {
+                            apkJpLink.href = apkJpAsset.browser_download_url;
+                            apkJpLink.setAttribute("download", "");
+                        }
+                        if (apkJpLinkSecondary) {
+                            apkJpLinkSecondary.href = apkJpAsset.browser_download_url;
+                            apkJpLinkSecondary.setAttribute("download", "");
+                        }
+                        if (apkJpNote) {
+                            apkJpNote.textContent =
+                                "Latest Japan APK release found and ready to download.";
+                        }
+                    } else {
+                        if (apkJpLink) {
+                            apkJpLink.href = latestJpApkDirect;
+                            apkJpLink.setAttribute("download", "");
+                        }
+                        if (apkJpLinkSecondary) {
+                            apkJpLinkSecondary.href = latestJpApkDirect;
+                            apkJpLinkSecondary.setAttribute("download", "");
+                        }
+                        if (apkJpNote) {
+                            apkJpNote.textContent =
+                                "Japan APK release not found yet — pointing to latest build.";
+                        }
+                    }
+
                     if (windowsAsset) {
                         windowsLink.href = windowsAsset.browser_download_url;
                         windowsLink.setAttribute("download", "");
@@ -8025,6 +8103,14 @@
                     if (apkLinkSecondary) {
                         apkLinkSecondary.href = releasesUrl;
                         apkLinkSecondary.removeAttribute("download");
+                    }
+                    if (apkJpLink) {
+                        apkJpLink.href = latestJpApkDirect;
+                        apkJpLink.setAttribute("download", "");
+                    }
+                    if (apkJpLinkSecondary) {
+                        apkJpLinkSecondary.href = latestJpApkDirect;
+                        apkJpLinkSecondary.setAttribute("download", "");
                     }
                     if (apkNote) {
                         apkNote.textContent =
@@ -10601,9 +10687,7 @@
                 ].join("\n    ");
 
                 const navLinks = [
-                    `<li><a href="cover.xhtml">Cover</a>
-                                <a class="btn btn-secondary" id="apk-download-jp-secondary" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/threadborn-jp.apk" download>Download Japan APK</a>
-                            <a class="btn btn-secondary" id="apk-download-jp" href="https://github.com/BiniFn/Threadborn-Starting-Life-Beyond-the-Covenant-Door/releases/latest/download/threadborn-jp.apk" download>Download Japan APK</a></li>`,
+                    `<li><a href="cover.xhtml">Cover</a></li>`,
                     ...pageFiles.map(
                         (page, index) =>
                             `<li><a href="text/page-${index + 1}.xhtml">${escapeXml(page.title)}</a></li>`,

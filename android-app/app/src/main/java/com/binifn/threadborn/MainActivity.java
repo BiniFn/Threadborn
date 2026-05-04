@@ -98,8 +98,10 @@ public class MainActivity extends AppCompatActivity {
             "try{localStorage.setItem('threadborn_api_base','" + escapedApiBase + "');}catch(e){}" +
           "document.documentElement.classList.add('native-app','android-app');" +
             "if(window.applyAppMode){window.applyAppMode();}" +
-            "const apkLink=document.getElementById('apk-download-link');" +
-            "if(apkLink){apkLink.textContent='Android app installed';apkLink.removeAttribute('href');apkLink.removeAttribute('download');apkLink.style.pointerEvents='none';apkLink.style.opacity='0.65';}" +
+            "['apk-download-link','apk-download-link-secondary','apk-download-jp-link','apk-download-jp-link-secondary','apk-download-en-link','apk-download-en-link-secondary'].forEach(function(id){" +
+            "  var el=document.getElementById(id);" +
+            "  if(el){el.textContent='App installed';el.removeAttribute('href');el.removeAttribute('download');el.style.pointerEvents='none';el.style.opacity='0.65';}" +
+            "});" +
             "const installBtn=document.getElementById('install-btn');if(installBtn){installBtn.style.display='none';}" +
             "document.querySelectorAll('.web-app-promo').forEach(function(el){el.style.display='none';});" +
             "const apkNote=document.getElementById('apk-note');if(apkNote){apkNote.textContent='You are using the offline Android app build. PDF and EPUB exports save straight to your device.';}",
