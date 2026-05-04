@@ -8635,6 +8635,23 @@
                             "macOS build not found yet. This button opens the Releases page until it finishes publishing.";
                         macLink.href = releasesUrl;
                     }
+
+                    const linuxLink = document.getElementById("linux-download-link");
+                    const linuxNote = document.getElementById("linux-download-note");
+                    if (linuxLink) {
+                        if (linuxAsset) {
+                            linuxLink.href = linuxAsset.browser_download_url;
+                            linuxLink.setAttribute("download", "");
+                            if (linuxNote) {
+                                linuxNote.textContent =
+                                    "最新のLinuxデスクトップビルドが見つかり、ダウンロードの準備ができました。";
+                            }
+                        } else if (linuxNote) {
+                            linuxNote.textContent =
+                                "Linuxビルドはまだ見つかりません。公開が完了するまで、このボタンでリリースページを開きます。";
+                            linuxLink.href = releasesUrl;
+                        }
+                    }
                 } catch (error) {
                     if (apkLink) {
                         apkLink.href = latestJpApkDirect;
