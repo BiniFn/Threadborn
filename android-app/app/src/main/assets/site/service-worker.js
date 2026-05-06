@@ -1,4 +1,4 @@
-const CACHE_NAME = "threadborn-static-v41";
+const CACHE_NAME = "threadborn-static-v42";
 const CORE_ASSETS = [
   "./",
   "./runtime-config.js",

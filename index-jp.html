@@ -8841,10 +8841,17 @@
           <div class="meta">
             <span>${chapter.pages.length} pages</span>
             <div class="chapter-actions">
-              <button class="ghost-btn" onclick="openChapter(${index})">Read chapter</button>
+              
+              ${ (() => {
+                if (chapter.releaseDate && new Date(chapter.releaseDate) > new Date()) {
+                  return `<button class="ghost-btn" disabled>🔒 近日公開</button>\n<button class="ghost-btn" disabled>コメント</button>\n<button class="ghost-btn download-btn pdf-btn" disabled>Collector PDF</button>\n<button class="ghost-btn download-btn epub-btn" disabled>Styled EPUB</button>`;
+                }
+                return `<button class="ghost-btn" onclick="openChapter(${index})">Read chapter</button>
               <button class="ghost-btn" onclick="openChapterReaction(${index})">コメント</button>
               <button class="ghost-btn download-btn pdf-btn" onclick="downloadChapterPdf(${index}, this)">Collector PDF</button>
-              <button class="ghost-btn download-btn epub-btn" onclick="downloadChapterEpub(${index}, this)">Styled EPUB</button>
+              <button class="ghost-btn download-btn epub-btn" onclick="downloadChapterEpub(${index}, this)">Styled EPUB</button>`;
+              })() }
+
             </div>
           </div>
         </article>
