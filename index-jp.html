@@ -74,7 +74,7 @@
             href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap"
             rel="stylesheet"
         />
-        <link rel="stylesheet" href="./global.css?v=39" />
+        <link rel="stylesheet" href="./global.css?v=41" />
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css"
@@ -1809,13 +1809,13 @@
             <div class="reader-toolbar" id="reader-toolbar">
                 <div class="toolbar-pill">
                     <span class="pill-label">Read aloud</span>
-                    <div class="toolbar-value">Playback controls</div>
+                    <div class="toolbar-value">Narration deck</div>
                     <p class="toolbar-note">
-                        Listen to the current page with built-in text to speech.
+                        Cloud Kenta voice when available. Browser voice when offline.
                     </p>
                     <div class="toolbar-actions">
                         <button class="ghost-btn" onclick="createBookmark()">
-                            📝 Bookmark
+                            Bookmark
                         </button>
                         <button class="ghost-btn" onclick="speakCurrentPage()">
                             Play
@@ -1922,6 +1922,9 @@
                 <label class="toolbar-pill">
                     <span class="pill-label">Voice</span>
                     <div class="toolbar-value">Narration voice</div>
+                    <p class="toolbar-note">
+                        Kenta Hayashi uses secure server narration.
+                    </p>
                     <select
                         id="voice-select"
                         aria-label="Text to speech voice"
@@ -7368,6 +7371,10 @@
             let ttsHighlightFallback = null;
             let ttsBoundaryActive = false;
             let ttsPageText = "";
+            let ttsAudio = null;
+            let ttsAudioUrl = "";
+            let ttsAbortController = null;
+            let ttsCloudReady = true;
             let deferredInstallPrompt = null;
             const progressKey = "novelverse_reader_progress";
             const activeUserKey = "threadborn_user";
@@ -9281,6 +9288,47 @@
                 document.getElementById("tts-status").textContent = text;
             }
 
+            function getTtsVoiceValue() {
+                return document.getElementById("voice-select")?.value || "";
+            }
+
+            function useCambTts() {
+                return getTtsVoiceValue() === "camb:kenta";
+            }
+
+            function getTtsLanguageCode() {
+                const isJapanese =
+                    currentLanguage === "ja" ||
+                    document.documentElement.lang === "ja" ||
+                    window.location.pathname.includes("index-jp");
+                return isJapanese ? "ja-jp" : "en-us";
+            }
+
+            function isTtsPausedForHighlight() {
+                return Boolean(
+                    (ttsAudio && ttsAudio.paused) ||
+                        ("speechSynthesis" in window &&
+                            window.speechSynthesis.paused),
+                );
+            }
+
+            function cleanupTtsAudio() {
+                if (ttsAbortController) {
+                    ttsAbortController.abort();
+                    ttsAbortController = null;
+                }
+                if (ttsAudio) {
+                    ttsAudio.pause();
+                    ttsAudio.removeAttribute("src");
+                    ttsAudio.load();
+                    ttsAudio = null;
+                }
+                if (ttsAudioUrl) {
+                    URL.revokeObjectURL(ttsAudioUrl);
+                    ttsAudioUrl = "";
+                }
+            }
+
             function clearTtsHighlightTimer() {
                 if (ttsHighlightFallback) {
                     clearInterval(ttsHighlightFallback);
@@ -9523,7 +9571,7 @@
                 return words;
             }
 
-            function startTtsFallbackHighlight(segment, tick) {
+            function startTtsFallbackHighlight(segment, tick, durationSeconds = 0) {
                 clearTtsHighlightTimer();
                 if (!segment || tick !== ttsRenderTick) return;
 
@@ -9541,7 +9589,10 @@
                     0.5,
                     Number(document.getElementById("rate-range").value) || 1,
                 );
-                const delay = Math.max(180, Math.min(780, 420 / rate));
+                const audioDuration = Number.isFinite(durationSeconds) && durationSeconds > 0 ? durationSeconds : 0;
+                const delay = audioDuration
+                    ? Math.max(110, (audioDuration * 1000) / Math.max(words.length, 1))
+                    : Math.max(180, Math.min(780, 420 / rate));
                 highlightSpokenRange(
                     words[wordIndex].start,
                     words[wordIndex].length,
@@ -9555,7 +9606,7 @@
                     if (
                         tick !== ttsRenderTick ||
                         !ttsKeepReading ||
-                        window.speechSynthesis.paused
+                        isTtsPausedForHighlight()
                     ) {
                         return;
                     }
@@ -9571,17 +9622,24 @@
             }
 
             function loadVoices() {
+                const select = document.getElementById("voice-select");
+                if (!select) return;
+
                 if (!("speechSynthesis" in window)) {
-                    updateTtsStatus("TTS unavailable");
+                    select.innerHTML =
+                        `<option value="camb:kenta">CAMB AI • Kenta Hayashi</option>`;
+                    select.value = "camb:kenta";
+                    updateTtsStatus("Kenta ready when server is connected");
                     return;
                 }
 
                 ttsVoices = window.speechSynthesis.getVoices();
-                const select = document.getElementById("voice-select");
-                if (!select) return;
 
                 if (!ttsVoices.length) {
-                    select.innerHTML = `<option value="">Default voice</option>`;
+                    select.innerHTML =
+                        `<option value="camb:kenta">CAMB AI • Kenta Hayashi</option>` +
+                        `<option value="">Browser default voice</option>`;
+                    select.value = "camb:kenta";
                     return;
                 }
 
@@ -9635,8 +9693,12 @@
                 }
 
                 const current = select.value;
+                const cambOption = ttsCloudReady
+                    ? `<option value="camb:kenta">CAMB AI • Kenta Hayashi</option>`
+                    : `<option value="camb:kenta">CAMB AI • Kenta Hayashi (connect server)</option>`;
                 select.innerHTML =
-                    `<option value="">Default voice</option>` +
+                    cambOption +
+                    `<option value="">Browser default voice</option>` +
                     filteredVoices
                         .map(
                             (v) =>
@@ -9644,23 +9706,18 @@
                         )
                         .join("");
 
-                if (current && filteredVoices.some((v) => v.name === current)) {
+                if (current === "camb:kenta") {
+                    select.value = current;
+                } else if (current && filteredVoices.some((v) => v.name === current)) {
                     select.value = current;
                 } else {
-                    const preferred = filteredVoices.find((v) =>
-                        isJpPage
-                            ? v.lang.toLowerCase().startsWith("ja")
-                            : v.lang.toLowerCase().startsWith("en"),
-                    );
-                    select.value = preferred
-                        ? preferred.name
-                        : filteredVoices[0].name;
+                    select.value = "camb:kenta";
                 }
             }
 
             function applySpeechSettings(utterance) {
-                const selectedVoice =
-                    document.getElementById("voice-select").value;
+                const selectedVoice = getTtsVoiceValue();
+                if (selectedVoice === "camb:kenta") return;
                 const matchedVoice = ttsVoices.find(
                     (voice) => voice.name === selectedVoice,
                 );
@@ -9701,6 +9758,68 @@
                 }
                 renderPage();
                 setTimeout(() => speakCurrentPage(true), 180);
+            }
+
+            async function speakNextCambSegment(tick) {
+                if (tick !== ttsRenderTick || !ttsKeepReading) return;
+                if (ttsSegmentIndex >= ttsSegments.length) {
+                    finishTtsPage(tick);
+                    return;
+                }
+
+                const segment = ttsSegments[ttsSegmentIndex];
+                cleanupTtsAudio();
+                ttsAbortController = new AbortController();
+                updateTtsStatus(`Preparing Kenta ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
+                highlightSpokenRange(segment.start, Math.min(24, segment.end - segment.start));
+
+                try {
+                    const response = await fetch("/api/reader/tts", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        signal: ttsAbortController.signal,
+                        body: JSON.stringify({
+                            text: segment.text,
+                            language: getTtsLanguageCode(),
+                            model: "mars-flash",
+                        }),
+                    });
+                    if (!response.ok) throw new Error("Cloud narration failed");
+                    const blob = await response.blob();
+                    if (tick !== ttsRenderTick || !ttsKeepReading) return;
+
+                    ttsCloudReady = true;
+                    ttsAudioUrl = URL.createObjectURL(blob);
+                    ttsAudio = new Audio(ttsAudioUrl);
+                    ttsAudio.playbackRate = Number(document.getElementById("rate-range").value) || 1;
+                    ttsAudio.onplaying = () => {
+                        if (tick !== ttsRenderTick) return;
+                        updateTtsStatus(`Kenta reading ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
+                        startTtsFallbackHighlight(segment, tick, ttsAudio.duration);
+                    };
+                    ttsAudio.onended = () => {
+                        if (tick !== ttsRenderTick) return;
+                        clearTtsHighlightTimer();
+                        cleanupTtsAudio();
+                        ttsSegmentIndex += 1;
+                        setTimeout(() => speakNextCambSegment(tick), 80);
+                    };
+                    ttsAudio.onerror = () => {
+                        if (tick !== ttsRenderTick) return;
+                        ttsCloudReady = false;
+                        cleanupTtsAudio();
+                        updateTtsStatus("Kenta unavailable. Using browser voice.");
+                        speakNextTtsSegment(tick);
+                    };
+                    await ttsAudio.play();
+                } catch (error) {
+                    if (error.name === "AbortError") return;
+                    if (tick !== ttsRenderTick) return;
+                    ttsCloudReady = false;
+                    cleanupTtsAudio();
+                    updateTtsStatus("Kenta unavailable. Using browser voice.");
+                    speakNextTtsSegment(tick);
+                }
             }
 
             function speakNextTtsSegment(tick) {
@@ -9776,7 +9895,8 @@
             }
 
             function speakCurrentPage(isContinuation = false) {
-                if (!("speechSynthesis" in window)) {
+                const cloudVoice = useCambTts();
+                if (!cloudVoice && !("speechSynthesis" in window)) {
                     updateTtsStatus("TTS unavailable");
                     return;
                 }
@@ -9786,7 +9906,7 @@
                 ttsRenderTick += 1;
                 const tick = ttsRenderTick;
                 ttsPageText = getCurrentPageText();
-                ttsSegments = getCurrentPageSpeechSegments(getReadingMode());
+                ttsSegments = getCurrentPageSpeechSegments(cloudVoice ? "sentence" : getReadingMode());
                 ttsSegmentIndex = 0;
                 ttsBoundaryActive = false;
                 if (!ttsSegments.length) {
@@ -9794,13 +9914,31 @@
                     ttsKeepReading = false;
                     return;
                 }
-                speakNextTtsSegment(tick);
-                if (!isContinuation) {
-                    startTtsFallbackHighlight(ttsSegments[0], tick);
+                if (cloudVoice) {
+                    speakNextCambSegment(tick);
+                } else {
+                    speakNextTtsSegment(tick);
+                    if (!isContinuation) {
+                        startTtsFallbackHighlight(ttsSegments[0], tick);
+                    }
                 }
             }
 
             function toggleSpeechPause() {
+                if (useCambTts() && ttsAudio) {
+                    if (ttsAudio.paused) {
+                        ttsAudio.play();
+                        updateTtsStatus("Kenta reading");
+                        const segment = ttsSegments[ttsSegmentIndex];
+                        if (segment) startTtsFallbackHighlight(segment, ttsRenderTick, ttsAudio.duration);
+                    } else {
+                        ttsAudio.pause();
+                        clearTtsHighlightTimer();
+                        updateTtsStatus("Paused");
+                    }
+                    return;
+                }
+
                 if (!("speechSynthesis" in window)) {
                     updateTtsStatus("TTS unavailable");
                     return;
@@ -9830,6 +9968,7 @@
                 ttsSegmentIndex = 0;
                 ttsBoundaryActive = false;
                 ttsPageText = "";
+                cleanupTtsAudio();
                 if ("speechSynthesis" in window) {
                     window.speechSynthesis.cancel();
                 }
@@ -11726,7 +11865,7 @@
             ) {
                 const pushBtn = document.getElementById("push-enable-btn");
                 if (pushBtn) pushBtn.style.display = "";
-                updatePushButtonState && updatePushButtonState();
+                if (typeof updatePushButtonState === "function") updatePushButtonState();
             }
             loadVoices();
             loadDesktopDownloadLinks();
@@ -11797,8 +11936,8 @@
             }
         </style>
 
-        <script src="./assets/notifications.js?v=39"></script>
-        <script src="./assets/phase1-client.js?v=39"></script>
+        <script src="./assets/notifications.js?v=40"></script>
+        <script src="./assets/phase1-client.js?v=40"></script>
         <script>
             if ("serviceWorker" in navigator) {
                 let newWorker;
