@@ -1952,7 +1952,7 @@
                     <span class="pill-label">Read aloud</span>
                     <div class="toolbar-value">Narration deck</div>
                     <p class="toolbar-note">
-                        Cloud Kenta voice when available. Browser voice when offline.
+                        Best browser voice first. Free cloud fallback when needed.
                     </p>
                     <div class="toolbar-actions">
                         <button class="ghost-btn" onclick="createBookmark()">
@@ -2064,7 +2064,7 @@
                     <span class="pill-label">Voice</span>
                     <div class="toolbar-value">Narration voice</div>
                     <p class="toolbar-note">
-                        Kenta Hayashi uses secure server narration.
+                        Google voices when your browser supports them.
                     </p>
                     <select
                         id="voice-select"
@@ -8771,8 +8771,8 @@
                 return document.getElementById("voice-select")?.value || "";
             }
 
-            function useCambTts() {
-                return getTtsVoiceValue() === "camb:kenta";
+            function useCloudTts() {
+                return getTtsVoiceValue() === "free:auto";
             }
 
             function getTtsLanguageCode() {
@@ -9102,15 +9102,75 @@
                 }, delay);
             }
 
+            function escapeVoiceOption(text) {
+                return String(text || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+            }
+
+            function getTtsLanguagePrefix() {
+                return getTtsLanguageCode().startsWith("ja") ? "ja" : "en";
+            }
+
+            function scoreBrowserVoice(voice, desiredPrefix = getTtsLanguagePrefix()) {
+                const name = String(voice?.name || "").toLowerCase();
+                const lang = String(voice?.lang || "").toLowerCase();
+                let score = 0;
+                if (lang.startsWith(desiredPrefix)) score += 90;
+                if (desiredPrefix === "en" && lang === "en-us") score += 12;
+                if (desiredPrefix === "ja" && lang === "ja-jp") score += 12;
+                if (name.includes("google")) score += 70;
+                if (voice && voice.localService === false) score += 14;
+                if (name.includes("neural") || name.includes("natural") || name.includes("premium")) score += 12;
+                if (desiredPrefix === "en" && /(us english|uk english|guy|davis|jenny|aria|andrew|ava|samantha|daniel)/.test(name)) score += 10;
+                if (desiredPrefix === "ja" && /(nanami|keita|kyoko|otoya|haruka|ichiro|sayaka|google|日本)/.test(name)) score += 10;
+                if (voice?.default) score += 4;
+                return score;
+            }
+
+            function getReadableVoices() {
+                const languageVoices = ttsVoices.filter((voice) => {
+                    const lang = String(voice.lang || "").toLowerCase();
+                    return lang.startsWith("en") || lang.startsWith("ja");
+                });
+                return languageVoices.length ? languageVoices : ttsVoices.slice();
+            }
+
+            function getPreferredBrowserVoice(voices = getReadableVoices()) {
+                if (!voices.length) return null;
+                const desiredPrefix = getTtsLanguagePrefix();
+                return voices
+                    .slice()
+                    .sort((a, b) => {
+                        const scoreDiff =
+                            scoreBrowserVoice(b, desiredPrefix) -
+                            scoreBrowserVoice(a, desiredPrefix);
+                        if (scoreDiff) return scoreDiff;
+                        return String(a.name).localeCompare(String(b.name));
+                    })[0];
+            }
+
+            function formatBestBrowserVoiceLabel(voice) {
+                return voice
+                    ? `Best browser voice • ${voice.name} (${voice.lang})`
+                    : "Best browser voice";
+            }
+
             function loadVoices() {
                 const select = document.getElementById("voice-select");
                 if (!select) return;
 
+                const current = select.value;
+                const cloudOption = ttsCloudReady
+                    ? `<option value="free:auto">FreeTTS fallback • English/Japanese</option>`
+                    : `<option value="free:auto">FreeTTS fallback • connect server</option>`;
+
                 if (!("speechSynthesis" in window)) {
-                    select.innerHTML =
-                        `<option value="camb:kenta">CAMB AI • Kenta Hayashi</option>`;
-                    select.value = "camb:kenta";
-                    updateTtsStatus("Kenta ready when server is connected");
+                    select.innerHTML = cloudOption;
+                    select.value = "free:auto";
+                    if (!ttsKeepReading) updateTtsStatus("Free English/Japanese TTS ready");
                     return;
                 }
 
@@ -9118,92 +9178,66 @@
 
                 if (!ttsVoices.length) {
                     select.innerHTML =
-                        `<option value="camb:kenta">CAMB AI • Kenta Hayashi</option>` +
-                        `<option value="">Browser default voice</option>`;
-                    select.value = "camb:kenta";
+                        `<option value="browser:best">Best browser voice</option>` +
+                        `<option value="">Browser default voice</option>` +
+                        cloudOption;
+                    select.value = current || "browser:best";
+                    if (!ttsKeepReading) updateTtsStatus("Loading browser voices...");
                     return;
                 }
 
-                // Detect app mode — Android WebView and desktop pywebview
-                // do not have Google TTS, so we use all available system voices
-                const appMode =
-                    typeof getAppMode === "function"
-                        ? getAppMode()
-                        : window.__THREADBORN_APP_MODE || "";
-                const isApp = appMode === "android" || appMode === "desktop";
-                const isJpPage =
-                    document.documentElement.lang === "ja" ||
-                    window.location.pathname.includes("index-jp");
-
-                let filteredVoices;
-
-                if (isApp) {
-                    // App mode: use ALL available English + Japanese voices from any provider
-                    filteredVoices = ttsVoices.filter((v) => {
-                        const lang = v.lang.toLowerCase();
-                        return lang.startsWith("en") || lang.startsWith("ja");
+                const filteredVoices = getReadableVoices()
+                    .slice()
+                    .sort((a, b) => {
+                        const scoreDiff = scoreBrowserVoice(b) - scoreBrowserVoice(a);
+                        if (scoreDiff) return scoreDiff;
+                        return String(a.name).localeCompare(String(b.name));
                     });
-                    // If still nothing, show all voices
-                    if (!filteredVoices.length)
-                        filteredVoices = ttsVoices.slice();
-                } else {
-                    // Web browser: prefer Google TTS (Chrome), fall back to any EN/JA
-                    filteredVoices = ttsVoices.filter((v) => {
-                        const name = v.name.toLowerCase();
-                        const lang = v.lang.toLowerCase();
-                        return (
-                            name.includes("google") &&
-                            (lang.startsWith("en") || lang.startsWith("ja"))
-                        );
-                    });
-                    if (!filteredVoices.length) {
-                        filteredVoices = ttsVoices.filter((v) => {
-                            const lang = v.lang.toLowerCase();
-                            return (
-                                lang.startsWith("en") || lang.startsWith("ja")
-                            );
-                        });
-                    }
-                    if (!filteredVoices.length)
-                        filteredVoices = ttsVoices.slice();
-                }
+                const preferredVoice = getPreferredBrowserVoice(filteredVoices);
 
-                if (!filteredVoices.length) {
-                    select.innerHTML = `<option value="">No voices available</option>`;
-                    return;
-                }
-
-                const current = select.value;
-                const cambOption = ttsCloudReady
-                    ? `<option value="camb:kenta">CAMB AI • Kenta Hayashi</option>`
-                    : `<option value="camb:kenta">CAMB AI • Kenta Hayashi (connect server)</option>`;
                 select.innerHTML =
-                    cambOption +
+                    `<option value="browser:best">${escapeVoiceOption(formatBestBrowserVoiceLabel(preferredVoice))}</option>` +
                     `<option value="">Browser default voice</option>` +
                     filteredVoices
                         .map(
-                            (v) =>
-                                `<option value="${v.name}">${v.name} (${v.lang})</option>`,
+                            (voice) =>
+                                `<option value="${escapeVoiceOption(voice.name)}">${escapeVoiceOption(voice.name)} (${escapeVoiceOption(voice.lang)})</option>`,
                         )
-                        .join("");
+                        .join("") +
+                    cloudOption;
 
-                if (current === "camb:kenta") {
-                    select.value = current;
-                } else if (current && filteredVoices.some((v) => v.name === current)) {
+                if (current === "free:auto" || current === "" || current === "browser:best") {
+                    select.value = current || "browser:best";
+                } else if (filteredVoices.some((voice) => voice.name === current)) {
                     select.value = current;
                 } else {
-                    select.value = "camb:kenta";
+                    select.value = "browser:best";
+                }
+
+                if (!ttsKeepReading) {
+                    updateTtsStatus(
+                        preferredVoice
+                            ? `Best voice: ${preferredVoice.name}`
+                            : "Browser TTS ready",
+                    );
                 }
             }
 
             function applySpeechSettings(utterance) {
                 const selectedVoice = getTtsVoiceValue();
-                if (selectedVoice === "camb:kenta") return;
-                const matchedVoice = ttsVoices.find(
-                    (voice) => voice.name === selectedVoice,
-                );
+                utterance.lang = getTtsLanguageCode();
+                let matchedVoice = null;
+                if (selectedVoice === "free:auto") return;
+                if (selectedVoice === "browser:best") {
+                    matchedVoice = getPreferredBrowserVoice();
+                } else if (selectedVoice) {
+                    matchedVoice = ttsVoices.find(
+                        (voice) => voice.name === selectedVoice,
+                    );
+                }
                 if (matchedVoice) {
                     utterance.voice = matchedVoice;
+                    utterance.lang = matchedVoice.lang || utterance.lang;
                 }
                 utterance.rate = Number(
                     document.getElementById("rate-range").value,
@@ -9241,7 +9275,7 @@
                 setTimeout(() => speakCurrentPage(true), 180);
             }
 
-            async function speakNextCambSegment(tick) {
+            async function speakNextCloudSegment(tick) {
                 if (tick !== ttsRenderTick || !ttsKeepReading) return;
                 if (ttsSegmentIndex >= ttsSegments.length) {
                     finishTtsPage(tick);
@@ -9251,7 +9285,7 @@
                 const segment = ttsSegments[ttsSegmentIndex];
                 cleanupTtsAudio();
                 ttsAbortController = new AbortController();
-                updateTtsStatus(`Preparing Kenta ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
+                updateTtsStatus(`Preparing voice ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
                 highlightSpokenRange(segment.start, Math.min(24, segment.end - segment.start));
 
                 try {
@@ -9275,7 +9309,7 @@
                     ttsAudio.playbackRate = Number(document.getElementById("rate-range").value) || 1;
                     ttsAudio.onplaying = () => {
                         if (tick !== ttsRenderTick) return;
-                        updateTtsStatus(`Kenta reading ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
+                        updateTtsStatus(`Reading ${ttsSegmentIndex + 1} of ${ttsSegments.length}`);
                         startTtsFallbackHighlight(segment, tick, ttsAudio.duration);
                     };
                     ttsAudio.onended = () => {
@@ -9283,13 +9317,13 @@
                         clearTtsHighlightTimer();
                         cleanupTtsAudio();
                         ttsSegmentIndex += 1;
-                        setTimeout(() => speakNextCambSegment(tick), 80);
+                        setTimeout(() => speakNextCloudSegment(tick), 80);
                     };
                     ttsAudio.onerror = () => {
                         if (tick !== ttsRenderTick) return;
                         ttsCloudReady = false;
                         cleanupTtsAudio();
-                        updateTtsStatus("Kenta unavailable. Using browser voice.");
+                        updateTtsStatus("Free TTS unavailable. Using browser voice.");
                         speakNextTtsSegment(tick);
                     };
                     await ttsAudio.play();
@@ -9298,7 +9332,7 @@
                     if (tick !== ttsRenderTick) return;
                     ttsCloudReady = false;
                     cleanupTtsAudio();
-                    updateTtsStatus("Kenta unavailable. Using browser voice.");
+                    updateTtsStatus("Free TTS unavailable. Using browser voice.");
                     speakNextTtsSegment(tick);
                 }
             }
@@ -9376,7 +9410,7 @@
             }
 
             function speakCurrentPage(isContinuation = false) {
-                const cloudVoice = useCambTts();
+                const cloudVoice = useCloudTts();
                 if (!cloudVoice && !("speechSynthesis" in window)) {
                     updateTtsStatus("TTS unavailable");
                     return;
@@ -9396,7 +9430,7 @@
                     return;
                 }
                 if (cloudVoice) {
-                    speakNextCambSegment(tick);
+                    speakNextCloudSegment(tick);
                 } else {
                     speakNextTtsSegment(tick);
                     if (!isContinuation) {
@@ -9406,10 +9440,10 @@
             }
 
             function toggleSpeechPause() {
-                if (useCambTts() && ttsAudio) {
+                if (useCloudTts() && ttsAudio) {
                     if (ttsAudio.paused) {
                         ttsAudio.play();
-                        updateTtsStatus("Kenta reading");
+                        updateTtsStatus("Reading");
                         const segment = ttsSegments[ttsSegmentIndex];
                         if (segment) startTtsFallbackHighlight(segment, ttsRenderTick, ttsAudio.duration);
                     } else {
@@ -9499,23 +9533,12 @@
                 bilingualMode = lang === "both";
                 localStorage.setItem("threadborn_language", lang);
 
-                // Update TTS voice selection based on language
-                if (lang === "ja") {
-                    // Prefer Japanese voices for Japanese content
-                    const select = document.getElementById("voice-select");
-                    if (select) {
-                        const japaneseVoice = Array.from(select.options).find(
-                            (option) =>
-                                option.value
-                                    .toLowerCase()
-                                    .includes("japanese") ||
-                                option.value.toLowerCase().includes("ja"),
-                        );
-                        if (japaneseVoice) {
-                            select.value = japaneseVoice.value;
-                        }
-                    }
+                // Rebuild TTS choices so Best browser voice follows the active language.
+                const voiceSelect = document.getElementById("voice-select");
+                if (voiceSelect && voiceSelect.value !== "free:auto") {
+                    voiceSelect.value = "browser:best";
                 }
+                loadVoices();
 
                 // Re-render current page with new language
                 renderPage();
