@@ -9774,7 +9774,7 @@
                 highlightSpokenRange(segment.start, Math.min(24, segment.end - segment.start));
 
                 try {
-                    const response = await fetch("/api/reader/tts", {
+                    const response = await fetch("/api/reader/reactions?action=tts", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         signal: ttsAbortController.signal,

@@ -1,0 +1,31 @@
+# Keep Vercel deployment under Hobby static upload limits.
+# The web reader uses root HTML/CSS/assets plus API routes; app/source artifacts deploy through GitHub releases/build workflows instead.
+
+.DS_Store
+.git
+.github
+.tooling
+.gradle
+node_modules
+.vercel
+
+android-app
+desktop-app
+scripts
+media
+
+Threadborn.apk
+aot_ashes.mp3
+*.py
+*.noindex
+
+Threadborn-Complete.md
+Threadborn-Complete-JP.md
+Threadborn-EX.md
+Threadborn-EX-JP.md
+Threadborn Expanded.md
+threadborn_ex_chronicle.md
+generated_pages.js
+en_ch7.json
+jp_ch7.json
+pyrightconfig.json
