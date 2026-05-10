@@ -779,6 +779,109 @@
     }
   };
 
+  function moderationLabel(type) {
+    return String(type || "")
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  function renderModerationPayload(request) {
+    const payload = request.payload || {};
+    if (request.type === "avatar_update") {
+      const avatar = escapeHtml(payload.avatarUrl || "");
+      return `
+        <div class="moderation-preview-row">
+          <img class="moderation-avatar-preview" src="${avatar}" alt="Pending avatar" loading="lazy" />
+          <div>
+            <strong>Profile picture update</strong>
+            <p>Crop saved with the upload. Approving makes this avatar public.</p>
+          </div>
+        </div>`;
+    }
+    if (request.type === "profile_update") {
+      return `<p><strong>New username:</strong> ${escapeHtml(payload.username || "")}</p>`;
+    }
+    if (request.type === "reader_reaction") {
+      return `
+        <p><strong>Target:</strong> ${escapeHtml(payload.volumeId || "")}${payload.chapterId ? ` • ${escapeHtml(payload.chapterId)}` : ""}</p>
+        <p><strong>Type:</strong> ${escapeHtml(payload.category || "comment")} ${payload.rating ? `• ${escapeHtml(payload.rating)} stars` : ""}</p>
+        <p>${escapeHtml(payload.content || "Rating only.")}</p>`;
+    }
+    if (request.type === "community_post") {
+      return `
+        <p><strong>${escapeHtml(payload.title || "(untitled)")}</strong> • ${escapeHtml(payload.category || "post")}</p>
+        <p>${escapeHtml(payload.content || "")}</p>
+        ${payload.imageUrl ? `<p><strong>Image:</strong> ${escapeHtml(payload.imageUrl)}</p>` : ""}`;
+    }
+    if (request.type === "community_comment") {
+      return `<p><strong>Reply:</strong> ${escapeHtml(payload.content || "")}</p>`;
+    }
+    return `<pre>${escapeHtml(JSON.stringify(payload, null, 2))}</pre>`;
+  }
+
+  window.loadModerationQueue = async function loadModerationQueue(status = "pending") {
+    const queue = document.getElementById("moderation-queue");
+    const statusEl = document.getElementById("moderation-status");
+    if (!queue) return;
+    queue.innerHTML = '<div class="muted">Loading review queue...</div>';
+    try {
+      const data = await apiFetch(
+        `/api/dashboard?action=moderation&status=${encodeURIComponent(status)}`,
+      );
+      const requests = Array.isArray(data.requests) ? data.requests : [];
+      if (statusEl) {
+        statusEl.textContent = `${requests.length} ${status} request${requests.length === 1 ? "" : "s"}`;
+      }
+      if (!requests.length) {
+        queue.innerHTML = '<div class="moderation-empty">Nothing waiting here.</div>';
+        return;
+      }
+      queue.innerHTML = requests
+        .map((request) => {
+          const user = request.user || {};
+          const reviewed = request.status !== "pending";
+          return `
+            <article class="moderation-item">
+              <div class="moderation-item-head">
+                <div>
+                  <span class="pill-label">${escapeHtml(moderationLabel(request.type))}</span>
+                  <h4>${escapeHtml(user.username || "Reader")}</h4>
+                  <p>${escapeHtml(user.email || "")} • ${new Date(request.createdAt).toLocaleString()}</p>
+                </div>
+                <strong class="moderation-status moderation-${escapeHtml(request.status)}">${escapeHtml(request.status)}</strong>
+              </div>
+              <div class="moderation-payload">${renderModerationPayload(request)}</div>
+              ${
+                reviewed
+                  ? `<p class="muted">Reviewed by ${escapeHtml(request.reviewer || "admin")}${request.reviewNote ? ` • ${escapeHtml(request.reviewNote)}` : ""}</p>`
+                  : `<div class="moderation-actions">
+                      <input id="moderation-note-${request.id}" class="input-field" maxlength="500" placeholder="Optional review note" />
+                      <button class="btn btn-secondary" type="button" onclick="reviewModerationRequest('${request.id}', 'approved')">Approve</button>
+                      <button class="ghost-btn danger" type="button" onclick="reviewModerationRequest('${request.id}', 'rejected')">Reject</button>
+                    </div>`
+              }
+            </article>`;
+        })
+        .join("");
+    } catch (error) {
+      queue.innerHTML = `<div class="moderation-empty">Review queue unavailable: ${escapeHtml(error.message)}</div>`;
+      if (statusEl) statusEl.textContent = "";
+    }
+  };
+
+  window.reviewModerationRequest = async function reviewModerationRequest(requestId, decision) {
+    const note = document.getElementById(`moderation-note-${requestId}`)?.value || "";
+    try {
+      await apiFetch("/api/dashboard?action=moderation", {
+        method: "POST",
+        body: JSON.stringify({ requestId, decision, note }),
+      });
+      await window.loadModerationQueue("pending");
+    } catch (error) {
+      alert("Could not review request: " + error.message);
+    }
+  };
+
   window.clearAllDashboardData = async function () {
     if (
       !confirm(
@@ -1595,10 +1698,17 @@
 
   function applySpoilerState() {
     const revealed = localStorage.getItem(SPOILER_KEY) === "1";
-    const btn = document.getElementById("spoiler-toggle-btn");
-    if (btn) btn.classList.toggle("on", revealed);
+    document.querySelectorAll(".spoiler-toggle").forEach((btn) => {
+      btn.classList.toggle("on", revealed);
+      btn.setAttribute("aria-pressed", String(revealed));
+    });
     document
-      .querySelectorAll(".spoiler-body")
+      .querySelectorAll("#view-leaks .power-card, #view-leaks .spoiler-note")
+      .forEach((el) => {
+        el.classList.add("spoiler-hidden");
+      });
+    document
+      .querySelectorAll(".spoiler-body, .spoiler-hidden")
       .forEach((el) => {
         el.classList.toggle("revealed", revealed);
       });
@@ -1795,4 +1905,3 @@
     }
   });
 })();
-

@@ -22,6 +22,7 @@ const { sendPushToUser, sendPushBroadcast } = require("../lib/api/push");
 
 const GOOGLE_OAUTH_STATE_COOKIE = "tb_google_oauth_state";
 const GOOGLE_OAUTH_RETURN_COOKIE = "tb_google_oauth_return";
+const GOOGLE_OAUTH_APP_MODE_COOKIE = "tb_google_oauth_app_mode";
 
 function getRequestOrigin(req) {
   const proto = String(req.headers["x-forwarded-proto"] || "https")
@@ -94,6 +95,26 @@ function googleAuthPayload(user, session, req) {
   return payload;
 }
 
+function appModeFromValue(value) {
+  const mode = String(value || "").trim().toLowerCase();
+  return mode === "android" || mode === "desktop" ? mode : "";
+}
+
+function googleAppRedirectPayload(user, session) {
+  return new URLSearchParams({
+    google_session: session.token,
+    google_csrf: session.csrfToken,
+    google_user: JSON.stringify({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatar_url || "",
+      verified: user.verified,
+      role: user.role,
+    }),
+  }).toString();
+}
+
 function normalizeGoogleUsername(profile) {
   const source =
     profile.name ||
@@ -123,6 +144,202 @@ async function makeUniqueGoogleUsername(profile) {
     if (!rows.length) return username;
   }
   return `reader_${crypto.randomBytes(4).toString("hex")}`.slice(0, 24);
+}
+
+function isAdminSession(session) {
+  return Boolean(session && (session.role === "owner" || session.role === "admin"));
+}
+
+function normalizeModerationPayload(value, maxLength = 200000) {
+  const text = JSON.stringify(value || {});
+  if (text.length > maxLength) {
+    throw new Error("Moderation payload too large");
+  }
+  return text;
+}
+
+async function createModerationRequest(userId, requestType, payload, options = {}) {
+  const { rows } = await pool.query(
+    `insert into moderation_requests
+       (user_id, request_type, payload, target_table, target_id, updated_at)
+     values ($1, $2, $3::jsonb, $4, $5, now())
+     returning id, created_at`,
+    [
+      userId,
+      requestType,
+      normalizeModerationPayload(payload),
+      options.targetTable || null,
+      options.targetId || null,
+    ],
+  );
+  return rows[0];
+}
+
+function moderationRow(row) {
+  return {
+    id: row.id,
+    type: row.request_type,
+    status: row.status,
+    payload: row.payload || {},
+    targetTable: row.target_table || "",
+    targetId: row.target_id || "",
+    createdAt: row.created_at,
+    reviewedAt: row.reviewed_at || null,
+    reviewNote: row.review_note || "",
+    user: {
+      id: row.user_id,
+      username: row.username || "Reader",
+      email: row.email || "",
+      avatarUrl: row.avatar_url || "",
+      verified: !!row.verified,
+      role: row.role || "user",
+    },
+    reviewer: row.reviewer_username || "",
+  };
+}
+
+async function getModerationRequest(id) {
+  const { rows } = await pool.query(
+    `select mr.*, u.username, u.email, u.avatar_url, u.verified, u.role,
+            reviewer.username as reviewer_username
+     from moderation_requests mr
+     join users u on u.id = mr.user_id
+     left join users reviewer on reviewer.id = mr.reviewed_by
+     where mr.id = $1
+     limit 1`,
+    [id],
+  );
+  return rows[0] || null;
+}
+
+async function approveModerationRequest(request) {
+  const payload = request.payload || {};
+  if (request.request_type === "profile_update") {
+    const username = String(payload.username || "").trim();
+    if (!/^[a-zA-Z0-9_]{3,24}$/.test(username)) {
+      throw new Error("Invalid username in request");
+    }
+    const duplicate = await pool.query(
+      "select id from users where lower(username) = lower($1) and id <> $2 limit 1",
+      [username, request.user_id],
+    );
+    if (duplicate.rows.length) {
+      throw new Error("duplicate username");
+    }
+    await pool.query(
+      `update users set username = $1, updated_at = now() where id = $2`,
+      [username, request.user_id],
+    );
+    return;
+  }
+
+  if (request.request_type === "avatar_update") {
+    const avatarUrl = String(payload.avatarUrl || "").trim();
+    const crop = payload.crop && typeof payload.crop === "object" ? payload.crop : {};
+    if (!avatarUrl.startsWith("https://")) {
+      throw new Error("Invalid avatar URL in request");
+    }
+    const existing = await pool.query(
+      "select avatar_url from users where id = $1",
+      [request.user_id],
+    );
+    const oldUrl = existing.rows[0]?.avatar_url || "";
+    await pool.query(
+      "update users set avatar_url = $1, avatar_crop = $2::jsonb, updated_at = now() where id = $3",
+      [avatarUrl, normalizeModerationPayload(crop, 2000), request.user_id],
+    );
+    if (
+      oldUrl &&
+      oldUrl !== avatarUrl &&
+      oldUrl.includes("blob.vercel-storage.com") &&
+      process.env.BLOB_READ_WRITE_TOKEN
+    ) {
+      try {
+        await del(oldUrl, { token: process.env.BLOB_READ_WRITE_TOKEN });
+      } catch (error) {
+        console.error("[moderation] old avatar delete failed:", error);
+      }
+    }
+    return;
+  }
+
+  if (request.request_type === "reader_reaction") {
+    await pool.query(
+      `insert into reader_reactions
+         (user_id, novel_id, target_type, volume_id, chapter_id, rating, category, content, updated_at)
+       values ($1, 'threadborn', $2, $3, $4, $5, $6, $7, now())`,
+      [
+        request.user_id,
+        payload.targetType,
+        payload.volumeId,
+        payload.chapterId || null,
+        payload.rating === undefined ? null : payload.rating,
+        payload.category || "comment",
+        payload.content || "",
+      ],
+    );
+    return;
+  }
+
+  if (request.request_type === "community_post") {
+    await pool.query(
+      `insert into posts (user_id, title, content, image_url, category, created_at, updated_at)
+       values ($1,$2,$3,$4,$5,now(),now())`,
+      [
+        request.user_id,
+        payload.title,
+        payload.content,
+        payload.imageUrl || null,
+        payload.category,
+      ],
+    );
+    return;
+  }
+
+  if (request.request_type === "community_comment") {
+    await pool.query(
+      `insert into comments (post_id, user_id, content, created_at, updated_at)
+       values ($1,$2,$3,now(),now())`,
+      [payload.postId, request.user_id, payload.content],
+    );
+  }
+}
+
+async function moderateRequest(requestId, reviewer, decision, note = "") {
+  if (!isAdminSession(reviewer)) {
+    throw new Error("Only owner/admin can review moderation requests");
+  }
+  const request = await getModerationRequest(requestId);
+  if (!request) {
+    throw new Error("Moderation request not found");
+  }
+  if (request.status !== "pending") {
+    throw new Error("Moderation request was already reviewed");
+  }
+  if (decision === "approved") {
+    await approveModerationRequest(request);
+  } else if (decision === "rejected") {
+    const pendingUrl = String(
+      request.request_type === "avatar_update"
+        ? request.payload?.avatarUrl || ""
+        : request.request_type === "community_post"
+          ? request.payload?.imageUrl || ""
+          : "",
+    );
+    if (pendingUrl.includes("blob.vercel-storage.com") && process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        await del(pendingUrl, { token: process.env.BLOB_READ_WRITE_TOKEN });
+      } catch (error) {
+        console.error("[moderation] rejected upload delete failed:", error);
+      }
+    }
+  }
+  await pool.query(
+    `update moderation_requests
+     set status = $1, reviewed_by = $2, review_note = $3, reviewed_at = now(), updated_at = now()
+     where id = $4`,
+    [decision, reviewer.user_id, String(note || "").slice(0, 500), requestId],
+  );
 }
 
 exports.handleLogin = (() => {
@@ -481,6 +698,7 @@ return async (req, res) => {
   const requestUrl = new URL(req.url || "/", getRequestOrigin(req));
   const state = crypto.randomBytes(24).toString("hex");
   const returnTo = sanitizeOAuthReturnTo(requestUrl.searchParams.get("returnTo"));
+  const appMode = appModeFromValue(requestUrl.searchParams.get("appMode"));
   const redirectUri = getGoogleRedirectUri(req);
   const googleUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   googleUrl.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID);
@@ -497,6 +715,12 @@ return async (req, res) => {
       returnTo,
       600,
       getSessionCookieOptions(req),
+    ),
+    makeCookie(
+      GOOGLE_OAUTH_APP_MODE_COOKIE,
+      appMode,
+      appMode ? 600 : 0,
+      getSessionCookieOptions(req, appMode ? {} : { clear: true }),
     ),
   ]);
   redirectTo(res, googleUrl.toString());
@@ -592,6 +816,7 @@ return async (req, res) => {
   const requestUrl = new URL(req.url || "/", getRequestOrigin(req));
   const cookies = parseSimpleCookies(req);
   const returnTo = sanitizeOAuthReturnTo(cookies[GOOGLE_OAUTH_RETURN_COOKIE]);
+  const appMode = appModeFromValue(cookies[GOOGLE_OAUTH_APP_MODE_COOKIE]);
   const clearOAuthCookies = [
     makeCookie(
       GOOGLE_OAUTH_STATE_COOKIE,
@@ -601,6 +826,12 @@ return async (req, res) => {
     ),
     makeCookie(
       GOOGLE_OAUTH_RETURN_COOKIE,
+      "",
+      0,
+      getSessionCookieOptions(req, { clear: true }),
+    ),
+    makeCookie(
+      GOOGLE_OAUTH_APP_MODE_COOKIE,
       "",
       0,
       getSessionCookieOptions(req, { clear: true }),
@@ -632,6 +863,10 @@ return async (req, res) => {
     ]);
     if (requestUrl.searchParams.get("mode") === "json") {
       success(res, googleAuthPayload(user, session, req));
+      return;
+    }
+    if (appMode) {
+      redirectTo(res, `${returnTo}#${googleAppRedirectPayload(user, session)}`);
       return;
     }
     redirectTo(res, returnTo);
@@ -1238,6 +1473,18 @@ return async (req, res) => {
     const content = cleanText(body.content, 3000);
     const imageUrl = cleanText(body.imageUrl, 800);
     const category = cleanText(body.category, 30);
+    if (imageUrl) {
+      try {
+        const parsedImage = new URL(imageUrl);
+        if (!["http:", "https:"].includes(parsedImage.protocol)) {
+          fail(res, 400, "Image URL must be http or https");
+          return;
+        }
+      } catch {
+        fail(res, 400, "Invalid image URL");
+        return;
+      }
+    }
     if (
       !title ||
       !content ||
@@ -1246,13 +1493,20 @@ return async (req, res) => {
       fail(res, 400, "Invalid post payload");
       return;
     }
-    const { rows } = await pool.query(
-      `insert into posts (user_id, title, content, image_url, category, created_at, updated_at)
-       values ($1,$2,$3,$4,$5,now(),now())
-       returning id`,
-      [session.user_id, title, content, imageUrl || null, category],
+    const request = await createModerationRequest(
+      session.user_id,
+      "community_post",
+      { title, content, imageUrl: imageUrl || "", category },
     );
-    success(res, { postId: rows[0].id }, 201);
+    success(
+      res,
+      {
+        pending: true,
+        requestId: request.id,
+        message: "Community post submitted for review.",
+      },
+      202,
+    );
     return;
   }
 
@@ -1289,13 +1543,28 @@ return async (req, res) => {
       fail(res, 400, "postId and content are required");
       return;
     }
-    const { rows } = await pool.query(
-      `insert into comments (post_id, user_id, content, created_at, updated_at)
-       values ($1,$2,$3,now(),now())
-       returning id`,
-      [postId, session.user_id, content],
+    const exists = await pool.query("select 1 from posts where id = $1", [
+      postId,
+    ]);
+    if (!exists.rows.length) {
+      fail(res, 404, "Post not found");
+      return;
+    }
+    const request = await createModerationRequest(
+      session.user_id,
+      "community_comment",
+      { postId, content },
+      { targetTable: "posts", targetId: postId },
     );
-    success(res, { commentId: rows[0].id }, 201);
+    success(
+      res,
+      {
+        pending: true,
+        requestId: request.id,
+        message: "Reply submitted for review.",
+      },
+      202,
+    );
     return;
   }
 
@@ -1807,24 +2076,28 @@ return async (req, res) => {
       return;
     }
 
-    const { rows } = await pool.query(
-      `
-      insert into reader_reactions (user_id, novel_id, target_type, volume_id, chapter_id, rating, category, content, updated_at)
-      values ($1, 'threadborn', $2, $3, $4, $5, $6, $7, now())
-      returning id
-    `,
-      [
-        session.user_id,
-        target.targetType,
-        target.volumeId,
-        target.chapterId,
+    const request = await createModerationRequest(
+      session.user_id,
+      "reader_reaction",
+      {
+        targetType: target.targetType,
+        volumeId: target.volumeId,
+        chapterId: target.chapterId,
         rating,
         category,
         content,
-      ],
+      },
     );
 
-    success(res, { reactionId: rows[0].id }, 201);
+    success(
+      res,
+      {
+        pending: true,
+        requestId: request.id,
+        message: "Reaction submitted for review.",
+      },
+      202,
+    );
   } catch (error) {
     fail(res, 500, "Reader reactions unavailable");
   }
@@ -1866,6 +2139,7 @@ return async (req, res) => {
   }
 
   try {
+    await pool.ensureMigrations();
     const body = await parseJsonBody(req);
     const dataUrl = String(body.dataUrl || "");
     if (!dataUrl.startsWith("data:image/")) {
@@ -1895,23 +2169,21 @@ return async (req, res) => {
       return;
     }
 
-    // Delete the old avatar blob if it exists to prevent storage leaks
-    try {
-      const existing = await pool.query(
-        "select avatar_url from users where id = $1",
-        [session.user_id],
-      );
-      const oldUrl = existing.rows[0]?.avatar_url || "";
-      if (oldUrl && oldUrl.includes("blob.vercel-storage.com")) {
-        
-        await del(oldUrl, { token: process.env.BLOB_READ_WRITE_TOKEN });
-      }
-    } catch (e) {
-      console.error("[avatar] Failed to delete old blob:", e);
+    const ext = contentType.includes("png") ? "png" : "jpg";
+    const purpose = String(body.purpose || "avatar").trim().toLowerCase();
+    if (purpose === "community") {
+      const fileName = `community/pending/${session.user_id}-${Date.now()}.${ext}`;
+      const blob = await put(fileName, bytes, {
+        access: "public",
+        addRandomSuffix: false,
+        contentType,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+      success(res, { url: blob.url, pending: true });
+      return;
     }
 
-    const ext = contentType.includes("png") ? "png" : "jpg";
-    const fileName = `avatars/${session.user_id}-${Date.now()}.${ext}`;
+    const fileName = `avatars/pending/${session.user_id}-${Date.now()}.${ext}`;
     const blob = await put(fileName, bytes, {
       access: "public",
       addRandomSuffix: false,
@@ -1919,13 +2191,26 @@ return async (req, res) => {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
-    // Persist the new avatar URL to the database immediately
-    await pool.query(
-      "update users set avatar_url = $1, updated_at = now() where id = $2",
-      [blob.url, session.user_id],
+    const crop = body.crop && typeof body.crop === "object" ? body.crop : {};
+    const request = await createModerationRequest(
+      session.user_id,
+      "avatar_update",
+      {
+        avatarUrl: blob.url,
+        crop: {
+          x: Math.max(-1, Math.min(1, Number(crop.x) || 0)),
+          y: Math.max(-1, Math.min(1, Number(crop.y) || 0)),
+          size: Math.max(0.1, Math.min(1, Number(crop.size) || 1)),
+        },
+      },
     );
 
-    success(res, { url: blob.url });
+    success(res, {
+      url: blob.url,
+      pending: true,
+      requestId: request.id,
+      message: "Avatar submitted for review.",
+    });
   } catch (error) {
     fail(res, 500, "Upload failed");
   }
@@ -2224,6 +2509,16 @@ return async (req, res) => {
         [session.user_id],
       )
       .catch(() => ({ rows: [] }));
+    const pendingResult = await pool
+      .query(
+        `select id, request_type, status, payload, created_at
+         from moderation_requests
+         where user_id = $1 and status = 'pending'
+         order by created_at desc
+         limit 20`,
+        [session.user_id],
+      )
+      .catch(() => ({ rows: [] }));
     success(res, {
       user: {
         id: session.user_id,
@@ -2234,6 +2529,13 @@ return async (req, res) => {
         role: session.role,
       },
       posts: postsResult.rows,
+      pending: pendingResult.rows.map((row) => ({
+        id: row.id,
+        type: row.request_type,
+        status: row.status,
+        payload: row.payload || {},
+        createdAt: row.created_at,
+      })),
       reactions: await loadReactionsForUser(session.user_id),
     });
     return;
@@ -2249,6 +2551,7 @@ return async (req, res) => {
   }
 
   try {
+    await pool.ensureMigrations();
     const body = await parseJsonBody(req);
     const username = String(body.username || "").trim();
     if (!username || !/^[a-zA-Z0-9_]{3,24}$/.test(username)) {
@@ -2260,40 +2563,26 @@ return async (req, res) => {
       return;
     }
 
-    let rows;
-    if (body.avatarUrl !== undefined) {
-      let avatarUrl = null;
-      if (body.avatarUrl !== undefined && String(body.avatarUrl).trim()) {
-        const rawUrl = String(body.avatarUrl).trim();
-        try {
-          const parsed = new URL(rawUrl);
-          if (parsed.protocol === "https:") avatarUrl = parsed.href;
-          else {
-            fail(res, 400, "Avatar URL must use HTTPS");
-            return;
-          }
-        } catch {
-          fail(res, 400, "Invalid avatar URL");
-          return;
-        }
-      }
-      ({ rows } = await pool.query(
-        `update users
-         set username = $1, avatar_url = $2, updated_at = now()
-         where id = $3
-         returning id, email, username, avatar_url, verified, role`,
-        [username, avatarUrl, session.user_id],
-      ));
-    } else {
-      ({ rows } = await pool.query(
-        `update users
-         set username = $1, updated_at = now()
-         where id = $2
-         returning id, email, username, avatar_url, verified, role`,
-        [username, session.user_id],
-      ));
+    const duplicate = await pool.query(
+      "select id from users where lower(username) = lower($1) and id <> $2 limit 1",
+      [username, session.user_id],
+    );
+    if (duplicate.rows.length) {
+      fail(res, 409, "Username is already in use");
+      return;
     }
+    const request = await createModerationRequest(session.user_id, "profile_update", {
+      username,
+      previousUsername: session.username,
+    });
+    const { rows } = await pool.query(
+      "select id, email, username, avatar_url, verified, role from users where id = $1",
+      [session.user_id],
+    );
     success(res, {
+      pending: true,
+      requestId: request.id,
+      message: "Profile change submitted for review.",
       user: {
         id: rows[0].id,
         email: rows[0].email,
@@ -2337,6 +2626,75 @@ return async (req, res) => {
 
     // Parse action from query or default to config
     const action = req.query.action || "config";
+
+    if (action === "moderation") {
+      const session = await requireSession(req, res, fail);
+      if (!session) return;
+      if (!isAdminSession(session)) {
+        return fail(res, 403, "Only owner/admin can review moderation requests");
+      }
+
+      if (req.method === "GET") {
+        const status = String(req.query.status || "pending").toLowerCase();
+        const params = [];
+        let where = "";
+        if (["pending", "approved", "rejected"].includes(status)) {
+          params.push(status);
+          where = "where mr.status = $1";
+        }
+        const { rows } = await pool.query(
+          `select mr.*, u.username, u.email, u.avatar_url, u.verified, u.role,
+                  reviewer.username as reviewer_username
+           from moderation_requests mr
+           join users u on u.id = mr.user_id
+           left join users reviewer on reviewer.id = mr.reviewed_by
+           ${where}
+           order by
+             case when mr.status = 'pending' then 0 else 1 end,
+             mr.created_at desc
+           limit 100`,
+          params,
+        );
+        return success(res, { requests: rows.map(moderationRow) });
+      }
+
+      if (req.method === "POST") {
+        if (!validateCsrf(req, session)) {
+          return fail(res, 403, "Invalid CSRF token");
+        }
+        const body = await parseJsonBody(req);
+        const requestId = String(body.requestId || "").trim();
+        const decision =
+          String(body.decision || "").toLowerCase() === "approved"
+            ? "approved"
+            : String(body.decision || "").toLowerCase() === "rejected"
+              ? "rejected"
+              : "";
+        if (!requestId || !decision) {
+          return fail(res, 400, "requestId and decision are required");
+        }
+        try {
+          await moderateRequest(
+            requestId,
+            session,
+            decision,
+            String(body.note || ""),
+          );
+          return success(res, { reviewed: true, status: decision });
+        } catch (error) {
+          const message = String(error.message || "Moderation failed");
+          if (message.includes("already")) return fail(res, 409, message);
+          if (message.includes("Invalid")) return fail(res, 400, message);
+          if (message.includes("not found")) return fail(res, 404, message);
+          if (message.includes("duplicate")) {
+            return fail(res, 409, "That username is already in use");
+          }
+          return fail(res, 500, message);
+        }
+      }
+
+      return fail(res, 405, "Method not allowed");
+    }
 
     if (action === "config") {
       const lang = req.query.lang || "en";

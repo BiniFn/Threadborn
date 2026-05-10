@@ -74,7 +74,7 @@
             href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap"
             rel="stylesheet"
         />
-        <link rel="stylesheet" href="./global.css?v=41" />
+        <link rel="stylesheet" href="./global.css?v=43" />
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css"
@@ -1143,6 +1143,17 @@
                         </p>
                     </div>
                 </div>
+                <div class="spoiler-toggle-bar">
+                    <span>Lore spoilers are hidden until you reveal them.</span>
+                    <button
+                        class="spoiler-toggle"
+                        type="button"
+                        aria-label="Toggle lore spoilers"
+                        aria-pressed="false"
+                        onclick="toggleSpoilerReveal()"
+                        title="Toggle spoilers"
+                    ></button>
+                </div>
                 <div id="lore-grid" class="grid lore-grid"></div>
             </section>
 
@@ -1514,6 +1525,28 @@
                             id="dashboard-art-status"
                             style="margin-top: 10px; font-size: 12px"
                         ></p>
+                    </article>
+
+                    <article class="card moderation-card" style="grid-column: 1 / -1">
+                        <h3>Review Queue</h3>
+                        <p>
+                            Approve profile names, profile pictures, reader
+                            comments, theories, spoilers, and community posts
+                            before they go public.
+                        </p>
+                        <div class="toolbar-actions moderation-toolbar">
+                            <button class="ghost-btn" type="button" onclick="loadModerationQueue('pending')">
+                                Pending
+                            </button>
+                            <button class="ghost-btn" type="button" onclick="loadModerationQueue('approved')">
+                                Approved
+                            </button>
+                            <button class="ghost-btn" type="button" onclick="loadModerationQueue('rejected')">
+                                Rejected
+                            </button>
+                        </div>
+                        <p id="moderation-status" class="muted"></p>
+                        <div id="moderation-queue" class="moderation-queue"></div>
                     </article>
                 </div>
             </section>
@@ -6780,18 +6813,22 @@
                 },
                 {
                     title: "The Forest Confession",
+                    spoiler: true,
                     text: "Yono and Violet become fully real as a couple in the forest shelter before they find Velkor's sealed prison the next morning.",
                 },
                 {
                     title: "Velkor's Prison",
+                    spoiler: true,
                     text: "The stone door in the forest is an Old Covenant seal built to hold Velkor, a thread-eating Elder who kept growing stronger even while imprisoned.",
                 },
                 {
                     title: "Why Yono Keeps Climbing",
+                    spoiler: true,
                     text: "His old life was not erased. It was layered under self-made seals. Every new chapter can cut another one, which is why the latest Yono is always the strongest Yono.",
                 },
                 {
                     title: "Why Violet Still Matters",
+                    spoiler: true,
                     text: "Yono's power trend is infinite on purpose, so the story's emotional counterweight is Violet keeping him seen, chosen, and attached to a human scale of love.",
                 },
             ];
@@ -6839,6 +6876,7 @@
             const bookmarkKey = "threadborn_bookmarks_v2";
             const legacyBookmarkKey = "threadborn_bookmarks";
             const communityImageState = { dataUrl: "" };
+            let spoilerRevealEnabled = false;
 
             Object.defineProperties(window, {
                 chapters: { configurable: true, get: () => chapters },
@@ -7264,7 +7302,9 @@
                         }),
                     });
                     if (textEl) textEl.value = "";
-                    if (status) status.textContent = "Posted.";
+                    if (status)
+                        status.textContent =
+                            "Submitted for admin review. It will appear after approval.";
                     await setReactionTarget(
                         target.targetType,
                         target.volumeId,
@@ -7389,6 +7429,21 @@
                 return `<span class="name-badges">${check}${owner}</span>`;
             }
 
+            function safeImageUrl(value, fallback = "assets/threadborn-app-icon.png") {
+                const text = String(value || "").trim();
+                if (!text) return fallback;
+                try {
+                    const parsed = new URL(text, window.location.href);
+                    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+                        return escapeHtml(parsed.href);
+                    }
+                    if (text.startsWith("assets/") || text.startsWith("./assets/")) {
+                        return escapeHtml(text);
+                    }
+                } catch (_) {}
+                return fallback;
+            }
+
             function renderCommunityFeed(posts = []) {
                 const feed = document.getElementById("community-feed");
                 if (!feed) {
@@ -7401,38 +7456,44 @@
                 }
                 feed.innerHTML = posts
                     .map(
-                        (post) => `
+                        (post) => {
+                            const postId = escapeHtml(post.id || "");
+                            const username = escapeHtml(post.username || "Reader");
+                            const category = escapeHtml(String(post.category || "post").replace("_", " "));
+                            const postContent = escapeHtml(post.content || "");
+                            return `
         <article class="community-post">
           <div class="community-head">
-            <img src="${post.avatar_url || "assets/threadborn-app-icon.png"}" alt="${post.username || "User"} avatar" />
+            <img src="${safeImageUrl(post.avatar_url)}" alt="${username} avatar" />
             <div>
-              <strong>${post.username || "Reader"}${renderNameBadges(post)}</strong>
-              <div class="community-meta">${post.category.replace("_", " ")} • ${formatCommunityTime(post.created_at)}</div>
+              <strong>${username}${renderNameBadges(post)}</strong>
+              <div class="community-meta">${category} • ${formatCommunityTime(post.created_at)}</div>
             </div>
           </div>
-          <h4>${post.title}</h4>
-          <div class="${post.category === "spoiler" ? "spoiler-body" : ""}" onclick="this.classList.add('revealed')">${post.content}</div>
-          ${post.image_url ? `<img class="post-image" src="${post.image_url}" alt="Community image" loading="lazy" />` : ""}
+          <h4>${escapeHtml(post.title || "")}</h4>
+          <div class="${post.category === "spoiler" ? "spoiler-body" : ""}" onclick="this.classList.add('revealed')">${postContent}</div>
+          ${post.image_url ? `<img class="post-image" src="${safeImageUrl(post.image_url, "")}" alt="Community image" loading="lazy" />` : ""}
           <div class="post-actions">
-            <button class="btn btn-ghost" onclick="toggleCommunityLike('${post.id}')">${post.liked_by_me ? "Unlike" : "Like"} • ${post.like_count}</button>
+            <button class="btn btn-ghost" onclick="toggleCommunityLike('${postId}')">${post.liked_by_me ? "Unlike" : "Like"} • ${Number(post.like_count || 0)}</button>
           </div>
           <div class="post-comments">
             ${(post.comments || [])
                 .map(
                     (comment) => `
               <div class="post-comment">
-                <strong>${comment.username || "reader"}${renderNameBadges(comment)}:</strong> ${isModerator ? `<button onclick="deleteCommunityComment(\'${comment.id}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;float:right;">[Delete]</button>` : ""} ${comment.content}
+                <strong>${escapeHtml(comment.username || "reader")}${renderNameBadges(comment)}:</strong> ${isModerator ? `<button onclick="deleteCommunityComment(\'${escapeHtml(comment.id || "")}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;float:right;">[Delete]</button>` : ""} ${escapeHtml(comment.content || "")}
               </div>
             `,
                 )
                 .join("")}
             <div class="row-inline">
-              <input id="comment-input-${post.id}" placeholder="Reply to this post..." maxlength="1200" />
-              <button class="btn btn-ghost" onclick="addCommunityComment('${post.id}')">Reply</button>
+              <input id="comment-input-${postId}" placeholder="Reply to this post..." maxlength="1200" />
+              <button class="btn btn-ghost" onclick="addCommunityComment('${postId}')">Reply</button>
             </div>
           </div>
         </article>
-      `,
+      `;
+                        },
                     )
                     .join("");
             }
@@ -7554,6 +7615,10 @@
                         }),
                     });
                     input.value = "";
+                    const status = document.getElementById("community-status");
+                    if (status)
+                        status.textContent =
+                            "Reply submitted for admin review.";
                     await loadCommunityFeed();
                 } catch (error) {
                     const status = document.getElementById("community-status");
@@ -7580,6 +7645,7 @@
                             method: "POST",
                             body: JSON.stringify({
                                 dataUrl: communityImageState.dataUrl,
+                                purpose: "community",
                             }),
                         });
                         imageUrl = upload.url;
@@ -7601,7 +7667,8 @@
                         "community-image-preview",
                     );
                     if (preview) preview.style.display = "none";
-                    status.textContent = "Posted.";
+                    status.textContent =
+                        "Submitted for admin review. It will appear after approval.";
                     await loadCommunityFeed();
                 } catch (error) {
                     status.textContent = error.message;
@@ -8471,13 +8538,32 @@
                 grid.innerHTML = loreEntries
                     .map(
                         (entry) => `
-        <article class="card lore-card">
+        <article class="card lore-card${entry.spoiler ? " spoiler-hidden" : ""}">
           <strong>${entry.title}</strong>
           <p>${entry.text}</p>
         </article>
       `,
                     )
                     .join("");
+                applySpoilerRevealState();
+            }
+
+            function applySpoilerRevealState() {
+                document.querySelectorAll(".spoiler-toggle").forEach((button) => {
+                    button.classList.toggle("on", spoilerRevealEnabled);
+                    button.setAttribute("aria-pressed", String(spoilerRevealEnabled));
+                });
+                document.querySelectorAll("#view-leaks .power-card, #view-leaks .spoiler-note").forEach((item) => {
+                    item.classList.add("spoiler-hidden");
+                });
+                document.querySelectorAll(".spoiler-hidden").forEach((item) => {
+                    item.classList.toggle("revealed", spoilerRevealEnabled);
+                });
+            }
+
+            function toggleSpoilerReveal() {
+                spoilerRevealEnabled = !spoilerRevealEnabled;
+                applySpoilerRevealState();
             }
 
             function switchLeaksTab(tab) {
@@ -8539,6 +8625,9 @@
                 ) {
                     window.loadDashboardConfig();
                     window.loadDashboardArt();
+                    if (typeof window.loadModerationQueue === "function") {
+                        window.loadModerationQueue("pending");
+                    }
                 }
 
                 if (
@@ -11447,8 +11536,8 @@
             }
         </style>
 
-        <script src="./assets/notifications.js?v=40"></script>
-        <script src="./assets/phase1-client.js?v=40"></script>
+        <script src="./assets/notifications.js?v=43"></script>
+        <script src="./assets/phase1-client.js?v=43"></script>
         <script>
             if ("serviceWorker" in navigator) {
                 let newWorker;

@@ -3769,6 +3769,114 @@ textarea::placeholder {
     user-select: text;
 }
 
+/* ── Profile Cropper + Moderation Queue ─────────────────── */
+.avatar-crop-wrap {
+    display: grid;
+    grid-template-columns: minmax(180px, 320px) minmax(180px, 1fr);
+    gap: 18px;
+    align-items: start;
+    margin-top: 14px;
+}
+.avatar-crop-wrap[hidden] {
+    display: none;
+}
+.avatar-crop-wrap canvas {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #111;
+}
+.avatar-crop-controls {
+    display: grid;
+    gap: 8px;
+}
+.avatar-crop-controls label {
+    color: var(--mist);
+    font-size: 13px;
+    letter-spacing: 0;
+}
+.moderation-card {
+    overflow: hidden;
+}
+.moderation-toolbar {
+    margin: 12px 0;
+}
+.moderation-queue {
+    display: grid;
+    gap: 14px;
+}
+.moderation-item {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.035);
+}
+.moderation-item-head,
+.moderation-preview-row,
+.moderation-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+.moderation-item-head h4 {
+    margin: 6px 0 4px;
+}
+.moderation-item-head p,
+.moderation-payload p {
+    margin: 4px 0;
+    color: var(--mist);
+}
+.moderation-payload {
+    margin: 12px 0;
+    overflow-wrap: anywhere;
+}
+.moderation-avatar-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    flex: 0 0 auto;
+}
+.moderation-status {
+    text-transform: capitalize;
+    font-size: 13px;
+}
+.moderation-pending {
+    color: #f4d47c;
+}
+.moderation-approved {
+    color: #7fe3a1;
+}
+.moderation-rejected,
+.ghost-btn.danger {
+    color: #ff8c8c;
+}
+.moderation-empty {
+    padding: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    color: var(--mist);
+}
+
+@media (max-width: 720px) {
+    .avatar-crop-wrap,
+    .moderation-item-head,
+    .moderation-preview-row,
+    .moderation-actions {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .moderation-actions .input-field,
+    .moderation-actions button {
+        width: 100%;
+    }
+}
+
 /* ── Feedback Button ─────────────────────────────────────── */
 .feedback-fab {
     position: fixed;

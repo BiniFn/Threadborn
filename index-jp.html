@@ -74,7 +74,7 @@
             href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap"
             rel="stylesheet"
         />
-        <link rel="stylesheet" href="./global.css?v=41" />
+        <link rel="stylesheet" href="./global.css?v=43" />
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css"
@@ -1030,6 +1030,17 @@
                         </p>
                     </div>
                 </div>
+                <div class="spoiler-toggle-bar">
+                    <span>世界観のネタバレは、表示するまで隠されます。</span>
+                    <button
+                        class="spoiler-toggle"
+                        type="button"
+                        aria-label="世界観のネタバレを切り替える"
+                        aria-pressed="false"
+                        onclick="toggleSpoilerReveal()"
+                        title="Toggle spoilers"
+                    ></button>
+                </div>
                 <div id="lore-grid" class="grid lore-grid"></div>
             </section>
 
@@ -1384,6 +1395,26 @@
                             id="dashboard-art-status"
                             style="margin-top: 10px; font-size: 12px"
                         ></p>
+                    </article>
+
+                    <article class="card moderation-card" style="grid-column: 1 / -1">
+                        <h3>審査キュー</h3>
+                        <p>
+                            プロフィール名、プロフィール画像、読者コメント、考察、ネタバレ、コミュニティ投稿を公開前に承認します。
+                        </p>
+                        <div class="toolbar-actions moderation-toolbar">
+                            <button class="ghost-btn" type="button" onclick="loadModerationQueue('pending')">
+                                保留中
+                            </button>
+                            <button class="ghost-btn" type="button" onclick="loadModerationQueue('approved')">
+                                承認済み
+                            </button>
+                            <button class="ghost-btn" type="button" onclick="loadModerationQueue('rejected')">
+                                却下
+                            </button>
+                        </div>
+                        <p id="moderation-status" class="muted"></p>
+                        <div id="moderation-queue" class="moderation-queue"></div>
                     </article>
                 </div>
             </section>
@@ -7322,18 +7353,22 @@
                 },
                 {
                     title: "森での告白",
+                    spoiler: true,
                     text: "翌朝、ヴェルコールが封印された牢獄を見つける前に、森の隠れ家でヨノとバイオレットはカップルとして完全に結ばれる。",
                 },
                 {
                     title: "ヴェルコールの牢獄",
+                    spoiler: true,
                     text: "森にある石の扉は、旧コヴナントの封印であり、幽閉されている間も強くなり続ける糸を食らう長老ヴェルコールを閉じ込めるために作られた。",
                 },
                 {
                     title: "ヨノが登り続ける理由",
+                    spoiler: true,
                     text: "彼の過去の人生は消去されたわけではない。自ら作り出した封印の下に層として重なっている。新しい章ごとにその封印を一つ解くことができるため、最新のヨノが常に最強のヨノとなる。",
                 },
                 {
                     title: "バイオレットが今も重要な理由",
+                    spoiler: true,
                     text: "ヨノの力のインフレは意図的に無限に設定されているため、彼が人間の愛のスケールに留まり、選ばれ、繋ぎ止められるための物語における感情的なカウンターウェイトがバイオレットである。",
                 },
             ];
@@ -7381,6 +7416,7 @@
             const bookmarkKey = "threadborn_bookmarks_v2";
             const legacyBookmarkKey = "threadborn_bookmarks";
             const communityImageState = { dataUrl: "" };
+            let spoilerRevealEnabled = false;
 
             Object.defineProperties(window, {
                 chapters: { configurable: true, get: () => chapters },
@@ -7806,7 +7842,9 @@
                         }),
                     });
                     if (textEl) textEl.value = "";
-                    if (status) status.textContent = "Posted.";
+                    if (status)
+                        status.textContent =
+                            "管理者レビューに送信しました。承認後に表示されます。";
                     await setReactionTarget(
                         target.targetType,
                         target.volumeId,
@@ -7931,6 +7969,21 @@
                 return `<span class="name-badges">${check}${owner}</span>`;
             }
 
+            function safeImageUrl(value, fallback = "assets/threadborn-app-icon.png") {
+                const text = String(value || "").trim();
+                if (!text) return fallback;
+                try {
+                    const parsed = new URL(text, window.location.href);
+                    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+                        return escapeHtml(parsed.href);
+                    }
+                    if (text.startsWith("assets/") || text.startsWith("./assets/")) {
+                        return escapeHtml(text);
+                    }
+                } catch (_) {}
+                return fallback;
+            }
+
             function renderCommunityFeed(posts = []) {
                 const feed = document.getElementById("community-feed");
                 if (!feed) {
@@ -7943,38 +7996,44 @@
                 }
                 feed.innerHTML = posts
                     .map(
-                        (post) => `
+                        (post) => {
+                            const postId = escapeHtml(post.id || "");
+                            const username = escapeHtml(post.username || "Reader");
+                            const category = escapeHtml(String(post.category || "post").replace("_", " "));
+                            const postContent = escapeHtml(post.content || "");
+                            return `
         <article class="community-post">
           <div class="community-head">
-            <img src="${post.avatar_url || "assets/threadborn-app-icon.png"}" alt="${post.username || "User"} avatar" />
+            <img src="${safeImageUrl(post.avatar_url)}" alt="${username} avatar" />
             <div>
-              <strong>${post.username || "Reader"}${renderNameBadges(post)}</strong>
-              <div class="community-meta">${post.category.replace("_", " ")} • ${formatCommunityTime(post.created_at)}</div>
+              <strong>${username}${renderNameBadges(post)}</strong>
+              <div class="community-meta">${category} • ${formatCommunityTime(post.created_at)}</div>
             </div>
           </div>
-          <h4>${post.title}</h4>
-          <div class="${post.category === "spoiler" ? "spoiler-body" : ""}" onclick="this.classList.add('revealed')">${post.content}</div>
-          ${post.image_url ? `<img class="post-image" src="${post.image_url}" alt="Community image" loading="lazy" />` : ""}
+          <h4>${escapeHtml(post.title || "")}</h4>
+          <div class="${post.category === "spoiler" ? "spoiler-body" : ""}" onclick="this.classList.add('revealed')">${postContent}</div>
+          ${post.image_url ? `<img class="post-image" src="${safeImageUrl(post.image_url, "")}" alt="Community image" loading="lazy" />` : ""}
           <div class="post-actions">
-            <button class="btn btn-ghost" onclick="toggleCommunityLike('${post.id}')">${post.liked_by_me ? "Unlike" : "Like"} • ${post.like_count}</button>
+            <button class="btn btn-ghost" onclick="toggleCommunityLike('${postId}')">${post.liked_by_me ? "Unlike" : "Like"} • ${Number(post.like_count || 0)}</button>
           </div>
           <div class="post-comments">
             ${(post.comments || [])
                 .map(
                     (comment) => `
               <div class="post-comment">
-                <strong>${comment.username || "reader"}${renderNameBadges(comment)}:</strong> ${isModerator ? `<button onclick="deleteCommunityComment(\'${comment.id}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;float:right;">[Delete]</button>` : ""} ${comment.content}
+                <strong>${escapeHtml(comment.username || "reader")}${renderNameBadges(comment)}:</strong> ${isModerator ? `<button onclick="deleteCommunityComment(\'${escapeHtml(comment.id || "")}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;float:right;">[Delete]</button>` : ""} ${escapeHtml(comment.content || "")}
               </div>
             `,
                 )
                 .join("")}
             <div class="row-inline">
-              <input id="comment-input-${post.id}" placeholder="Reply to this post..." maxlength="1200" />
-              <button class="btn btn-ghost" onclick="addCommunityComment('${post.id}')">Reply</button>
+              <input id="comment-input-${postId}" placeholder="Reply to this post..." maxlength="1200" />
+              <button class="btn btn-ghost" onclick="addCommunityComment('${postId}')">Reply</button>
             </div>
           </div>
         </article>
-      `,
+      `;
+                        },
                     )
                     .join("");
             }
@@ -8096,6 +8155,10 @@
                         }),
                     });
                     input.value = "";
+                    const status = document.getElementById("community-status");
+                    if (status)
+                        status.textContent =
+                            "返信を管理者レビューに送信しました。";
                     await loadCommunityFeed();
                 } catch (error) {
                     const status = document.getElementById("community-status");
@@ -8122,6 +8185,7 @@
                             method: "POST",
                             body: JSON.stringify({
                                 dataUrl: communityImageState.dataUrl,
+                                purpose: "community",
                             }),
                         });
                         imageUrl = upload.url;
@@ -8143,7 +8207,8 @@
                         "community-image-preview",
                     );
                     if (preview) preview.style.display = "none";
-                    status.textContent = "Posted.";
+                    status.textContent =
+                        "管理者レビューに送信しました。承認後に表示されます。";
                     await loadCommunityFeed();
                 } catch (error) {
                     status.textContent = error.message;
@@ -8993,13 +9058,32 @@
                 grid.innerHTML = loreEntries
                     .map(
                         (entry) => `
-        <article class="card lore-card">
+        <article class="card lore-card${entry.spoiler ? " spoiler-hidden" : ""}">
           <strong>${entry.title}</strong>
           <p>${entry.text}</p>
         </article>
       `,
                     )
                     .join("");
+                applySpoilerRevealState();
+            }
+
+            function applySpoilerRevealState() {
+                document.querySelectorAll(".spoiler-toggle").forEach((button) => {
+                    button.classList.toggle("on", spoilerRevealEnabled);
+                    button.setAttribute("aria-pressed", String(spoilerRevealEnabled));
+                });
+                document.querySelectorAll("#view-leaks .power-card, #view-leaks .spoiler-note").forEach((item) => {
+                    item.classList.add("spoiler-hidden");
+                });
+                document.querySelectorAll(".spoiler-hidden").forEach((item) => {
+                    item.classList.toggle("revealed", spoilerRevealEnabled);
+                });
+            }
+
+            function toggleSpoilerReveal() {
+                spoilerRevealEnabled = !spoilerRevealEnabled;
+                applySpoilerRevealState();
             }
 
             function switchLeaksTab(tab) {
@@ -9067,6 +9151,9 @@
                 ) {
                     window.loadDashboardConfig();
                     window.loadDashboardArt();
+                    if (typeof window.loadModerationQueue === "function") {
+                        window.loadModerationQueue("pending");
+                    }
                 }
 
                 if (
@@ -11959,8 +12046,8 @@
             }
         </style>
 
-        <script src="./assets/notifications.js?v=40"></script>
-        <script src="./assets/phase1-client.js?v=40"></script>
+        <script src="./assets/notifications.js?v=43"></script>
+        <script src="./assets/phase1-client.js?v=43"></script>
         <script>
             if ("serviceWorker" in navigator) {
                 let newWorker;

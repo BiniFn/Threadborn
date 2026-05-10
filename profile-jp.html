@@ -45,7 +45,7 @@
         />
         <link rel="apple-touch-icon" href="./assets/threadborn-logo-jp-new.png" />
 
-        <link rel="stylesheet" href="./global.css?v=41" />
+        <link rel="stylesheet" href="./global.css?v=43" />
     </head>
     <body>
         <main class="auth-shell">
@@ -111,6 +111,53 @@
                     </button>
                 </div>
                 <p class="muted" id="profile-status"></p>
+            </article>
+
+            <article class="card profile-avatar-editor" style="text-align: left; margin-bottom: 24px">
+                <h2
+                    style="
+                        margin-top: 0;
+                        font-family: &quot;Cormorant Garamond&quot;, serif;
+                    "
+                >
+                    プロフィール画像
+                </h2>
+                <p class="muted">
+                    画像を選び、正方形に切り抜いてから管理者レビューへ送信します。
+                </p>
+                <input id="avatar-file" class="input-field" type="file" accept="image/*" />
+                <div id="avatar-crop-wrap" class="avatar-crop-wrap" hidden>
+                    <canvas id="avatar-crop-canvas" width="320" height="320" aria-label="Avatar crop preview"></canvas>
+                    <div class="avatar-crop-controls">
+                        <label for="avatar-zoom">ズーム</label>
+                        <input id="avatar-zoom" type="range" min="1" max="3" step="0.01" value="1" />
+                        <label for="avatar-x">横位置</label>
+                        <input id="avatar-x" type="range" min="-1" max="1" step="0.01" value="0" />
+                        <label for="avatar-y">縦位置</label>
+                        <input id="avatar-y" type="range" min="-1" max="1" step="0.01" value="0" />
+                    </div>
+                </div>
+                <button
+                    id="save-avatar"
+                    class="btn-form"
+                    style="margin-top: 12px; width: auto; padding: 12px 24px"
+                    disabled
+                >
+                    画像を送信
+                </button>
+                <p id="avatar-status" class="muted"></p>
+            </article>
+
+            <article class="card" style="text-align: left; margin-bottom: 24px">
+                <h2
+                    style="
+                        margin-top: 0;
+                        font-family: &quot;Cormorant Garamond&quot;, serif;
+                    "
+                >
+                    レビュー待ち
+                </h2>
+                <div id="pending-review" class="muted">保留中の変更を読み込み中...</div>
             </article>
             <article class="card" style="text-align: left; margin-bottom: 24px">
                 <h2
@@ -255,7 +302,17 @@
             const metaEl = document.getElementById("meta");
             const verifiedEl = document.getElementById("verified");
             const profileStatus = document.getElementById("profile-status");
+            const avatarStatus = document.getElementById("avatar-status");
             const settingsStatus = document.getElementById("settings-status");
+            const avatarFile = document.getElementById("avatar-file");
+            const avatarCanvas = document.getElementById("avatar-crop-canvas");
+            const avatarCropWrap = document.getElementById("avatar-crop-wrap");
+            const avatarZoom = document.getElementById("avatar-zoom");
+            const avatarX = document.getElementById("avatar-x");
+            const avatarY = document.getElementById("avatar-y");
+            const saveAvatarBtn = document.getElementById("save-avatar");
+            const avatarCtx = avatarCanvas?.getContext("2d");
+            let avatarImage = null;
             let csrfToken = "";
 
             async function apiFetch(path, options = {}) {
@@ -286,6 +343,115 @@
                 target.textContent = message;
                 target.className = ok ? "muted ok" : "muted";
             }
+
+            function escapeHtml(value) {
+                return String(value ?? "").replace(
+                    /[&<>"']/g,
+                    (char) =>
+                        ({
+                            "&": "&amp;",
+                            "<": "&lt;",
+                            ">": "&gt;",
+                            '"': "&quot;",
+                            "'": "&#39;",
+                        })[char],
+                );
+            }
+
+            function drawAvatarCrop() {
+                if (!avatarImage || !avatarCtx || !avatarCanvas) return;
+                const size = avatarCanvas.width;
+                avatarCtx.clearRect(0, 0, size, size);
+                avatarCtx.fillStyle = "#111";
+                avatarCtx.fillRect(0, 0, size, size);
+                const zoom = Number(avatarZoom.value || 1);
+                const scale = Math.max(size / avatarImage.width, size / avatarImage.height) * zoom;
+                const width = avatarImage.width * scale;
+                const height = avatarImage.height * scale;
+                const x = (size - width) / 2 + Number(avatarX.value || 0) * size * 0.35;
+                const y = (size - height) / 2 + Number(avatarY.value || 0) * size * 0.35;
+                avatarCtx.drawImage(avatarImage, x, y, width, height);
+            }
+
+            function renderPendingRequests(items = []) {
+                const box = document.getElementById("pending-review");
+                if (!box) return;
+                if (!items.length) {
+                    box.textContent = "レビュー待ちの変更はありません。";
+                    return;
+                }
+                box.innerHTML = items
+                    .map((item) => {
+                        const payload = item.payload || {};
+                        const label = String(item.type || "request").replace(/_/g, " ");
+                        const detail =
+                            payload.username ||
+                            payload.title ||
+                            payload.content ||
+                            payload.volumeId ||
+                            payload.avatarUrl ||
+                            "";
+                        return `<div class="post-comment"><strong>${escapeHtml(label)}</strong><br>${escapeHtml(String(detail).slice(0, 180))}<br><span class="muted">${new Date(item.createdAt).toLocaleString()}</span></div>`;
+                    })
+                    .join("");
+            }
+
+            avatarFile?.addEventListener("change", () => {
+                const file = avatarFile.files && avatarFile.files[0];
+                if (!file) return;
+                if (!file.type.startsWith("image/")) {
+                    setMessage(avatarStatus, "画像ファイルを選択してください。", false);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const image = new Image();
+                    image.onload = () => {
+                        avatarImage = image;
+                        avatarCropWrap.hidden = false;
+                        saveAvatarBtn.disabled = false;
+                        avatarZoom.value = "1";
+                        avatarX.value = "0";
+                        avatarY.value = "0";
+                        drawAvatarCrop();
+                        setMessage(avatarStatus, "画像を切り抜いてからレビューへ送信してください。", true);
+                    };
+                    image.src = String(reader.result || "");
+                };
+                reader.readAsDataURL(file);
+            });
+
+            [avatarZoom, avatarX, avatarY].forEach((control) => {
+                control?.addEventListener("input", drawAvatarCrop);
+            });
+
+            saveAvatarBtn?.addEventListener("click", async () => {
+                try {
+                    if (!avatarImage || !avatarCanvas) {
+                        throw new Error("先に画像を選んで切り抜いてください。");
+                    }
+                    saveAvatarBtn.disabled = true;
+                    setMessage(avatarStatus, "レビュー用にアップロード中...", true);
+                    const dataUrl = avatarCanvas.toDataURL("image/png", 0.92);
+                    const result = await apiFetch("/api/upload/avatar", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            dataUrl,
+                            crop: {
+                                x: Number(avatarX.value || 0),
+                                y: Number(avatarY.value || 0),
+                                size: 1 / Number(avatarZoom.value || 1),
+                            },
+                        }),
+                    });
+                    setMessage(avatarStatus, result.message || "プロフィール画像をレビューへ送信しました。", true);
+                    await refreshProfileDetails();
+                } catch (error) {
+                    setMessage(avatarStatus, error.message, false);
+                } finally {
+                    saveAvatarBtn.disabled = false;
+                }
+            });
 
             document
                 .getElementById("save-profile")
@@ -320,7 +486,12 @@
                                 role: profile.user.role,
                             }),
                         );
-                        setMessage(profileStatus, "Profile saved.", true);
+                        setMessage(
+                            profileStatus,
+                            profile.message || "プロフィール変更をレビューへ送信しました。",
+                            true,
+                        );
+                        await refreshProfileDetails();
                     } catch (error) {
                         setMessage(profileStatus, error.message, false);
                     }
@@ -387,6 +558,13 @@
                     .join("");
             }
 
+            async function refreshProfileDetails() {
+                const profile = await apiFetch("/api/user/profile");
+                renderPendingRequests(profile.pending || []);
+                renderProfileReactions(profile.reactions || []);
+                return profile;
+            }
+
             async function loadProfile() {
                 let user;
                 try {
@@ -429,11 +607,10 @@
                     user.username || user.displayName;
 
                 try {
-                    const profile = await apiFetch("/api/user/profile");
+                    const profile = await refreshProfileDetails();
                     const posts = Array.isArray(profile.posts)
                         ? profile.posts
                         : [];
-                    renderProfileReactions(profile.reactions || []);
                     if (posts.length > 0) {
                         const lines = posts
                             .map(
