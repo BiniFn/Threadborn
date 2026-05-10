@@ -4,6 +4,12 @@
       "maxDuration": 10
     }
   },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.js?__threadborn_path=:path"
+    }
+  ],
   "headers": [
     {
       "source": "/sitemap.xml",

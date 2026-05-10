@@ -2,7 +2,7 @@ import os
 import re
 
 # 1. Update API Handlers to send Push Notifications
-api_file = 'api/_handlers.js'
+api_file = 'api/index.js'
 with open(api_file, 'r') as f:
     api_content = f.read()
 

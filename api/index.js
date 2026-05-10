@@ -140,6 +140,44 @@ return async (req, res) => {
 
 })();
 
+const routeHandlers = new Map([
+  ["/api/auth/login", exports.handleLogin],
+  ["/api/auth/logout", exports.handleLogout],
+  ["/api/auth/me", exports.handleMe],
+  ["/api/auth/signup", exports.handleSignup],
+  ["/api/dashboard", exports.handleDashboard],
+  ["/api/reader/analytics", exports.handleAnalytics],
+  ["/api/reader/bookmarks", exports.handleBookmarks],
+  ["/api/reader/community", exports.handleCommunity],
+  ["/api/reader/progress", exports.handleProgress],
+  ["/api/reader/reactions", exports.handleReactions],
+  ["/api/upload/avatar", exports.handleAvatar],
+  ["/api/user/profile", exports.handleProfile],
+]);
+
+function getApiPath(req) {
+  const requestUrl = new URL(req.url || "/", `https://${req.headers.host || "threadborn.local"}`);
+  const rewrittenPath = requestUrl.searchParams.get("__threadborn_path");
+  if (rewrittenPath) {
+    return `/api/${rewrittenPath}`.replace(/\/+$/, "");
+  }
+  return requestUrl.pathname.replace(/\/+$/, "") || "/api";
+}
+
+module.exports = async function handleApi(req, res) {
+  const pathname = getApiPath(req);
+  const handler = routeHandlers.get(pathname);
+
+  if (!handler) {
+    if (allowCors(req, res)) {
+      return;
+    }
+    return fail(res, 404, "API route not found");
+  }
+
+  return handler(req, res);
+};
+
 exports.handleLogout = (() => {
 
 
