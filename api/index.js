@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const { put, del } = require("@vercel/blob");
 const pool = require("../lib/api/db");
 const { allowCors, success, fail } = require("../lib/api/http");
@@ -18,6 +19,111 @@ const {
   shouldExposeSessionToken,
 } = require("../lib/api/auth");
 const { sendPushToUser, sendPushBroadcast } = require("../lib/api/push");
+
+const GOOGLE_OAUTH_STATE_COOKIE = "tb_google_oauth_state";
+const GOOGLE_OAUTH_RETURN_COOKIE = "tb_google_oauth_return";
+
+function getRequestOrigin(req) {
+  const proto = String(req.headers["x-forwarded-proto"] || "https")
+    .split(",")[0]
+    .trim();
+  const host = String(req.headers["x-forwarded-host"] || req.headers.host || "")
+    .split(",")[0]
+    .trim();
+  return `${proto || "https"}://${host}`;
+}
+
+function getGoogleRedirectUri(req) {
+  return (
+    process.env.GOOGLE_REDIRECT_URI ||
+    `${getRequestOrigin(req)}/api/auth/google/callback`
+  );
+}
+
+function parseSimpleCookies(req) {
+  return String(req.headers.cookie || "")
+    .split(";")
+    .reduce((cookies, pair) => {
+      const [key, ...rest] = pair.trim().split("=");
+      if (!key) return cookies;
+      try {
+        cookies[key] = decodeURIComponent(rest.join("="));
+      } catch {
+        cookies[key] = rest.join("=");
+      }
+      return cookies;
+    }, {});
+}
+
+function sanitizeOAuthReturnTo(value) {
+  const fallback = "/index.html";
+  const raw = String(value || fallback).trim();
+  if (!raw || raw.startsWith("//")) return fallback;
+  try {
+    const parsed = new URL(raw, "https://threadborn.local");
+    if (parsed.origin !== "https://threadborn.local") return fallback;
+    if (!parsed.pathname.endsWith(".html")) return fallback;
+    if (parsed.pathname.includes("/api/")) return fallback;
+    return `${parsed.pathname}${parsed.search || ""}${parsed.hash || ""}`;
+  } catch {
+    return fallback;
+  }
+}
+
+function redirectTo(res, location, statusCode = 302) {
+  res.statusCode = statusCode;
+  res.setHeader("Location", location);
+  res.end("");
+}
+
+function googleAuthPayload(user, session, req) {
+  const payload = {
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatar_url || "",
+      verified: user.verified,
+      role: user.role,
+    },
+    csrfToken: session.csrfToken,
+  };
+  if (shouldExposeSessionToken(req)) {
+    payload.sessionToken = session.token;
+  }
+  return payload;
+}
+
+function normalizeGoogleUsername(profile) {
+  const source =
+    profile.name ||
+    (profile.email ? profile.email.split("@")[0] : "") ||
+    "reader";
+  const cleaned = source
+    .normalize("NFKD")
+    .replace(/[^\w\s]/g, "")
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 18)
+    .toLowerCase();
+  return /^[a-zA-Z0-9_]{3,24}$/.test(cleaned) ? cleaned : "reader";
+}
+
+async function makeUniqueGoogleUsername(profile) {
+  const base = normalizeGoogleUsername(profile);
+  for (let index = 0; index < 12; index += 1) {
+    const suffix = index === 0 ? "" : `_${crypto.randomBytes(2).toString("hex")}`;
+    const username = `${base}${suffix}`.slice(0, 24);
+    const { rows } = await pool.query(
+      "select id from users where lower(username) = lower($1) limit 1",
+      [username],
+    );
+    if (!rows.length) return username;
+  }
+  return `reader_${crypto.randomBytes(4).toString("hex")}`.slice(0, 24);
+}
 
 exports.handleLogin = (() => {
 
@@ -350,6 +456,192 @@ return async (req, res) => {
       return;
     }
     fail(res, 500, "Signup failed");
+  }
+};
+
+})();
+
+exports.handleGoogleAuthStart = (() => {
+
+return async (req, res) => {
+  if (allowCors(req, res)) return;
+  if (req.method !== "GET") {
+    fail(res, 405, "Method not allowed");
+    return;
+  }
+  if (!takeRateLimitToken(`google-start:${getClientIp(req)}`, 20, 60_000)) {
+    fail(res, 429, "Too many Google sign-in attempts");
+    return;
+  }
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    fail(res, 503, "Google sign-in is not configured");
+    return;
+  }
+
+  const requestUrl = new URL(req.url || "/", getRequestOrigin(req));
+  const state = crypto.randomBytes(24).toString("hex");
+  const returnTo = sanitizeOAuthReturnTo(requestUrl.searchParams.get("returnTo"));
+  const redirectUri = getGoogleRedirectUri(req);
+  const googleUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+  googleUrl.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID);
+  googleUrl.searchParams.set("redirect_uri", redirectUri);
+  googleUrl.searchParams.set("response_type", "code");
+  googleUrl.searchParams.set("scope", "openid email profile");
+  googleUrl.searchParams.set("state", state);
+  googleUrl.searchParams.set("prompt", "select_account");
+
+  res.setHeader("Set-Cookie", [
+    makeCookie(GOOGLE_OAUTH_STATE_COOKIE, state, 600, getSessionCookieOptions(req)),
+    makeCookie(
+      GOOGLE_OAUTH_RETURN_COOKIE,
+      returnTo,
+      600,
+      getSessionCookieOptions(req),
+    ),
+  ]);
+  redirectTo(res, googleUrl.toString());
+};
+
+})();
+
+exports.handleGoogleAuthCallback = (() => {
+
+async function exchangeGoogleCode(req, code) {
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID || "",
+      client_secret: process.env.GOOGLE_CLIENT_SECRET || "",
+      redirect_uri: getGoogleRedirectUri(req),
+      grant_type: "authorization_code",
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.access_token) {
+    throw new Error(data.error_description || "Google token exchange failed");
+  }
+  return data.access_token;
+}
+
+async function fetchGoogleProfile(accessToken) {
+  const response = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  const profile = await response.json().catch(() => ({}));
+  if (!response.ok || !profile.sub || !profile.email) {
+    throw new Error("Google profile request failed");
+  }
+  if (profile.email_verified === false) {
+    throw new Error("Google email is not verified");
+  }
+  return {
+    googleId: String(profile.sub),
+    email: String(profile.email).trim().toLowerCase(),
+    name: String(profile.name || "").trim(),
+    avatarUrl: String(profile.picture || "").trim(),
+  };
+}
+
+async function findOrCreateGoogleUser(profile) {
+  const existing = await pool.query(
+    `select id, email, username, avatar_url, verified, role
+     from users
+     where google_id = $1 or lower(email) = $2
+     order by google_id nulls last
+     limit 1`,
+    [profile.googleId, profile.email],
+  );
+  if (existing.rows.length) {
+    const user = existing.rows[0];
+    const avatarUrl = user.avatar_url || profile.avatarUrl || null;
+    const updated = await pool.query(
+      `update users
+       set google_id = coalesce(google_id, $1),
+           avatar_url = coalesce(nullif(avatar_url, ''), $2),
+           verified = true,
+           updated_at = now()
+       where id = $3
+       returning id, email, username, avatar_url, verified, role`,
+      [profile.googleId, avatarUrl, user.id],
+    );
+    return updated.rows[0];
+  }
+
+  const username = await makeUniqueGoogleUsername(profile);
+  const passwordHash = makePasswordHash(
+    `google:${profile.googleId}:${crypto.randomBytes(24).toString("hex")}`,
+  );
+  const { rows } = await pool.query(
+    `insert into users
+       (email, username, password_hash, avatar_url, role, verified, google_id, updated_at)
+     values ($1, $2, $3, $4, 'user', true, $5, now())
+     returning id, email, username, avatar_url, verified, role`,
+    [profile.email, username, passwordHash, profile.avatarUrl || null, profile.googleId],
+  );
+  return rows[0];
+}
+
+return async (req, res) => {
+  if (allowCors(req, res)) return;
+  if (req.method !== "GET") {
+    fail(res, 405, "Method not allowed");
+    return;
+  }
+  const requestUrl = new URL(req.url || "/", getRequestOrigin(req));
+  const cookies = parseSimpleCookies(req);
+  const returnTo = sanitizeOAuthReturnTo(cookies[GOOGLE_OAUTH_RETURN_COOKIE]);
+  const clearOAuthCookies = [
+    makeCookie(
+      GOOGLE_OAUTH_STATE_COOKIE,
+      "",
+      0,
+      getSessionCookieOptions(req, { clear: true }),
+    ),
+    makeCookie(
+      GOOGLE_OAUTH_RETURN_COOKIE,
+      "",
+      0,
+      getSessionCookieOptions(req, { clear: true }),
+    ),
+  ];
+
+  try {
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      throw new Error("Google sign-in is not configured");
+    }
+    const code = requestUrl.searchParams.get("code") || "";
+    const state = requestUrl.searchParams.get("state") || "";
+    if (!code || !state || state !== cookies[GOOGLE_OAUTH_STATE_COOKIE]) {
+      throw new Error("Invalid Google sign-in state");
+    }
+    await pool.ensureMigrations();
+    const accessToken = await exchangeGoogleCode(req, code);
+    const profile = await fetchGoogleProfile(accessToken);
+    const user = await findOrCreateGoogleUser(profile);
+    const session = await createSession(user.id);
+    res.setHeader("Set-Cookie", [
+      ...clearOAuthCookies,
+      makeCookie(
+        SESSION_COOKIE,
+        session.token,
+        Math.floor(SESSION_TTL_MS / 1000),
+        getSessionCookieOptions(req),
+      ),
+    ]);
+    if (requestUrl.searchParams.get("mode") === "json") {
+      success(res, googleAuthPayload(user, session, req));
+      return;
+    }
+    redirectTo(res, returnTo);
+  } catch (error) {
+    res.setHeader("Set-Cookie", clearOAuthCookies);
+    const loginPath = returnTo.includes("-jp") ? "/login-jp.html" : "/login.html";
+    redirectTo(
+      res,
+      `${loginPath}?google_error=${encodeURIComponent(error.message || "Google sign-in failed")}`,
+    );
   }
 };
 
@@ -2428,6 +2720,8 @@ const routeHandlers = new Map([
   ["/api/auth/logout", exports.handleLogout],
   ["/api/auth/me", exports.handleMe],
   ["/api/auth/signup", exports.handleSignup],
+  ["/api/auth/google/start", exports.handleGoogleAuthStart],
+  ["/api/auth/google/callback", exports.handleGoogleAuthCallback],
   ["/api/dashboard", exports.handleDashboard],
   ["/api/reader/analytics", exports.handleAnalytics],
   ["/api/reader/bookmarks", exports.handleBookmarks],

@@ -45,7 +45,7 @@ html
         />
         <link rel="apple-touch-icon" href="./assets/threadborn-logo-jp-new.png" />
 
-        <link rel="stylesheet" href="./global.css?v=41" />
+        <link rel="stylesheet" href="./global.css?v=42" />
     </head>
     <body>
         <main class="auth-shell">
@@ -61,6 +61,11 @@ html
             <p style="color: var(--mist); margin-bottom: 24px">
                 Threadborn アカウントでサインインします。
             </p>
+            <button id="google-login-btn" class="btn-google" type="button">
+                <span class="google-mark">G</span>
+                Google で続行
+            </button>
+            <div class="auth-divider"><span>または</span></div>
             <form id="login-form">
                 <label for="email">電子メール</label>
                 <input
@@ -166,6 +171,7 @@ html
 
             const form = document.getElementById("login-form");
             const submitBtn = document.getElementById("submit-btn");
+            const googleLoginBtn = document.getElementById("google-login-btn");
             const statusEl = document.getElementById("status");
 
             function setStatus(message, type) {
@@ -180,6 +186,33 @@ html
                 }
                 return text || "Login failed.";
             }
+
+            function getOAuthReturnPath() {
+                return window.location.pathname.includes("-jp")
+                    ? "/index-jp.html"
+                    : "/index.html";
+            }
+
+            function showGoogleErrorFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                const error = params.get("google_error");
+                if (!error) return;
+                setStatus(normalizeAuthError(error), "error");
+                params.delete("google_error");
+                const nextQuery = params.toString();
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${window.location.hash}`,
+                );
+            }
+
+            googleLoginBtn.addEventListener("click", () => {
+                googleLoginBtn.disabled = true;
+                setStatus("Google サインインを開いています...", "ok");
+                const returnTo = encodeURIComponent(getOAuthReturnPath());
+                window.location.href = `${API_BASE}/api/auth/google/start?returnTo=${returnTo}`;
+            });
 
             form.addEventListener("submit", async (event) => {
                 event.preventDefault();
@@ -230,6 +263,8 @@ html
                     submitBtn.textContent = "サインイン";
                 }
             });
+
+            showGoogleErrorFromUrl();
         </script>
     </body>
 </html>

@@ -1,9 +1,9 @@
-const CACHE_NAME = "threadborn-static-v45";
+const CACHE_NAME = "threadborn-static-v46";
 const CORE_ASSETS = [
   "./",
   "./runtime-config.js",
   "./manifest.json",
-  "./global.css?v=41",
+  "./global.css?v=42",
   "./assets/threadborn-logo-en-new.png",
   "./assets/threadborn-logo-jp-new.png",
   "./assets/threadborn-logo.png",

@@ -2893,6 +2893,81 @@ label {
     box-shadow: 0 12px 24px rgba(207, 47, 47, 0.25);
 }
 
+.btn-google {
+    width: 100%;
+    min-height: 52px;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #151515;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.btn-google:hover {
+    transform: translateY(-2px);
+    background: #fff;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24);
+}
+
+.btn-google:disabled,
+.btn-form:disabled {
+    cursor: wait;
+    opacity: 0.72;
+    transform: none;
+}
+
+.google-mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: conic-gradient(
+        from -45deg,
+        #4285f4 0deg 90deg,
+        #34a853 90deg 180deg,
+        #fbbc05 180deg 270deg,
+        #ea4335 270deg 360deg
+    );
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    flex: 0 0 auto;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    color: var(--mist);
+    font-family: "Space Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: var(--line);
+}
+
 .muted {
     color: var(--mist);
     font-size: 0.95rem;
