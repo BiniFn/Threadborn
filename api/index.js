@@ -157,7 +157,12 @@ const routeHandlers = new Map([
 
 function getApiPath(req) {
   const requestUrl = new URL(req.url || "/", `https://${req.headers.host || "threadborn.local"}`);
-  const rewrittenPath = requestUrl.searchParams.get("__threadborn_path");
+  const queryPath =
+    req.query && (req.query.__threadborn_path || req.query.path);
+  const rewrittenPath =
+    requestUrl.searchParams.get("__threadborn_path") ||
+    requestUrl.searchParams.get("path") ||
+    (Array.isArray(queryPath) ? queryPath.join("/") : queryPath);
   if (rewrittenPath) {
     return `/api/${rewrittenPath}`.replace(/\/+$/, "");
   }
