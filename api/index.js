@@ -1352,16 +1352,21 @@ return async (req, res) => {
     fail(res, 429, "Too many requests");
     return;
   }
-  const session = await requireSession(req, res, fail);
-  if (!session) {
+  const session =
+    req.method === "GET"
+      ? await getSession(req).catch(() => null)
+      : await requireSession(req, res, fail);
+  if (!session && req.method !== "GET") {
     return;
   }
   await pool.ensureMigrations();
 
-  const meResult = await pool.query(
-    "select role, coalesce(verified, false) as verified, community_banned_until, community_ban_reason from users where id = $1 limit 1",
-    [session.user_id],
-  );
+  const meResult = session
+    ? await pool.query(
+        "select role, coalesce(verified, false) as verified, community_banned_until, community_ban_reason from users where id = $1 limit 1",
+        [session.user_id],
+      )
+    : { rows: [] };
   const me = meResult.rows[0] || null;
   const isModerator = !!me && (me.role === "owner" || me.role === "admin");
   const isCommunityBanned = !!(
@@ -1373,6 +1378,7 @@ return async (req, res) => {
   if (req.method === "GET") {
     const limit = Math.max(1, Math.min(30, Number(req.query?.limit || 12)));
     const offset = Math.max(0, Number(req.query?.offset || 0));
+    const chatOnly = String(req.query?.feed || "") === "chat";
     const postsResult = await pool.query(
       `
       select
@@ -1389,10 +1395,11 @@ return async (req, res) => {
       left join (
         select post_id, count(*) as comment_count from comments group by post_id
       ) c on c.post_id = p.id
+      ${chatOnly ? "where p.category in ('chat', 'theory', 'spoiler')" : ""}
       order by p.created_at desc
       limit $2 offset $3
       `,
-      [session.user_id, limit, offset],
+      [session?.user_id || null, limit, offset],
     );
 
     const ids = postsResult.rows.map((post) => post.id);
@@ -1534,7 +1541,7 @@ return async (req, res) => {
     if (
       !title ||
       !content ||
-      !["fan_art", "theory", "spoiler"].includes(category)
+      !["chat", "fan_art", "theory", "spoiler"].includes(category)
     ) {
       fail(res, 400, "Invalid post payload");
       return;

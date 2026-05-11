@@ -122,13 +122,6 @@
                         data-view="reactions"
                         onclick="switchView('reactions')"
                     >
-                        評価・コメント
-                    </button>
-                    <button
-                        class="nav-btn"
-                        data-view="reactions"
-                        onclick="switchView('reactions')"
-                    >
                         Discuss
                     </button>
                     <button
@@ -736,39 +729,31 @@
             <section id="view-reactions" class="view">
                 <div class="section-head">
                     <div>
-                        <h2>評価・コメント</h2>
+                        <h2>Discuss</h2>
                         <p class="section-copy">
-                            巻または章を評価できます。コメントは誰でも読めます。投稿にはログインが必要です。
+                            読者同士でチャットできます。巻や章について話す時はピンを付けられますが、巻別や章別のコメント欄には分かれません。
                         </p>
                     </div>
                 </div>
-                <article class="card comments-shell reader-reactions-shell">
-                    <strong>読者評価とコメント</strong>
+                <article class="card comments-shell reader-reactions-shell discuss-chat-shell">
+                    <strong>読者チャット</strong>
                     <p>
-                        巻または章を評価できます。コメントは誰でも読めます。投稿にはログインが必要です。
+                        通常チャット、考察、ネタバレを選べます。投稿は表示前に管理者レビューへ送られ、危険な内容は自動でフラグされます。
                     </p>
                     <form
-                        class="comment-form"
+                        class="comment-form discuss-chat-form"
                         onsubmit="submitReaderReaction(event)"
                     >
                         <select
                             id="reaction-target"
-                            aria-label="反応する巻または章"
+                            aria-label="任意のストーリーピン"
                         ></select>
                         <div class="reaction-form-row">
-                            <select id="reaction-rating" aria-label="評価">
-                                <option value="">評価なし</option>
-                                <option value="5">5つ星</option>
-                                <option value="4">4つ星</option>
-                                <option value="3">3つ星</option>
-                                <option value="2">2つ星</option>
-                                <option value="1">1つ星</option>
-                            </select>
                             <select
                                 id="reaction-category"
-                                aria-label="コメント種別"
+                                aria-label="チャット種別"
                             >
-                                <option value="comment">コメント</option>
+                                <option value="chat">通常チャット</option>
                                 <option value="theory">考察</option>
                                 <option value="spoiler">ネタバレ</option>
                             </select>
@@ -776,14 +761,14 @@
                         <textarea
                             id="reaction-text"
                             maxlength="1600"
-                            placeholder="コメント、考察、ネタバレメモを書いてください..."
+                            placeholder="メッセージを書いてください。巻や章について話す時はピンを使えます..."
                         ></textarea>
                         <button class="btn btn-primary" type="submit">
-                            投稿する
+                            送信
                         </button>
                     </form>
                     <div id="reaction-status" class="toolbar-note">
-                        公開コメントを読み込み中...
+                        読者チャットを読み込み中...
                     </div>
                     <div id="comment-list" class="comment-list"></div>
                 </article>
@@ -1695,13 +1680,6 @@
                 onclick="switchView('volumes')"
             >
                 巻
-            </button>
-            <button
-                class="nav-btn"
-                data-view="reactions"
-                onclick="switchView('reactions')"
-            >
-                評価・コメント
             </button>
             <button
                 class="nav-btn"
@@ -7743,12 +7721,17 @@
                 const select = document.getElementById("reaction-target");
                 if (!select) return;
                 const current = select.value;
-                const options = [];
+                const options = [
+                    new Option(
+                        "ピンなし・通常チャット",
+                        reactionKey("chat", "General", ""),
+                    ),
+                ];
                 volumes.forEach((volume) => {
                     const id = volume.id || volume.name.split(" • ")[0];
                     options.push(
                         new Option(
-                            `${volume.name} • whole volume`,
+                            `${volume.name} をピン`,
                             reactionKey("volume", id, ""),
                         ),
                     );
@@ -7756,7 +7739,7 @@
                 chapters.forEach((chapter) => {
                     options.push(
                         new Option(
-                            `${chapter.volume} • ${chapter.chapter} • ${chapter.title}`,
+                            `${chapter.volume} • ${chapter.chapter} • ${chapter.title} をピン`,
                             reactionKey(
                                 "chapter",
                                 chapter.volume,
@@ -7784,6 +7767,12 @@
                 return { targetType, volumeId, chapterId };
             }
 
+            function chatPingLabel(post) {
+                const raw = String(post.title || "").trim();
+                if (!raw || raw === "General chat") return "通常チャット";
+                return raw.replace(/^Ping:\s*/i, "");
+            }
+
             function renderReactionItems(targetEl, reactions, emptyText) {
                 if (!targetEl) return;
                 if (!reactions.length) {
@@ -7791,41 +7780,45 @@
                     return;
                 }
                 targetEl.innerHTML = reactions
-                    .map((reaction) => {
-                        const user = reaction.user || {};
-                        const rating = reaction.rating
-                            ? `<span class="reaction-rating">${"★".repeat(reaction.rating)}${"☆".repeat(5 - reaction.rating)}</span>`
-                            : "";
+                    .map((post) => {
+                        const user = {
+                            username: post.username,
+                            avatarUrl: post.avatar_url,
+                            verified: post.verified,
+                            role: post.role,
+                        };
                         const category = escapeHtml(
-                            reaction.category || "comment",
+                            post.category || "chat",
                         );
                         const contentClass =
-                            reaction.category === "spoiler"
+                            post.category === "spoiler"
                                 ? "spoiler-body"
                                 : "";
-                        const content = escapeHtml(reaction.content || "");
-                        const when = reaction.createdAt
-                            ? formatCommunityTime(reaction.createdAt)
+                        const content = escapeHtml(post.content || "");
+                        const when = post.created_at
+                            ? formatCommunityTime(post.created_at)
                             : "just now";
                         const username = escapeHtml(user.username || "Reader");
                         const avatar = safeImageUrl(user.avatarUrl);
+                        const ping = escapeHtml(chatPingLabel(post));
                         const isOwner =
                             localStorage.getItem("threadborn_user") &&
                             JSON.parse(localStorage.getItem("threadborn_user"))
                                 .role === "owner";
                         const deleteBtn = isOwner
-                            ? `<button onclick="deleteReaction(\'${reaction.id}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;margin-left:10px;">[Delete]</button>`
+                            ? `<button onclick="deleteCommunityPost(\'${escapeHtml(post.id || "")}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;margin-left:10px;">[Delete]</button>`
                             : "";
                         return `
-          <article class="comment-item reaction-item">
+          <article class="comment-item reaction-item chat-message ${post.category === "spoiler" ? "chat-spoiler" : ""}">
             <div class="comment-head">
               <span style="display:flex;align-items:center;gap:10px;">
                 <img class="clickable-avatar" src="${avatar}" alt="${username} avatar" onclick="openPublicProfile('${username}')" />
                 <button class="profile-link-btn" type="button" onclick="openPublicProfile('${username}')">${username}${renderNameBadges(user)}</button>
               </span>
-              <span>${rating} ${category} • ${when}</span>${deleteBtn}
+              <span><span class="chat-type-chip">${category}</span> • ${when}</span>${deleteBtn}
             </div>
-            <div class="${contentClass}" ${contentClass ? "onclick=\"this.classList.add('revealed')\"" : ""}>${content || "<em>Rating only.</em>"}</div>
+            <div class="chat-ping">↳ ${ping}</div>
+            <div class="${contentClass}" ${contentClass ? "onclick=\"this.classList.add('revealed')\"" : ""}>${content || "<em>本文なし。</em>"}</div>
           </article>`;
                     })
                     .join("");
@@ -7942,35 +7935,20 @@
                     volumeId,
                     chapterId: chapterId || "",
                 };
-                if (status) status.textContent = "Loading public reactions...";
+                if (status) status.textContent = "読者チャットを読み込み中...";
                 try {
-                    const params = new URLSearchParams({
-                        targetType,
-                        volumeId,
-                        limit: "30",
-                    });
-                    if (chapterId) params.set("chapterId", chapterId);
                     const data = await apiJson(
-                        `/api/reader/reactions?${params.toString()}`,
+                        "/api/reader/community?limit=30&feed=chat",
                     );
-                    reactionState.reactions = data.reactions || [];
-                    if (data.summary) {
-                        reactionState.summaries.set(
-                            reactionKey(targetType, volumeId, chapterId || ""),
-                            data.summary,
-                        );
-                    }
+                    reactionState.reactions = data.posts || [];
                     renderReactionItems(
                         list,
                         reactionState.reactions,
-                        "No comments yet. Be the first to drop one.",
+                        "まだチャットはありません。最初の話題を始めましょう。",
                     );
                     if (status)
-                        status.textContent = reactionSummaryText(
-                            targetType,
-                            volumeId,
-                            chapterId || "",
-                        );
+                        status.textContent =
+                            "Discuss は共有チャットです。ピンはラベルだけなので、巻や章のページは分かれません。";
                     if (options.scroll) {
                         document
                             .querySelector(".reader-reactions-shell")
@@ -7984,11 +7962,11 @@
                     renderReaderReactionPanel();
                 } catch (error) {
                     if (status)
-                        status.textContent = `Reaction load failed: ${error.message}`;
+                        status.textContent = `チャットの読み込みに失敗しました: ${error.message}`;
                     renderReactionItems(
                         list,
                         [],
-                        "No public reactions loaded.",
+                        "公開チャットを読み込めませんでした。",
                     );
                 }
             }
@@ -8007,7 +7985,7 @@
             }
 
             function openReactionTarget(targetType, volumeId, chapterId = "") {
-                switchView("volumes");
+                switchView("reactions");
                 setReactionTarget(targetType, volumeId, chapterId, {
                     scroll: true,
                 });
@@ -8024,23 +8002,29 @@
                 const target = parseReactionTarget(
                     document.getElementById("reaction-target")?.value,
                 );
-                const rating =
-                    document.getElementById("reaction-rating")?.value || "";
                 const category =
                     document.getElementById("reaction-category")?.value ||
-                    "comment";
+                    "chat";
                 const textEl = document.getElementById("reaction-text");
                 const content = (textEl?.value || "").trim();
                 const status = document.getElementById("reaction-status");
                 if (!target) return;
+                if (!content) {
+                    if (status) status.textContent = "メッセージ本文が必要です。";
+                    return;
+                }
+                const pingLabel =
+                    target.targetType === "chapter"
+                        ? `${target.volumeId} • ${target.chapterId}`
+                        : target.targetType === "volume"
+                          ? target.volumeId
+                          : "General chat";
                 try {
-                    await apiJson("/api/reader/reactions", {
+                    await apiJson("/api/reader/community", {
                         method: "POST",
                         body: JSON.stringify({
-                            targetType: target.targetType,
-                            volumeId: target.volumeId,
-                            chapterId: target.chapterId,
-                            rating,
+                            action: "create_post",
+                            title: pingLabel,
                             category,
                             content,
                         }),
@@ -8054,7 +8038,6 @@
                         target.volumeId,
                         target.chapterId,
                     );
-                    await loadReactionSummaries();
                 } catch (error) {
                     if (status)
                         status.textContent =
@@ -8065,65 +8048,20 @@
             }
 
             async function loadReaderReactions() {
-                const chapter = chapters[activeChapter];
-                if (!chapter) return;
-                const target = {
-                    targetType: "chapter",
-                    volumeId: chapter.volume,
-                    chapterId: chapter.chapter,
-                };
-                reactionState.readerTarget = target;
-                try {
-                    const params = new URLSearchParams({
-                        targetType: "chapter",
-                        volumeId: chapter.volume,
-                        chapterId: chapter.chapter,
-                        limit: "3",
-                    });
-                    const data = await apiJson(
-                        `/api/reader/reactions?${params.toString()}`,
-                    );
-                    if (data.summary) {
-                        reactionState.summaries.set(
-                            reactionKey(
-                                "chapter",
-                                chapter.volume,
-                                chapter.chapter,
-                            ),
-                            data.summary,
-                        );
-                    }
-                    reactionState.readerReactions = data.reactions || [];
-                    renderReaderReactionPanel();
-                } catch (error) {
-                    reactionState.readerReactions = [];
-                    renderReaderReactionPanel();
-                }
+                reactionState.readerReactions = [];
+                renderReaderReactionPanel();
             }
 
             function renderReaderReactionPanel() {
                 const panel = document.getElementById("reader-reactions");
                 if (!panel || !chapters[activeChapter]) return;
-                const chapter = chapters[activeChapter];
-                const summary = reactionSummaryText(
-                    "chapter",
-                    chapter.volume,
-                    chapter.chapter,
-                );
-                const recent = reactionState.readerReactions.slice(0, 3);
                 panel.innerHTML = `
         <div class="reader-reaction-head">
-          <strong>Reader reactions</strong>
-          <span>${summary}</span>
-          <button class="ghost-btn" type="button" onclick="openChapterReaction(${activeChapter})">Comment or rate</button>
+          <strong>この章をDiscussで話す</strong>
+          <span>チャットはDiscussにまとまります。このボタンで章ピンを付けます。</span>
+          <button class="ghost-btn" type="button" onclick="openChapterReaction(${activeChapter})">チャットを開く</button>
         </div>
-        <div class="reader-reaction-list"></div>
       `;
-                renderReactionItems(
-                    panel.querySelector(".reader-reaction-list"),
-                    recent,
-                    "No chapter comments yet.",
-                );
             }
 
             function initializeReaderReactions() {
@@ -9170,7 +9108,7 @@
             <span>${volume.status}</span>
             <div class="chapter-actions">
               <button class="ghost-btn" onclick="${volume.action}">${volume.actionLabel}</button>
-              <button class="ghost-btn" onclick="openReactionTarget('volume', '${volume.id || volume.name.split(" • ")[0]}')">コメント</button>
+              <button class="ghost-btn" onclick="openReactionTarget('volume', '${volume.id || volume.name.split(" • ")[0]}')">チャット</button>
             </div>
           </div>
         </article>
@@ -9202,10 +9140,10 @@
               
               ${ (() => {
                 if (chapter.releaseDate && new Date(chapter.releaseDate) > new Date()) {
-                  return `<button class="ghost-btn" disabled>🔒 近日公開</button>\n<button class="ghost-btn" disabled>コメント</button>\n<button class="ghost-btn download-btn pdf-btn" disabled>Collector PDF</button>\n<button class="ghost-btn download-btn epub-btn" disabled>Styled EPUB</button>`;
+                  return `<button class="ghost-btn" disabled>🔒 近日公開</button>\n<button class="ghost-btn" disabled>チャット</button>\n<button class="ghost-btn download-btn pdf-btn" disabled>Collector PDF</button>\n<button class="ghost-btn download-btn epub-btn" disabled>Styled EPUB</button>`;
                 }
                 return `<button class="ghost-btn" onclick="openChapter(${index})">Read chapter</button>
-              <button class="ghost-btn" onclick="openChapterReaction(${index})">コメント</button>
+              <button class="ghost-btn" onclick="openChapterReaction(${index})">チャット</button>
               <button class="ghost-btn download-btn pdf-btn" onclick="downloadChapterPdf(${index}, this)">Collector PDF</button>
               <button class="ghost-btn download-btn epub-btn" onclick="downloadChapterEpub(${index}, this)">Styled EPUB</button>`;
               })() }

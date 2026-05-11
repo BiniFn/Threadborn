@@ -3096,6 +3096,57 @@ label {
     letter-spacing: 0.03em;
 }
 
+.discuss-chat-shell {
+    max-width: 980px;
+    margin-inline: auto;
+}
+
+.discuss-chat-form {
+    border: 1px solid rgba(132, 208, 199, 0.22);
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(180deg, rgba(132, 208, 199, 0.07), rgba(255, 255, 255, 0.025));
+}
+
+.chat-message {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.chat-message .comment-head {
+    align-items: flex-start;
+}
+
+.chat-ping {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    margin: 4px 0 10px;
+    padding: 5px 9px;
+    border: 1px solid rgba(132, 208, 199, 0.25);
+    border-radius: 999px;
+    color: #9fded7;
+    background: rgba(132, 208, 199, 0.08);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.chat-type-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 3px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: var(--bone);
+    background: rgba(255, 255, 255, 0.06);
+    text-transform: capitalize;
+}
+
+.chat-spoiler {
+    border-color: rgba(255, 107, 107, 0.32);
+}
+
 .reader-reactions-inline {
     margin-top: 34px;
     padding-top: 18px;
