@@ -9,6 +9,9 @@ desktop-app/build/
 desktop-app/dist/
 desktop-app/site/
 desktop-app/*.spec
+threadborn-remotion-trailer/node_modules/
+threadborn-remotion-trailer/out/
+threadborn-remotion-trailer/.DS_Store
 /build/
 /dist/
 /*.spec

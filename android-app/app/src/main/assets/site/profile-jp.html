@@ -35,26 +35,29 @@
                 } catch (e) {}
             })();
         </script>
-        <meta charset="utf-8" />
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <title>Threadborn Profile</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Threadborn Profile JP</title>
         <link
             rel="icon"
             type="image/png"
-            href="./assets/threadborn-favicon-jp.png"
+            href="./assets/threadborn-favicon.png"
         />
-        <link rel="apple-touch-icon" href="./assets/threadborn-logo-jp-new.png" />
+        <link
+            rel="apple-touch-icon"
+            href="./assets/threadborn-apple-touch.png"
+        />
 
-        <link rel="stylesheet" href="./global.css?v=43" />
+        <link rel="stylesheet" href="./global.css?v=48" />
     </head>
     <body>
         <main class="auth-shell">
             <article class="card" style="margin-bottom: 24px; text-align: left">
                 <div class="row">
                     <img
-                        alt="Avatar"
-                        class="avatar"
                         id="avatar"
+                        class="avatar"
+                        alt="Avatar"
                         src="./assets/threadborn-app-icon.png"
                     />
                     <div>
@@ -67,20 +70,21 @@
                                 font-size: 28px;
                             "
                         >
-                            プロフィール
+                            Profile
                         </h1>
-                        <p class="muted" id="meta" style="margin: 6px 0 0">
-                            読み込み中...
+                        <p id="meta" class="muted" style="margin: 6px 0 0">
+                            Loading...
                         </p>
                         <span
-                            class="badge"
                             id="verified"
+                            class="badge"
                             style="display: none; margin-top: 8px"
-                            >確認済み</span
+                            >Verified</span
                         >
                     </div>
                 </div>
             </article>
+
             <article class="card" style="text-align: left; margin-bottom: 24px">
                 <h2
                     style="
@@ -88,11 +92,11 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    プロファイル設定
+                    Profile Settings
                 </h2>
                 <div class="grid">
                     <div>
-                        <label>ユーザー名</label>
+                        <label>Username</label>
                         <input
                             id="username"
                             class="input-field"
@@ -107,10 +111,10 @@
                         class="btn-form"
                         style="width: auto; padding: 12px 24px"
                     >
-                        プロファイルの保存
+                        Save Profile
                     </button>
                 </div>
-                <p class="muted" id="profile-status"></p>
+                <p id="profile-status" class="muted"></p>
             </article>
 
             <article class="card profile-avatar-editor" style="text-align: left; margin-bottom: 24px">
@@ -120,21 +124,40 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    プロフィール画像
+                    Profile Picture
                 </h2>
                 <p class="muted">
-                    画像を選び、正方形に切り抜いてから管理者レビューへ送信します。
+                    Pick an image, crop it into a square, then submit it for admin review.
                 </p>
-                <input id="avatar-file" class="input-field" type="file" accept="image/*" />
+                <label id="avatar-upload-zone" class="avatar-upload-zone" for="avatar-file">
+                    <input id="avatar-file" type="file" accept="image/*" />
+                    <span class="avatar-upload-copy">
+                        <strong>Drop an image or tap to choose</strong>
+                        <span class="muted">PNG, JPEG, WebP, or GIF. Crop changes go to admin review.</span>
+                    </span>
+                </label>
                 <div id="avatar-crop-wrap" class="avatar-crop-wrap" hidden>
-                    <canvas id="avatar-crop-canvas" width="320" height="320" aria-label="Avatar crop preview"></canvas>
+                    <div class="avatar-preview-row">
+                        <canvas id="avatar-crop-canvas" width="512" height="512" aria-label="Avatar crop preview"></canvas>
+                        <div>
+                            <div id="avatar-circle-preview" class="avatar-circle-preview" aria-label="Circular avatar preview"></div>
+                            <button id="reload-current-avatar" class="ghost-btn" type="button" style="margin-top: 12px">Re-edit current</button>
+                        </div>
+                    </div>
                     <div class="avatar-crop-controls">
-                        <label for="avatar-zoom">ズーム</label>
+                        <label for="avatar-zoom">Zoom</label>
                         <input id="avatar-zoom" type="range" min="1" max="3" step="0.01" value="1" />
-                        <label for="avatar-x">横位置</label>
+                        <label for="avatar-x">Horizontal</label>
                         <input id="avatar-x" type="range" min="-1" max="1" step="0.01" value="0" />
-                        <label for="avatar-y">縦位置</label>
+                        <label for="avatar-y">Vertical</label>
                         <input id="avatar-y" type="range" min="-1" max="1" step="0.01" value="0" />
+                        <label for="avatar-rotate">Rotate</label>
+                        <input id="avatar-rotate" type="range" min="-180" max="180" step="1" value="0" />
+                        <div class="crop-button-row">
+                            <button id="rotate-left" class="ghost-btn" type="button">Rotate left</button>
+                            <button id="rotate-right" class="ghost-btn" type="button">Rotate right</button>
+                            <button id="crop-reset" class="ghost-btn" type="button">Reset crop</button>
+                        </div>
                     </div>
                 </div>
                 <button
@@ -143,7 +166,7 @@
                     style="margin-top: 12px; width: auto; padding: 12px 24px"
                     disabled
                 >
-                    画像を送信
+                    Submit Picture
                 </button>
                 <p id="avatar-status" class="muted"></p>
             </article>
@@ -155,10 +178,11 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    レビュー待ち
+                    Pending Review
                 </h2>
-                <div id="pending-review" class="muted">保留中の変更を読み込み中...</div>
+                <div id="pending-review" class="muted">Loading pending changes...</div>
             </article>
+
             <article class="card" style="text-align: left; margin-bottom: 24px">
                 <h2
                     style="
@@ -166,26 +190,26 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    読み取り設定
+                    Reading Settings
                 </h2>
                 <div class="grid">
                     <div>
-                        <label>テーマ</label>
+                        <label>Theme</label>
                         <select id="setting-theme" class="input-field">
-                            <option value="night">夜</option>
-                            <option value="paper">紙</option>
-                            <option value="ember">残り火</option>
+                            <option value="night">Night</option>
+                            <option value="paper">Paper</option>
+                            <option value="ember">Ember</option>
                         </select>
                     </div>
                     <div>
-                        <label>文字サイズ</label>
+                        <label>Text size</label>
                         <input
                             id="setting-size"
                             class="input-field"
-                            max="24"
-                            min="15"
-                            step="1"
                             type="number"
+                            min="15"
+                            max="24"
+                            step="1"
                         />
                     </div>
                 </div>
@@ -194,10 +218,11 @@
                     class="btn-form"
                     style="margin-top: 10px; width: auto; padding: 12px 24px"
                 >
-                    設定の保存
+                    Save Settings
                 </button>
-                <p class="muted" id="settings-status"></p>
+                <p id="settings-status" class="muted"></p>
             </article>
+
             <article class="card" style="text-align: left; margin-bottom: 24px">
                 <h2
                     style="
@@ -205,12 +230,11 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    ブックマーク
+                    Bookmarks
                 </h2>
-                <div class="muted" id="bookmarks">
-                    ブックマークを読み込んでいます...
-                </div>
+                <div id="bookmarks" class="muted">Loading bookmarks...</div>
             </article>
+
             <article class="card" style="text-align: left; margin-bottom: 24px">
                 <h2
                     style="
@@ -218,12 +242,13 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    読者評価とコメント
+                    Reader Ratings & Comments
                 </h2>
                 <div id="profile-reactions" class="muted">
-                    コメントを読み込んでいます...
+                    Loading reactions...
                 </div>
             </article>
+
             <article class="card" style="text-align: left">
                 <h2
                     style="
@@ -231,14 +256,14 @@
                         font-family: &quot;Cormorant Garamond&quot;, serif;
                     "
                 >
-                    読書分析
+                    Reading Analytics
                 </h2>
-                <div class="muted" id="analytics">
-                    分析を読み込んでいます...
-                </div>
+                <div id="analytics" class="muted">Loading analytics...</div>
             </article>
-            <a href="./index-jp.html" class="back-link">← 読者に戻る</a>
+
+            <a href="./index.html" class="back-link">← Back to Reader</a>
         </main>
+
         <script src="./runtime-config.js"></script>
         <script>
             function resolveApiBase() {
@@ -310,6 +335,9 @@
             const avatarZoom = document.getElementById("avatar-zoom");
             const avatarX = document.getElementById("avatar-x");
             const avatarY = document.getElementById("avatar-y");
+            const avatarRotate = document.getElementById("avatar-rotate");
+            const avatarUploadZone = document.getElementById("avatar-upload-zone");
+            const avatarCirclePreview = document.getElementById("avatar-circle-preview");
             const saveAvatarBtn = document.getElementById("save-avatar");
             const avatarCtx = avatarCanvas?.getContext("2d");
             let avatarImage = null;
@@ -358,6 +386,23 @@
                 );
             }
 
+            async function requestAndroidImagePermission() {
+                if (!window.AndroidBridge?.requestImagePermission) {
+                    return true;
+                }
+                try {
+                    window.AndroidBridge.requestImagePermission();
+                } catch (_) {}
+                return true;
+            }
+
+            function resetCropControls() {
+                avatarZoom.value = "1";
+                avatarX.value = "0";
+                avatarY.value = "0";
+                avatarRotate.value = "0";
+            }
+
             function drawAvatarCrop() {
                 if (!avatarImage || !avatarCtx || !avatarCanvas) return;
                 const size = avatarCanvas.width;
@@ -370,14 +415,48 @@
                 const height = avatarImage.height * scale;
                 const x = (size - width) / 2 + Number(avatarX.value || 0) * size * 0.35;
                 const y = (size - height) / 2 + Number(avatarY.value || 0) * size * 0.35;
-                avatarCtx.drawImage(avatarImage, x, y, width, height);
+                avatarCtx.save();
+                avatarCtx.translate(size / 2, size / 2);
+                avatarCtx.rotate((Number(avatarRotate.value || 0) * Math.PI) / 180);
+                avatarCtx.drawImage(avatarImage, x - size / 2, y - size / 2, width, height);
+                avatarCtx.restore();
+                if (avatarCirclePreview) {
+                    avatarCirclePreview.style.backgroundImage = `url(${avatarCanvas.toDataURL("image/png", 0.92)})`;
+                }
+            }
+
+            function loadAvatarFile(file) {
+                if (!file) return;
+                if (!file.type.startsWith("image/")) {
+                    setMessage(avatarStatus, "Choose an image file.", false);
+                    return;
+                }
+                if (file.size > 6 * 1024 * 1024) {
+                    setMessage(avatarStatus, "Choose an image under 6MB.", false);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const image = new Image();
+                    image.onload = () => {
+                        avatarImage = image;
+                        avatarCropWrap.hidden = false;
+                        saveAvatarBtn.disabled = false;
+                        resetCropControls();
+                        drawAvatarCrop();
+                        setMessage(avatarStatus, "Crop the image, then submit it for review.", true);
+                    };
+                    image.onerror = () => setMessage(avatarStatus, "Could not read that image.", false);
+                    image.src = String(reader.result || "");
+                };
+                reader.readAsDataURL(file);
             }
 
             function renderPendingRequests(items = []) {
                 const box = document.getElementById("pending-review");
                 if (!box) return;
                 if (!items.length) {
-                    box.textContent = "レビュー待ちの変更はありません。";
+                    box.textContent = "No pending profile or comment changes.";
                     return;
                 }
                 box.innerHTML = items
@@ -396,42 +475,63 @@
                     .join("");
             }
 
-            avatarFile?.addEventListener("change", () => {
-                const file = avatarFile.files && avatarFile.files[0];
-                if (!file) return;
-                if (!file.type.startsWith("image/")) {
-                    setMessage(avatarStatus, "画像ファイルを選択してください。", false);
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const image = new Image();
-                    image.onload = () => {
-                        avatarImage = image;
-                        avatarCropWrap.hidden = false;
-                        saveAvatarBtn.disabled = false;
-                        avatarZoom.value = "1";
-                        avatarX.value = "0";
-                        avatarY.value = "0";
-                        drawAvatarCrop();
-                        setMessage(avatarStatus, "画像を切り抜いてからレビューへ送信してください。", true);
-                    };
-                    image.src = String(reader.result || "");
-                };
-                reader.readAsDataURL(file);
+            avatarUploadZone?.addEventListener("click", requestAndroidImagePermission);
+            avatarUploadZone?.addEventListener("dragover", (event) => {
+                event.preventDefault();
+                avatarUploadZone.classList.add("dragging");
+            });
+            avatarUploadZone?.addEventListener("dragleave", () => {
+                avatarUploadZone.classList.remove("dragging");
+            });
+            avatarUploadZone?.addEventListener("drop", (event) => {
+                event.preventDefault();
+                avatarUploadZone.classList.remove("dragging");
+                loadAvatarFile(event.dataTransfer?.files?.[0]);
             });
 
-            [avatarZoom, avatarX, avatarY].forEach((control) => {
+            avatarFile?.addEventListener("change", () => {
+                loadAvatarFile(avatarFile.files && avatarFile.files[0]);
+            });
+
+            [avatarZoom, avatarX, avatarY, avatarRotate].forEach((control) => {
                 control?.addEventListener("input", drawAvatarCrop);
+            });
+
+            document.getElementById("rotate-left")?.addEventListener("click", () => {
+                avatarRotate.value = String(Number(avatarRotate.value || 0) - 90);
+                drawAvatarCrop();
+            });
+            document.getElementById("rotate-right")?.addEventListener("click", () => {
+                avatarRotate.value = String(Number(avatarRotate.value || 0) + 90);
+                drawAvatarCrop();
+            });
+            document.getElementById("crop-reset")?.addEventListener("click", () => {
+                resetCropControls();
+                drawAvatarCrop();
+            });
+            document.getElementById("reload-current-avatar")?.addEventListener("click", () => {
+                const source = avatarEl.src;
+                if (!source) return;
+                const image = new Image();
+                image.crossOrigin = "anonymous";
+                image.onload = () => {
+                    avatarImage = image;
+                    avatarCropWrap.hidden = false;
+                    saveAvatarBtn.disabled = false;
+                    resetCropControls();
+                    drawAvatarCrop();
+                };
+                image.onerror = () => setMessage(avatarStatus, "Current image cannot be re-edited from cache. Choose the original file again.", false);
+                image.src = source + (source.includes("?") ? "&" : "?") + "edit=" + Date.now();
             });
 
             saveAvatarBtn?.addEventListener("click", async () => {
                 try {
                     if (!avatarImage || !avatarCanvas) {
-                        throw new Error("先に画像を選んで切り抜いてください。");
+                        throw new Error("Choose and crop an image first.");
                     }
                     saveAvatarBtn.disabled = true;
-                    setMessage(avatarStatus, "レビュー用にアップロード中...", true);
+                    setMessage(avatarStatus, "Uploading for review...", true);
                     const dataUrl = avatarCanvas.toDataURL("image/png", 0.92);
                     const result = await apiFetch("/api/upload/avatar", {
                         method: "POST",
@@ -441,10 +541,11 @@
                                 x: Number(avatarX.value || 0),
                                 y: Number(avatarY.value || 0),
                                 size: 1 / Number(avatarZoom.value || 1),
+                                rotate: Number(avatarRotate.value || 0),
                             },
                         }),
                     });
-                    setMessage(avatarStatus, result.message || "プロフィール画像をレビューへ送信しました。", true);
+                    setMessage(avatarStatus, result.message || "Profile picture submitted for review.", true);
                     await refreshProfileDetails();
                 } catch (error) {
                     setMessage(avatarStatus, error.message, false);
@@ -488,7 +589,7 @@
                         );
                         setMessage(
                             profileStatus,
-                            profile.message || "プロフィール変更をレビューへ送信しました。",
+                            profile.message || "Profile change submitted for review.",
                             true,
                         );
                         await refreshProfileDetails();
@@ -526,7 +627,7 @@
                 const box = document.getElementById("profile-reactions");
                 if (!box) return;
                 if (!Array.isArray(reactions) || !reactions.length) {
-                    box.textContent = "読者評価やコメントはまだありません。";
+                    box.textContent = "No reader ratings or comments yet.";
                     return;
                 }
                 box.innerHTML = reactions
@@ -541,19 +642,7 @@
                         const category = item.category
                             ? ` • ${item.category}`
                             : "";
-                        const content = String(
-                            item.content || "Rating only.",
-                        ).replace(
-                            /[&<>"]/g,
-                            (c) =>
-                                ({
-                                    "&": "&amp;",
-                                    "<": "&lt;",
-                                    ">": "&gt;",
-                                    '"': "&quot;",
-                                })[c],
-                        );
-                        return `<div class="post-comment"><strong>${target}</strong>${rating}${category}<br>${content}</div>`;
+                        return `<div class="post-comment"><strong>${target}</strong>${rating}${category}<br>${String(item.content || "Rating only.").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c])}</div>`;
                     })
                     .join("");
             }
@@ -637,7 +726,7 @@
                 const bookmarks = data.bookmarks || [];
                 if (!bookmarks.length) {
                     document.getElementById("bookmarks").textContent =
-                        "ブックマークはまだありません。";
+                        "No bookmarks yet.";
                     return;
                 }
                 document.getElementById("bookmarks").innerHTML = bookmarks

@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.app.ActivityCompat;
 import android.os.Bundle;
 import android.webkit.CookieManager;
+import android.webkit.ValueCallback;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebChromeClient;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
   private static final String LEGACY_WEB_HOST = "https://threadborn.vercel.app";
   private static final String APP_SITE_PREFIX = "https://appassets.androidplatform.net/assets/site";
   private WebView webView;
+  private ValueCallback<Uri[]> filePathCallback;
+  private static final int IMAGE_PERMISSION_REQUEST = 202;
+  private static final int FILE_CHOOSER_REQUEST = 203;
 
   @SuppressLint("SetJavaScriptEnabled")
   @Override
@@ -59,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     settings.setJavaScriptEnabled(true);
     settings.setDomStorageEnabled(true);
     settings.setDatabaseEnabled(true);
-    settings.setAllowFileAccess(true);
+    settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(true);
     settings.setUseWideViewPort(true);
     settings.setLoadWithOverviewMode(true);
@@ -68,15 +72,29 @@ public class MainActivity extends AppCompatActivity {
     settings.setDisplayZoomControls(false);
     settings.setMediaPlaybackRequiresUserGesture(false);
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-    settings.setAllowFileAccessFromFileURLs(true);
-    settings.setAllowUniversalAccessFromFileURLs(true);
+    settings.setAllowFileAccessFromFileURLs(false);
+    settings.setAllowUniversalAccessFromFileURLs(false);
     settings.setGeolocationEnabled(true);
     webView.clearCache(true);
 
     webView.setWebChromeClient(new WebChromeClient() {
       @Override
       public void onPermissionRequest(final PermissionRequest request) {
-        request.grant(request.getResources());
+        request.deny();
+      }
+
+      @Override
+      public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        if (MainActivity.this.filePathCallback != null) {
+          MainActivity.this.filePathCallback.onReceiveValue(null);
+        }
+        MainActivity.this.filePathCallback = filePathCallback;
+        if (!hasImagePermission()) {
+          requestImagePermission();
+          return true;
+        }
+        openImageChooser();
+        return true;
       }
     });
     webView.addJavascriptInterface(new AndroidBridge(this), "AndroidBridge");
@@ -216,6 +234,69 @@ public class MainActivity extends AppCompatActivity {
 
   void showToast(String message) {
     runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+  }
+
+  boolean hasImagePermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+    }
+    return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+  }
+
+  void requestImagePermission() {
+    if (hasImagePermission()) {
+      openImageChooser();
+      return;
+    }
+    String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+      ? Manifest.permission.READ_MEDIA_IMAGES
+      : Manifest.permission.READ_EXTERNAL_STORAGE;
+    ActivityCompat.requestPermissions(this, new String[]{permission}, IMAGE_PERMISSION_REQUEST);
+  }
+
+  private void openImageChooser() {
+    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType("image/*");
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    try {
+      startActivityForResult(Intent.createChooser(intent, "Choose profile picture"), FILE_CHOOSER_REQUEST);
+    } catch (ActivityNotFoundException error) {
+      showToast("No image picker found");
+      if (filePathCallback != null) {
+        filePathCallback.onReceiveValue(null);
+        filePathCallback = null;
+      }
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (requestCode == IMAGE_PERMISSION_REQUEST) {
+      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        openImageChooser();
+      } else {
+        showToast("Image permission denied");
+        if (filePathCallback != null) {
+          filePathCallback.onReceiveValue(null);
+          filePathCallback = null;
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == FILE_CHOOSER_REQUEST && filePathCallback != null) {
+      Uri[] results = null;
+      if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+        results = new Uri[]{data.getData()};
+      }
+      filePathCallback.onReceiveValue(results);
+      filePathCallback = null;
+    }
   }
 
   private void openExternal(String url) {

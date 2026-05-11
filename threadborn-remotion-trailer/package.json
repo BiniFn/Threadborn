@@ -1,0 +1,22 @@
+{
+  "name": "threadborn-remotion-trailer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "preview": "remotion studio src/index.ts",
+    "still": "remotion still src/index.ts ThreadbornTrailer --frame=540 --scale=0.35 out/threadborn-still.png",
+    "render": "remotion render src/index.ts ThreadbornTrailer out/threadborn-trailer.mp4 --codec=h264 --audio-codec=aac"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.459",
+    "@remotion/media": "4.0.459",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "remotion": "4.0.459",
+    "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.17",
+    "@types/react-dom": "19.1.11"
+  }
+}

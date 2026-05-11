@@ -77,6 +77,24 @@ function redirectTo(res, location, statusCode = 302) {
   res.end("");
 }
 
+function isTrustedImageBytes(contentType, bytes) {
+  if (!Buffer.isBuffer(bytes) || bytes.length < 12) return false;
+  if (contentType === "image/png") {
+    return bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+  }
+  if (contentType === "image/jpeg") {
+    return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[bytes.length - 2] === 0xff && bytes[bytes.length - 1] === 0xd9;
+  }
+  if (contentType === "image/gif") {
+    const header = bytes.slice(0, 6).toString("ascii");
+    return header === "GIF87a" || header === "GIF89a";
+  }
+  if (contentType === "image/webp") {
+    return bytes.slice(0, 4).toString("ascii") === "RIFF" && bytes.slice(8, 12).toString("ascii") === "WEBP";
+  }
+  return false;
+}
+
 function googleAuthPayload(user, session, req) {
   const payload = {
     user: {
@@ -2111,6 +2129,25 @@ exports.handleAvatar = (() => {
 
 
 
+function hasValidImageSignature(contentType, bytes) {
+  if (!Buffer.isBuffer(bytes) || bytes.length < 12) {
+    return false;
+  }
+  if (contentType === "image/png") {
+    return bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+  }
+  if (contentType === "image/jpeg") {
+    return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[bytes.length - 2] === 0xff && bytes[bytes.length - 1] === 0xd9;
+  }
+  if (contentType === "image/gif") {
+    return bytes.slice(0, 6).toString("ascii") === "GIF87a" || bytes.slice(0, 6).toString("ascii") === "GIF89a";
+  }
+  if (contentType === "image/webp") {
+    return bytes.slice(0, 4).toString("ascii") === "RIFF" && bytes.slice(8, 12).toString("ascii") === "WEBP";
+  }
+  return false;
+}
+
 
 
 return async (req, res) => {
@@ -2168,8 +2205,19 @@ return async (req, res) => {
       fail(res, 400, "Image too large (max 3MB)");
       return;
     }
+    if (!hasValidImageSignature(contentType, bytes)) {
+      fail(res, 400, "Image file signature does not match its type");
+      return;
+    }
 
-    const ext = contentType.includes("png") ? "png" : "jpg";
+    const ext =
+      contentType === "image/png"
+        ? "png"
+        : contentType === "image/webp"
+          ? "webp"
+          : contentType === "image/gif"
+            ? "gif"
+            : "jpg";
     const purpose = String(body.purpose || "avatar").trim().toLowerCase();
     if (purpose === "community") {
       const fileName = `community/pending/${session.user_id}-${Date.now()}.${ext}`;
@@ -2201,6 +2249,7 @@ return async (req, res) => {
           x: Math.max(-1, Math.min(1, Number(crop.x) || 0)),
           y: Math.max(-1, Math.min(1, Number(crop.y) || 0)),
           size: Math.max(0.1, Math.min(1, Number(crop.size) || 1)),
+          rotate: Math.max(-180, Math.min(180, Number(crop.rotate) || 0)),
         },
       },
     );
@@ -2817,13 +2866,27 @@ return async (req, res) => {
         }
 
         const contentType = typeMatch[1];
+        const allowedTypes = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
+        if (!allowedTypes.has(contentType)) {
+          return fail(res, 400, "Only JPEG, PNG, GIF, and WebP images are allowed");
+        }
         const bytes = Buffer.from(base64, "base64");
 
         if (bytes.length > 5 * 1024 * 1024) {
           return fail(res, 400, "Image too large (max 5MB)");
         }
+        if (!isTrustedImageBytes(contentType, bytes)) {
+          return fail(res, 400, "Image file signature does not match its type");
+        }
 
-        const ext = contentType.includes("png") ? "png" : "jpg";
+        const ext =
+          contentType === "image/png"
+            ? "png"
+            : contentType === "image/webp"
+              ? "webp"
+              : contentType === "image/gif"
+                ? "gif"
+                : "jpg";
         const fileName = `art/${characterName.toLowerCase().replace(/[^a-z0-9]/g, "_")}-${Date.now()}.${ext}`;
 
         const blob = await put(fileName, bytes, {

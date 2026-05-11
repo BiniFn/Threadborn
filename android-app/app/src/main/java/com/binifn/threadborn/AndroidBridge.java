@@ -116,5 +116,14 @@ public class AndroidBridge {
   public String getDeviceInfo() {
     return "Android " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")";
   }
-}
 
+  @JavascriptInterface
+  public boolean hasImagePermission() {
+    return activity.hasImagePermission();
+  }
+
+  @JavascriptInterface
+  public void requestImagePermission() {
+    activity.runOnUiThread(() -> activity.requestImagePermission());
+  }
+}

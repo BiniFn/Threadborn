@@ -74,7 +74,7 @@
             href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap"
             rel="stylesheet"
         />
-        <link rel="stylesheet" href="./global.css?v=43" />
+        <link rel="stylesheet" href="./global.css?v=48" />
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css"
@@ -179,6 +179,13 @@
                         onclick="switchView('drawings')"
                     >
                         Drawings
+                    </button>
+                    <button
+                        class="nav-btn"
+                        data-view="manga"
+                        onclick="switchView('manga')"
+                    >
+                        Manga
                     </button>
                     <button
                         class="nav-btn"
@@ -704,6 +711,46 @@
                         </article>
                     </div>
                 </article>
+            </section>
+
+            <section id="view-manga" class="view">
+                <div class="section-head">
+                    <div>
+                        <h2>Manga Coming Soon</h2>
+                        <p class="section-copy">
+                            A cleaner teaser space for the future manga
+                            adaptation without crowding the reader.
+                        </p>
+                    </div>
+                </div>
+                <div class="manga-teaser-grid">
+                    <article class="manga-teaser-card">
+                        <span class="manga-teaser-tag">Teaser 01</span>
+                        <strong>The Bridge Scene</strong>
+                        <p>
+                            The first adaptation preview will focus on rain,
+                            neon, the impossible push, and Yono falling into
+                            the story that refuses to let him stay dead.
+                        </p>
+                    </article>
+                    <article class="manga-teaser-card">
+                        <span class="manga-teaser-tag">Teaser 02</span>
+                        <strong>Lumera Awakens</strong>
+                        <p>
+                            Early concept panels will explore the first sky,
+                            the thread glow, Violet's entrance, and the quiet
+                            horror behind the Covenant.
+                        </p>
+                    </article>
+                    <article class="manga-teaser-card">
+                        <span class="manga-teaser-tag">Status</span>
+                        <strong>Adaptation Prep</strong>
+                        <p>
+                            Character sheets, page tests, and chapter previews
+                            will appear here once they are ready for readers.
+                        </p>
+                    </article>
+                </div>
             </section>
 
             <section id="view-volumes" class="view">
@@ -1790,6 +1837,13 @@
             </button>
             <button
                 class="nav-btn"
+                data-view="manga"
+                onclick="switchView('manga')"
+            >
+                Manga
+            </button>
+            <button
+                class="nav-btn"
                 data-view="community"
                 onclick="switchView('community')"
             >
@@ -2120,6 +2174,7 @@
                         <option value="ocean">Ocean</option>
                         <option value="sunset">Sunset</option>
                         <option value="midnight">Midnight</option>
+                        <option value="amoled">AMOLED</option>
                     </select>
                 </label>
 
@@ -2153,6 +2208,57 @@
                         aria-label="Reader text size"
                     />
                 </label>
+
+                <label class="toolbar-pill">
+                    <span class="pill-label">Line spacing</span>
+                    <div class="toolbar-value" id="line-height-output">1.95</div>
+                    <input
+                        id="line-height-range"
+                        type="range"
+                        min="1.55"
+                        max="2.35"
+                        step="0.05"
+                        value="1.95"
+                        oninput="setReaderLineHeight(this.value, false)"
+                        onchange="setReaderLineHeight(this.value)"
+                        aria-label="Reader line spacing"
+                    />
+                </label>
+
+                <label class="toolbar-pill">
+                    <span class="pill-label">Reading width</span>
+                    <div class="toolbar-value" id="width-output">820px</div>
+                    <input
+                        id="width-range"
+                        type="range"
+                        min="560"
+                        max="980"
+                        step="20"
+                        value="820"
+                        oninput="setReaderWidth(this.value, false)"
+                        onchange="setReaderWidth(this.value)"
+                        aria-label="Reader width"
+                    />
+                </label>
+
+                <div class="toolbar-pill">
+                    <span class="pill-label">Focus mode</span>
+                    <div class="toolbar-value">Distraction free</div>
+                    <p class="toolbar-note">
+                        Hide chrome while reading. Tap tools or press Escape to
+                        bring everything back.
+                    </p>
+                    <div class="toolbar-actions">
+                        <button
+                            class="ghost-btn"
+                            type="button"
+                            id="focus-mode-btn"
+                            onclick="toggleFocusMode()"
+                        >
+                            Enter focus
+                        </button>
+                    </div>
+                </div>
 
                 <label class="toolbar-pill">
                     <span class="pill-label">Reading speed</span>
@@ -6843,6 +6949,10 @@
             );
             let activePage = 0;
             let readerSize = 18;
+            let readerLineHeight = 1.95;
+            let readerWidth = 820;
+            let readerFocusMode = false;
+            let ttsWakeLock = null;
             let activeHomeVolume = "Volume 1";
             let readerTheme = "night";
             const readerThemes = [
@@ -6853,6 +6963,7 @@
                 "ocean",
                 "sunset",
                 "midnight",
+                "amoled",
             ];
             let readerToolsOpen = false;
             let currentLanguage = "en";
@@ -6971,7 +7082,10 @@
                     user && (user.displayName || user.email)
                         ? user.displayName || user.email
                         : "Guest reader";
-                const avatar = "assets/threadborn-app-icon.png";
+                const avatar =
+                    user && user.avatarUrl
+                        ? `${user.avatarUrl}${String(user.avatarUrl).includes("?") ? "&" : "?"}v=${encodeURIComponent(user.updatedAt || user.id || Date.now())}`
+                        : "assets/threadborn-app-icon.png";
                 nameEl.textContent = displayName;
                 avatarEl.src = avatar;
             }
@@ -7681,6 +7795,11 @@
                         night: "Night",
                         paper: "Paper",
                         ember: "Ember",
+                        forest: "Forest",
+                        ocean: "Ocean",
+                        sunset: "Sunset",
+                        midnight: "Midnight",
+                        amoled: "AMOLED",
                     }[theme] || "Night"
                 );
             }
@@ -7714,6 +7833,7 @@
                     "reader-theme-ocean",
                     "reader-theme-sunset",
                     "reader-theme-midnight",
+                    "reader-theme-amoled",
                 );
                 document.body.classList.add(`reader-theme-${readerTheme}`);
 
@@ -7774,6 +7894,69 @@
                 if (persist) {
                     saveProgress();
                 }
+            }
+
+            function applyReaderLineHeight() {
+                const value = Math.max(
+                    1.55,
+                    Math.min(2.35, Number(readerLineHeight) || 1.95),
+                );
+                readerLineHeight = value;
+                document.documentElement.style.setProperty(
+                    "--reader-line-height",
+                    String(value),
+                );
+                const output = document.getElementById("line-height-output");
+                const range = document.getElementById("line-height-range");
+                if (output) output.textContent = value.toFixed(2);
+                if (range) range.value = String(value);
+            }
+
+            function setReaderLineHeight(value, persist = true) {
+                readerLineHeight = Math.max(
+                    1.55,
+                    Math.min(2.35, Number(value) || 1.95),
+                );
+                applyReaderLineHeight();
+                if (persist) saveProgress();
+            }
+
+            function applyReaderWidth() {
+                const value = Math.max(
+                    560,
+                    Math.min(980, Number(readerWidth) || 820),
+                );
+                readerWidth = value;
+                document.documentElement.style.setProperty(
+                    "--reader-width",
+                    `${value}px`,
+                );
+                const output = document.getElementById("width-output");
+                const range = document.getElementById("width-range");
+                if (output) output.textContent = `${value}px`;
+                if (range) range.value = String(value);
+            }
+
+            function setReaderWidth(value, persist = true) {
+                readerWidth = Math.max(560, Math.min(980, Number(value) || 820));
+                applyReaderWidth();
+                if (persist) saveProgress();
+            }
+
+            function toggleFocusMode(force) {
+                readerFocusMode =
+                    typeof force === "boolean" ? force : !readerFocusMode;
+                document.body.classList.toggle(
+                    "reader-focus-mode",
+                    readerFocusMode,
+                );
+                const button = document.getElementById("focus-mode-btn");
+                if (button) {
+                    button.textContent = readerFocusMode
+                        ? "Exit focus"
+                        : "Enter focus";
+                }
+                saveProgress();
             }
 
             async function installWebApp() {
@@ -8718,6 +8901,10 @@
                 if (!chapter || !chapter.pages || !chapter.pages.length) {
                     return;
                 }
+                const reader = document.getElementById("reader");
+                if (reader) {
+                    reader.classList.add("reader-page-transitioning");
+                }
                 const totalPages = chapter.pages.length;
                 const hasPrevChapter = activeChapter > 0;
                 const hasNextChapter = activeChapter < chapters.length - 1;
@@ -8754,8 +8941,17 @@
                     );
                 }
 
-                document.getElementById("reader-content").innerHTML =
-                    pageContent;
+                const contentEl = document.getElementById("reader-content");
+                contentEl.innerHTML = pageContent;
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        if (reader) {
+                            reader.classList.remove(
+                                "reader-page-transitioning",
+                            );
+                        }
+                    });
+                });
                 document.getElementById("page-indicator").textContent =
                     `Page ${activePage + 1} / ${totalPages}`;
                 prevButton.disabled = activePage === 0 && !hasPrevChapter;
@@ -8854,6 +9050,30 @@
 
             function updateTtsStatus(text) {
                 document.getElementById("tts-status").textContent = text;
+            }
+
+            async function requestTtsWakeLock() {
+                if (!("wakeLock" in navigator) || ttsWakeLock) {
+                    return;
+                }
+                try {
+                    ttsWakeLock = await navigator.wakeLock.request("screen");
+                    ttsWakeLock.addEventListener("release", () => {
+                        ttsWakeLock = null;
+                    });
+                } catch (_) {
+                    ttsWakeLock = null;
+                }
+            }
+
+            async function releaseTtsWakeLock() {
+                if (!ttsWakeLock) {
+                    return;
+                }
+                try {
+                    await ttsWakeLock.release();
+                } catch (_) {}
+                ttsWakeLock = null;
             }
 
             function getTtsVoiceValue() {
@@ -9345,11 +9565,13 @@
                 if (!ttsKeepReading) {
                     updateTtsStatus("TTS ready");
                     ttsKeepReading = false;
+                    releaseTtsWakeLock();
                     return;
                 }
                 if (atLastPage && atLastChapter) {
                     updateTtsStatus("End of story reached");
                     ttsKeepReading = false;
+                    releaseTtsWakeLock();
                     return;
                 }
                 if (atLastPage) {
@@ -9487,6 +9709,19 @@
                 };
 
                 window.speechSynthesis.speak(utterance);
+                const keepAlive = setInterval(() => {
+                    if (tick !== ttsRenderTick || !ttsKeepReading) {
+                        clearInterval(keepAlive);
+                        return;
+                    }
+                    if (
+                        "speechSynthesis" in window &&
+                        window.speechSynthesis.speaking &&
+                        !window.speechSynthesis.paused
+                    ) {
+                        window.speechSynthesis.resume();
+                    }
+                }, 12000);
                 setTimeout(() => {
                     if (
                         tick === ttsRenderTick &&
@@ -9506,6 +9741,7 @@
                 }
 
                 stopSpeech(false);
+                requestTtsWakeLock();
                 ttsKeepReading = true;
                 ttsRenderTick += 1;
                 const tick = ttsRenderTick;
@@ -9531,6 +9767,7 @@
             function toggleSpeechPause() {
                 if (useCloudTts() && ttsAudio) {
                     if (ttsAudio.paused) {
+                        requestTtsWakeLock();
                         ttsAudio.play();
                         updateTtsStatus("Reading");
                         const segment = ttsSegments[ttsSegmentIndex];
@@ -9549,6 +9786,7 @@
                 }
 
                 if (window.speechSynthesis.paused) {
+                    requestTtsWakeLock();
                     window.speechSynthesis.resume();
                     updateTtsStatus("Reading aloud");
                     const segment = ttsSegments[ttsSegmentIndex];
@@ -9580,6 +9818,7 @@
                 if (update) {
                     updateTtsStatus("Stopped");
                 }
+                releaseTtsWakeLock();
             }
 
             function copyCurrentPage() {
@@ -11168,6 +11407,9 @@
                     chapter: activeChapter,
                     page: activePage,
                     size: readerSize,
+                    lineHeight: readerLineHeight,
+                    width: readerWidth,
+                    focusMode: readerFocusMode,
                     theme: readerTheme,
                     language: currentLanguage,
                     voicePitch:
@@ -11191,6 +11433,9 @@
                         activeChapter = progress.chapter || 0;
                         activePage = progress.page || 0;
                         readerSize = progress.size || 18;
+                        readerLineHeight = progress.lineHeight || 1.95;
+                        readerWidth = progress.width || 820;
+                        readerFocusMode = Boolean(progress.focusMode);
                         readerTheme = progress.theme || "night";
                         currentLanguage = progress.language || "en";
 
@@ -11279,6 +11524,12 @@
                             activeChapter = storedProgress.chapter || 0;
                             activePage = storedProgress.page || 0;
                             readerSize = storedProgress.size || 18;
+                            readerLineHeight =
+                                storedProgress.lineHeight || 1.95;
+                            readerWidth = storedProgress.width || 820;
+                            readerFocusMode = Boolean(
+                                storedProgress.focusMode,
+                            );
                             readerTheme = storedProgress.theme || "night";
                             currentLanguage = storedProgress.language || "en";
 
@@ -11298,6 +11549,9 @@
                     chapter: activeChapter,
                     page: activePage,
                     size: readerSize,
+                    lineHeight: readerLineHeight,
+                    width: readerWidth,
+                    focusMode: readerFocusMode,
                     theme: readerTheme,
                     language: currentLanguage,
                     voicePitch:
@@ -11406,13 +11660,49 @@
                 }
 
                 if (event.key === "Escape") {
-                    closeReader();
+                    if (readerFocusMode) {
+                        toggleFocusMode(false);
+                    } else {
+                        closeReader();
+                    }
                 } else if (event.key === "ArrowRight") {
                     changePage(1);
                 } else if (event.key === "ArrowLeft") {
                     changePage(-1);
                 }
             });
+
+            (() => {
+                const body = document.querySelector(".reader-body");
+                if (!body) return;
+                let startX = 0;
+                let startY = 0;
+                body.addEventListener(
+                    "touchstart",
+                    (event) => {
+                        const touch = event.touches && event.touches[0];
+                        if (!touch) return;
+                        startX = touch.clientX;
+                        startY = touch.clientY;
+                    },
+                    { passive: true },
+                );
+                body.addEventListener(
+                    "touchend",
+                    (event) => {
+                        const touch =
+                            event.changedTouches && event.changedTouches[0];
+                        if (!touch) return;
+                        const dx = touch.clientX - startX;
+                        const dy = touch.clientY - startY;
+                        if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.4) {
+                            return;
+                        }
+                        changePage(dx < 0 ? 1 : -1);
+                    },
+                    { passive: true },
+                );
+            })();
 
             const communityImageInput =
                 document.getElementById("community-image");
@@ -11454,6 +11744,9 @@
             renderBookmarks();
             initializeBrightness();
             applyReaderSize();
+            applyReaderLineHeight();
+            applyReaderWidth();
+            toggleFocusMode(readerFocusMode);
             applyReaderTheme();
             updateResumeButton();
             applyAppMode();
@@ -11536,8 +11829,8 @@
             }
         </style>
 
-        <script src="./assets/notifications.js?v=43"></script>
-        <script src="./assets/phase1-client.js?v=43"></script>
+        <script src="./assets/notifications.js?v=48"></script>
+        <script src="./assets/phase1-client.js?v=48"></script>
         <script>
             if ("serviceWorker" in navigator) {
                 let newWorker;

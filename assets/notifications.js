@@ -297,6 +297,13 @@
       badge.textContent   = total > 9 ? "9+" : total || "";
       badge.style.display = total > 0 ? "" : "none";
     }
+    try {
+      if ("setAppBadge" in navigator && _notifUnread > 0) {
+        navigator.setAppBadge(_notifUnread).catch(() => {});
+      } else if ("clearAppBadge" in navigator) {
+        navigator.clearAppBadge().catch(() => {});
+      }
+    } catch (_) {}
   }
 
   function renderNotifDropdown() {
@@ -351,10 +358,13 @@
   async function requestPushPermission() {
     const btn = document.getElementById("push-enable-btn");
 
-    // Android — permission is handled natively, just show a toast
+    // Android — permission is handled natively by the wrapper, keep app state in sync
     if (isAndroid()) {
       if (typeof window.AndroidBridge?.syncDataStore === "function") {
         window.AndroidBridge.syncDataStore(JSON.stringify({ pushRequested: true }));
+      }
+      if (typeof Notification !== "undefined" && Notification.permission === "default") {
+        try { await Notification.requestPermission(); } catch (_) {}
       }
       if (btn) {
         btn.innerHTML = "🔔 <span class='push-label'>Notifications On</span>";
@@ -424,7 +434,10 @@
             }),
           });
         }
-      } catch (_) { /* VAPID optional — local notifications still work */ }
+      } catch (error) {
+        console.warn("[TB_Notif] VAPID subscription failed, keeping local notifications:", error);
+        localStorage.setItem("threadborn_push_retry_at", String(Date.now() + 10 * 60 * 1000));
+      }
 
       localStorage.setItem(STORAGE_KEY_PUSH, "1");
       updatePushButtonState();
@@ -469,6 +482,15 @@
       btn.onclick      = requestPushPermission;
     }
     btn.disabled = false;
+  }
+
+  async function retryPushRegistrationIfNeeded() {
+    const retryAt = Number(localStorage.getItem("threadborn_push_retry_at") || 0);
+    if (!retryAt || Date.now() < retryAt) return;
+    localStorage.removeItem("threadborn_push_retry_at");
+    if (localStorage.getItem(STORAGE_KEY_PUSH) === "1") {
+      await requestPushPermission();
+    }
   }
 
   // ─── Notification Panel Toggle ────────────────────────────────────────────
@@ -569,6 +591,7 @@
     // Content polling
     pollContent();
     setInterval(pollContent, POLL_INTERVAL_MS);
+    retryPushRegistrationIfNeeded().catch(() => {});
 
     // Server notifications for logged-in users
     if (_authUser) {

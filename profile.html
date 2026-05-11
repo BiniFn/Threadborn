@@ -48,7 +48,7 @@
             href="./assets/threadborn-apple-touch.png"
         />
 
-        <link rel="stylesheet" href="./global.css?v=43" />
+        <link rel="stylesheet" href="./global.css?v=48" />
     </head>
     <body>
         <main class="auth-shell">
@@ -129,9 +129,21 @@
                 <p class="muted">
                     Pick an image, crop it into a square, then submit it for admin review.
                 </p>
-                <input id="avatar-file" class="input-field" type="file" accept="image/*" />
+                <label id="avatar-upload-zone" class="avatar-upload-zone" for="avatar-file">
+                    <input id="avatar-file" type="file" accept="image/*" />
+                    <span class="avatar-upload-copy">
+                        <strong>Drop an image or tap to choose</strong>
+                        <span class="muted">PNG, JPEG, WebP, or GIF. Crop changes go to admin review.</span>
+                    </span>
+                </label>
                 <div id="avatar-crop-wrap" class="avatar-crop-wrap" hidden>
-                    <canvas id="avatar-crop-canvas" width="320" height="320" aria-label="Avatar crop preview"></canvas>
+                    <div class="avatar-preview-row">
+                        <canvas id="avatar-crop-canvas" width="512" height="512" aria-label="Avatar crop preview"></canvas>
+                        <div>
+                            <div id="avatar-circle-preview" class="avatar-circle-preview" aria-label="Circular avatar preview"></div>
+                            <button id="reload-current-avatar" class="ghost-btn" type="button" style="margin-top: 12px">Re-edit current</button>
+                        </div>
+                    </div>
                     <div class="avatar-crop-controls">
                         <label for="avatar-zoom">Zoom</label>
                         <input id="avatar-zoom" type="range" min="1" max="3" step="0.01" value="1" />
@@ -139,6 +151,13 @@
                         <input id="avatar-x" type="range" min="-1" max="1" step="0.01" value="0" />
                         <label for="avatar-y">Vertical</label>
                         <input id="avatar-y" type="range" min="-1" max="1" step="0.01" value="0" />
+                        <label for="avatar-rotate">Rotate</label>
+                        <input id="avatar-rotate" type="range" min="-180" max="180" step="1" value="0" />
+                        <div class="crop-button-row">
+                            <button id="rotate-left" class="ghost-btn" type="button">Rotate left</button>
+                            <button id="rotate-right" class="ghost-btn" type="button">Rotate right</button>
+                            <button id="crop-reset" class="ghost-btn" type="button">Reset crop</button>
+                        </div>
                     </div>
                 </div>
                 <button
@@ -316,6 +335,9 @@
             const avatarZoom = document.getElementById("avatar-zoom");
             const avatarX = document.getElementById("avatar-x");
             const avatarY = document.getElementById("avatar-y");
+            const avatarRotate = document.getElementById("avatar-rotate");
+            const avatarUploadZone = document.getElementById("avatar-upload-zone");
+            const avatarCirclePreview = document.getElementById("avatar-circle-preview");
             const saveAvatarBtn = document.getElementById("save-avatar");
             const avatarCtx = avatarCanvas?.getContext("2d");
             let avatarImage = null;
@@ -364,6 +386,23 @@
                 );
             }
 
+            async function requestAndroidImagePermission() {
+                if (!window.AndroidBridge?.requestImagePermission) {
+                    return true;
+                }
+                try {
+                    window.AndroidBridge.requestImagePermission();
+                } catch (_) {}
+                return true;
+            }
+
+            function resetCropControls() {
+                avatarZoom.value = "1";
+                avatarX.value = "0";
+                avatarY.value = "0";
+                avatarRotate.value = "0";
+            }
+
             function drawAvatarCrop() {
                 if (!avatarImage || !avatarCtx || !avatarCanvas) return;
                 const size = avatarCanvas.width;
@@ -376,7 +415,41 @@
                 const height = avatarImage.height * scale;
                 const x = (size - width) / 2 + Number(avatarX.value || 0) * size * 0.35;
                 const y = (size - height) / 2 + Number(avatarY.value || 0) * size * 0.35;
-                avatarCtx.drawImage(avatarImage, x, y, width, height);
+                avatarCtx.save();
+                avatarCtx.translate(size / 2, size / 2);
+                avatarCtx.rotate((Number(avatarRotate.value || 0) * Math.PI) / 180);
+                avatarCtx.drawImage(avatarImage, x - size / 2, y - size / 2, width, height);
+                avatarCtx.restore();
+                if (avatarCirclePreview) {
+                    avatarCirclePreview.style.backgroundImage = `url(${avatarCanvas.toDataURL("image/png", 0.92)})`;
+                }
+            }
+
+            function loadAvatarFile(file) {
+                if (!file) return;
+                if (!file.type.startsWith("image/")) {
+                    setMessage(avatarStatus, "Choose an image file.", false);
+                    return;
+                }
+                if (file.size > 6 * 1024 * 1024) {
+                    setMessage(avatarStatus, "Choose an image under 6MB.", false);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const image = new Image();
+                    image.onload = () => {
+                        avatarImage = image;
+                        avatarCropWrap.hidden = false;
+                        saveAvatarBtn.disabled = false;
+                        resetCropControls();
+                        drawAvatarCrop();
+                        setMessage(avatarStatus, "Crop the image, then submit it for review.", true);
+                    };
+                    image.onerror = () => setMessage(avatarStatus, "Could not read that image.", false);
+                    image.src = String(reader.result || "");
+                };
+                reader.readAsDataURL(file);
             }
 
             function renderPendingRequests(items = []) {
@@ -402,33 +475,54 @@
                     .join("");
             }
 
-            avatarFile?.addEventListener("change", () => {
-                const file = avatarFile.files && avatarFile.files[0];
-                if (!file) return;
-                if (!file.type.startsWith("image/")) {
-                    setMessage(avatarStatus, "Choose an image file.", false);
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const image = new Image();
-                    image.onload = () => {
-                        avatarImage = image;
-                        avatarCropWrap.hidden = false;
-                        saveAvatarBtn.disabled = false;
-                        avatarZoom.value = "1";
-                        avatarX.value = "0";
-                        avatarY.value = "0";
-                        drawAvatarCrop();
-                        setMessage(avatarStatus, "Crop the image, then submit it for review.", true);
-                    };
-                    image.src = String(reader.result || "");
-                };
-                reader.readAsDataURL(file);
+            avatarUploadZone?.addEventListener("click", requestAndroidImagePermission);
+            avatarUploadZone?.addEventListener("dragover", (event) => {
+                event.preventDefault();
+                avatarUploadZone.classList.add("dragging");
+            });
+            avatarUploadZone?.addEventListener("dragleave", () => {
+                avatarUploadZone.classList.remove("dragging");
+            });
+            avatarUploadZone?.addEventListener("drop", (event) => {
+                event.preventDefault();
+                avatarUploadZone.classList.remove("dragging");
+                loadAvatarFile(event.dataTransfer?.files?.[0]);
             });
 
-            [avatarZoom, avatarX, avatarY].forEach((control) => {
+            avatarFile?.addEventListener("change", () => {
+                loadAvatarFile(avatarFile.files && avatarFile.files[0]);
+            });
+
+            [avatarZoom, avatarX, avatarY, avatarRotate].forEach((control) => {
                 control?.addEventListener("input", drawAvatarCrop);
+            });
+
+            document.getElementById("rotate-left")?.addEventListener("click", () => {
+                avatarRotate.value = String(Number(avatarRotate.value || 0) - 90);
+                drawAvatarCrop();
+            });
+            document.getElementById("rotate-right")?.addEventListener("click", () => {
+                avatarRotate.value = String(Number(avatarRotate.value || 0) + 90);
+                drawAvatarCrop();
+            });
+            document.getElementById("crop-reset")?.addEventListener("click", () => {
+                resetCropControls();
+                drawAvatarCrop();
+            });
+            document.getElementById("reload-current-avatar")?.addEventListener("click", () => {
+                const source = avatarEl.src;
+                if (!source) return;
+                const image = new Image();
+                image.crossOrigin = "anonymous";
+                image.onload = () => {
+                    avatarImage = image;
+                    avatarCropWrap.hidden = false;
+                    saveAvatarBtn.disabled = false;
+                    resetCropControls();
+                    drawAvatarCrop();
+                };
+                image.onerror = () => setMessage(avatarStatus, "Current image cannot be re-edited from cache. Choose the original file again.", false);
+                image.src = source + (source.includes("?") ? "&" : "?") + "edit=" + Date.now();
             });
 
             saveAvatarBtn?.addEventListener("click", async () => {
@@ -447,6 +541,7 @@
                                 x: Number(avatarX.value || 0),
                                 y: Number(avatarY.value || 0),
                                 size: 1 / Number(avatarZoom.value || 1),
+                                rotate: Number(avatarRotate.value || 0),
                             },
                         }),
                     });
