@@ -126,6 +126,13 @@
                     </button>
                     <button
                         class="nav-btn"
+                        data-view="reactions"
+                        onclick="switchView('reactions')"
+                    >
+                        Discuss
+                    </button>
+                    <button
+                        class="nav-btn"
                         data-view="chapters"
                         onclick="switchView('chapters')"
                     >
@@ -822,6 +829,21 @@
                         Loading public reactions...
                     </div>
                     <div id="comment-list" class="comment-list"></div>
+                </article>
+            </section>
+
+            <section id="view-profile" class="view">
+                <div class="section-head">
+                    <div>
+                        <h2 id="public-profile-heading">Reader Profile</h2>
+                        <p class="section-copy">
+                            Public reader profile, comments, theories, ratings,
+                            and community posts.
+                        </p>
+                    </div>
+                </div>
+                <article class="card public-profile-card" id="public-profile-card">
+                    <div class="muted">Choose a reader from Discuss.</div>
                 </article>
             </section>
 
@@ -1824,6 +1846,13 @@
                 onclick="switchView('reactions')"
             >
                 Ratings
+            </button>
+            <button
+                class="nav-btn"
+                data-view="reactions"
+                onclick="switchView('reactions')"
+            >
+                Discuss
             </button>
             <button
                 class="nav-btn"
@@ -6989,6 +7018,8 @@
             const communityImageState = { dataUrl: "" };
             let spoilerRevealEnabled = false;
 
+            window.openPublicProfile = openPublicProfile;
+
             Object.defineProperties(window, {
                 chapters: { configurable: true, get: () => chapters },
                 activeChapter: {
@@ -7238,6 +7269,8 @@
                         const when = reaction.createdAt
                             ? formatCommunityTime(reaction.createdAt)
                             : "just now";
+                        const username = escapeHtml(user.username || "Reader");
+                        const avatar = safeImageUrl(user.avatarUrl);
                         const isOwner =
                             localStorage.getItem("threadborn_user") &&
                             JSON.parse(localStorage.getItem("threadborn_user"))
@@ -7248,13 +7281,72 @@
                         return `
           <article class="comment-item reaction-item">
             <div class="comment-head">
-              <span>${escapeHtml(user.username || "Reader")}${renderNameBadges(user)}</span>
+              <span style="display:flex;align-items:center;gap:10px;">
+                <img class="clickable-avatar" src="${avatar}" alt="${username} avatar" onclick="openPublicProfile('${username}')" />
+                <button class="profile-link-btn" type="button" onclick="openPublicProfile('${username}')">${username}${renderNameBadges(user)}</button>
+              </span>
               <span>${rating} ${category} • ${when}</span>${deleteBtn}
             </div>
             <div class="${contentClass}" ${contentClass ? "onclick=\"this.classList.add('revealed')\"" : ""}>${content || "<em>Rating only.</em>"}</div>
           </article>`;
                     })
                     .join("");
+            }
+
+            function renderPublicProfileReaction(item) {
+                const rating = item.rating
+                    ? `${"★".repeat(item.rating)}${"☆".repeat(5 - item.rating)}`
+                    : "No rating";
+                const target =
+                    item.targetType === "chapter"
+                        ? `${escapeHtml(item.volumeId)} • ${escapeHtml(item.chapterId || "")}`
+                        : escapeHtml(item.volumeId || "Volume");
+                return `<article class="post-comment"><strong>${target}</strong><br><span class="muted">${rating} • ${escapeHtml(item.category || "comment")} • ${item.createdAt ? formatCommunityTime(item.createdAt) : ""}</span><br>${escapeHtml(item.content || "Rating only.")}</article>`;
+            }
+
+            function renderPublicProfilePost(item) {
+                return `<article class="post-comment"><strong>${escapeHtml(item.title || "Post")}</strong><br><span class="muted">${escapeHtml(item.category || "post")} • ${item.createdAt ? formatCommunityTime(item.createdAt) : ""}</span><br>${escapeHtml(item.content || "")}</article>`;
+            }
+
+            async function openPublicProfile(username) {
+                const clean = String(username || "").replace(/[^A-Za-z0-9_]/g, "");
+                if (!clean) return;
+                const card = document.getElementById("public-profile-card");
+                const heading = document.getElementById("public-profile-heading");
+                switchView("profile");
+                if (card) card.innerHTML = `<div class="muted">Loading ${escapeHtml(clean)}...</div>`;
+                try {
+                    const data = await apiJson(`/api/user/profile?username=${encodeURIComponent(clean)}`);
+                    const user = data.user || {};
+                    const reactions = data.reactions || [];
+                    const posts = data.posts || [];
+                    if (heading) heading.textContent = `${user.username || clean}'s Profile`;
+                    if (card) {
+                        card.innerHTML = `
+                          <div class="public-profile-hero">
+                            <img src="${safeImageUrl(user.avatarUrl)}" alt="${escapeHtml(user.username || clean)} avatar" />
+                            <div>
+                              <h3 style="margin:0;">${escapeHtml(user.username || clean)}${renderNameBadges(user)}</h3>
+                              <p class="muted" style="margin:6px 0 0;">Joined ${user.createdAt ? formatCommunityTime(user.createdAt) : "recently"}</p>
+                            </div>
+                          </div>
+                          <div class="public-profile-stats">
+                            <span>${reactions.length} reader comments</span>
+                            <span>${posts.length} community posts</span>
+                            <span>${escapeHtml(user.role || "reader")}</span>
+                          </div>
+                          <div>
+                            <h3>Reader Activity</h3>
+                            <div class="profile-feed-grid">${reactions.length ? reactions.map(renderPublicProfileReaction).join("") : `<div class="muted">No public reader comments yet.</div>`}</div>
+                          </div>
+                          <div>
+                            <h3>Community Posts</h3>
+                            <div class="profile-feed-grid">${posts.length ? posts.map(renderPublicProfilePost).join("") : `<div class="muted">No public community posts yet.</div>`}</div>
+                          </div>`;
+                    }
+                } catch (error) {
+                    if (card) card.innerHTML = `<div class="muted">Profile unavailable: ${escapeHtml(error.message)}</div>`;
+                }
             }
 
             async function loadReactionSummaries() {
@@ -7578,9 +7670,9 @@
                             return `
         <article class="community-post">
           <div class="community-head">
-            <img src="${safeImageUrl(post.avatar_url)}" alt="${username} avatar" />
+            <img class="clickable-avatar" src="${safeImageUrl(post.avatar_url)}" alt="${username} avatar" onclick="openPublicProfile('${username}')" />
             <div>
-              <strong>${username}${renderNameBadges(post)}</strong>
+              <button class="profile-link-btn" type="button" onclick="openPublicProfile('${username}')">${username}${renderNameBadges(post)}</button>
               <div class="community-meta">${category} • ${formatCommunityTime(post.created_at)}</div>
             </div>
           </div>
@@ -7595,7 +7687,7 @@
                 .map(
                     (comment) => `
               <div class="post-comment">
-                <strong>${escapeHtml(comment.username || "reader")}${renderNameBadges(comment)}:</strong> ${isModerator ? `<button onclick="deleteCommunityComment(\'${escapeHtml(comment.id || "")}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;float:right;">[Delete]</button>` : ""} ${escapeHtml(comment.content || "")}
+                <button class="profile-link-btn" type="button" onclick="openPublicProfile('${escapeHtml(comment.username || "reader")}')">${escapeHtml(comment.username || "reader")}${renderNameBadges(comment)}:</button> ${isModerator ? `<button onclick="deleteCommunityComment(\'${escapeHtml(comment.id || "")}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;float:right;">[Delete]</button>` : ""} ${escapeHtml(comment.content || "")}
               </div>
             `,
                 )
@@ -8514,9 +8606,24 @@
                 chapterJump.innerHTML = chapters
                     .map(
                         (chapter, index) =>
-                            `<option value="${index}" ${index === activeChapter ? "selected" : ""}>${chapter.volume} • ${chapter.chapter} • ${chapter.title}</option>`,
+                            `<option value="${index}" ${index === activeChapter ? "selected" : ""} ${isChapterLocked(chapter) ? "disabled" : ""}>${chapter.volume} • ${chapter.chapter} • ${chapter.title}${isChapterLocked(chapter) ? " • Locked" : ""}</option>`,
                     )
                     .join("");
+            }
+
+            function isChapterLocked(chapter) {
+                return Boolean(
+                    chapter &&
+                        chapter.releaseDate &&
+                        new Date(chapter.releaseDate) > new Date(),
+                );
+            }
+
+            function chapterUnlockMessage(chapter) {
+                if (!chapter?.releaseDate) {
+                    return "This chapter is not available yet.";
+                }
+                return `Locked until ${new Date(chapter.releaseDate).toLocaleString()}.`;
             }
 
             function jumpToChapter(value) {
@@ -8864,6 +8971,11 @@
             function openChapter(index, page = 0) {
                 if (!chapters[index]) {
                     index = 0;
+                }
+                if (isChapterLocked(chapters[index])) {
+                    updateTtsStatus(chapterUnlockMessage(chapters[index]));
+                    switchView("chapters");
+                    return;
                 }
                 activeChapter = index;
                 activePage = page;
@@ -11365,6 +11477,10 @@
                 button = null,
             ) {
                 const chapter = chapters[index];
+                if (isChapterLocked(chapter)) {
+                    updateTtsStatus(chapterUnlockMessage(chapter));
+                    return;
+                }
                 const filename = `${sanitizeFilename(`${chapter.volume}-${chapter.chapter}-${chapter.title}`)}.pdf`;
                 const result = await withBusyButton(
                     button,
@@ -11386,6 +11502,10 @@
                 button = null,
             ) {
                 const chapter = chapters[index];
+                if (isChapterLocked(chapter)) {
+                    updateTtsStatus(chapterUnlockMessage(chapter));
+                    return;
+                }
                 const filename = `${sanitizeFilename(`${chapter.volume}-${chapter.chapter}-${chapter.title}`)}.epub`;
                 const result = await withBusyButton(
                     button,

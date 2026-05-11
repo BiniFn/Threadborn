@@ -3815,17 +3815,19 @@ textarea::placeholder {
 /* ── Profile Cropper + Moderation Queue ─────────────────── */
 .avatar-crop-wrap {
     display: grid;
-    grid-template-columns: minmax(180px, 320px) minmax(180px, 1fr);
-    gap: 18px;
+    grid-template-columns: 1fr;
+    gap: 16px;
     align-items: start;
     margin-top: 14px;
+    max-width: 100%;
+    overflow: hidden;
 }
 .avatar-crop-wrap[hidden] {
     display: none;
 }
 .avatar-crop-wrap canvas {
     width: 100%;
-    max-width: 320px;
+    max-width: min(320px, 100%);
     aspect-ratio: 1;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3833,7 +3835,8 @@ textarea::placeholder {
 }
 .avatar-crop-controls {
     display: grid;
-    gap: 8px;
+    gap: 10px;
+    min-width: 0;
 }
 .avatar-crop-controls label {
     color: var(--mist);
@@ -4423,10 +4426,12 @@ textarea::placeholder {
 
 .avatar-preview-row {
     display: grid;
-    grid-template-columns: minmax(220px, 320px) 140px;
-    gap: 18px;
+    grid-template-columns: minmax(180px, 320px) minmax(112px, 150px);
+    gap: 16px;
     align-items: center;
     margin-top: 18px;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .avatar-circle-preview {
@@ -4446,8 +4451,81 @@ textarea::placeholder {
     margin-top: 8px;
 }
 
+.public-profile-card {
+    display: grid;
+    gap: 22px;
+}
+
+.public-profile-hero {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+
+.public-profile-hero img,
+.clickable-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.clickable-avatar {
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+}
+
+.profile-link-btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+}
+
+.profile-link-btn:hover {
+    color: #84d0c7;
+}
+
+.public-profile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.public-profile-stats span {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 12px;
+    color: var(--mist);
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.profile-feed-grid {
+    display: grid;
+    gap: 12px;
+}
+
 @media (max-width: 640px) {
     .avatar-preview-row {
+        grid-template-columns: 1fr;
+        justify-items: start;
+    }
+
+    .avatar-circle-preview {
+        width: 118px;
+        height: 118px;
+    }
+
+    .avatar-crop-controls .crop-button-row {
+        display: grid;
         grid-template-columns: 1fr;
     }
 }

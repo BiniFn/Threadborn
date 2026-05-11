@@ -176,6 +176,34 @@ function normalizeModerationPayload(value, maxLength = 200000) {
   return text;
 }
 
+function moderationSignals(text) {
+  const value = String(text || "").toLowerCase();
+  const patterns = [
+    { key: "slur_or_hate", re: /\b(kill all|gas the|race war|nazi salute|white power)\b/i },
+    { key: "threat", re: /\b(i will kill|i'm going to kill|i will hurt|bomb threat|doxx)\b/i },
+    { key: "self_harm", re: /\b(kill myself|suicide|self harm|cut myself)\b/i },
+    { key: "sexual_minors", re: /\b(loli|shota|minor sex|underage)\b/i },
+    { key: "spam", re: /(https?:\/\/|discord\.gg|t\.me\/|free money|crypto pump)/i },
+  ];
+  const matches = patterns.filter((item) => item.re.test(value)).map((item) => item.key);
+  return {
+    needsReview: matches.length > 0,
+    matches,
+  };
+}
+
+function withModerationSignals(payload, fields = []) {
+  const text = fields.map((field) => payload?.[field] || "").join("\n");
+  const signals = moderationSignals(text);
+  return {
+    ...payload,
+    moderation: {
+      filtered: signals.needsReview,
+      reasons: signals.matches,
+    },
+  };
+}
+
 async function createModerationRequest(userId, requestType, payload, options = {}) {
   const { rows } = await pool.query(
     `insert into moderation_requests
@@ -1514,7 +1542,10 @@ return async (req, res) => {
     const request = await createModerationRequest(
       session.user_id,
       "community_post",
-      { title, content, imageUrl: imageUrl || "", category },
+      withModerationSignals(
+        { title, content, imageUrl: imageUrl || "", category },
+        ["title", "content"],
+      ),
     );
     success(
       res,
@@ -1571,7 +1602,7 @@ return async (req, res) => {
     const request = await createModerationRequest(
       session.user_id,
       "community_comment",
-      { postId, content },
+      withModerationSignals({ postId, content }, ["content"]),
       { targetTable: "posts", targetId: postId },
     );
     success(
@@ -2097,14 +2128,17 @@ return async (req, res) => {
     const request = await createModerationRequest(
       session.user_id,
       "reader_reaction",
-      {
-        targetType: target.targetType,
-        volumeId: target.volumeId,
-        chapterId: target.chapterId,
-        rating,
-        category,
-        content,
-      },
+      withModerationSignals(
+        {
+          targetType: target.targetType,
+          volumeId: target.volumeId,
+          chapterId: target.chapterId,
+          rating,
+          category,
+          content,
+        },
+        ["content"],
+      ),
     );
 
     success(
@@ -2281,6 +2315,7 @@ function publicUser(row) {
     avatarUrl: row.avatar_url || "",
     verified: row.verified,
     role: row.role,
+    createdAt: row.created_at || null,
   };
 }
 
@@ -2300,6 +2335,17 @@ function reactionRows(rows) {
   }));
 }
 
+function postRows(rows) {
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title || "",
+    content: row.content || "",
+    category: row.category || "post",
+    imageUrl: row.image_url || "",
+    createdAt: row.created_at,
+  }));
+}
+
 async function loadReactionsForUser(userId) {
   const result = await pool
     .query(
@@ -2312,6 +2358,20 @@ async function loadReactionsForUser(userId) {
     )
     .catch(() => ({ rows: [] }));
   return reactionRows(result.rows);
+}
+
+async function loadPostsForUser(userId) {
+  const result = await pool
+    .query(
+      `select id, title, content, image_url, category, created_at
+       from posts
+       where user_id = $1
+       order by created_at desc
+       limit 30`,
+      [userId],
+    )
+    .catch(() => ({ rows: [] }));
+  return postRows(result.rows);
 }
 
 return async (req, res) => {
@@ -2332,7 +2392,7 @@ return async (req, res) => {
     await pool.ensureMigrations();
     const username = String(req.query.username || "").trim();
     const userResult = await pool.query(
-      "select id, username, avatar_url, verified, role from users where lower(username) = lower($1) limit 1",
+      "select id, username, avatar_url, verified, role, created_at from users where lower(username) = lower($1) limit 1",
       [username],
     );
     if (!userResult.rowCount) {
@@ -2343,7 +2403,7 @@ return async (req, res) => {
     success(res, {
       user: publicUser(user),
       reactions: await loadReactionsForUser(user.id),
-      posts: [],
+      posts: await loadPostsForUser(user.id),
     });
     return;
   }
@@ -2620,10 +2680,17 @@ return async (req, res) => {
       fail(res, 409, "Username is already in use");
       return;
     }
-    const request = await createModerationRequest(session.user_id, "profile_update", {
-      username,
-      previousUsername: session.username,
-    });
+    const request = await createModerationRequest(
+      session.user_id,
+      "profile_update",
+      withModerationSignals(
+        {
+          username,
+          previousUsername: session.username,
+        },
+        ["username"],
+      ),
+    );
     const { rows } = await pool.query(
       "select id, email, username, avatar_url, verified, role from users where id = $1",
       [session.user_id],

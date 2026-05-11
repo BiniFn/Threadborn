@@ -25,6 +25,7 @@
 
   // Content fingerprints tracked across polls
   let _lastChapterCount   = null;
+  let _lastMangaCount     = null;
   let _lastArtCount       = null;
   let _lastCommunityCount = null;
   let _lastBadgeCount     = null;
@@ -206,6 +207,28 @@
         }
         _lastChapterCount = count;
       }
+
+      // ── Manga teasers / future manga chapters ─────────────────────────────
+      const mangaCards = Array.from(document.querySelectorAll("#view-manga .manga-teaser-card"));
+      const mangaCount = mangaCards.length;
+      if (_lastMangaCount !== null && mangaCount > _lastMangaCount && canNotify) {
+        const newest = mangaCards[mangaCards.length - 1];
+        const title = newest?.querySelector("strong")?.textContent?.trim() || (isJP() ? "新しい漫画情報" : "New manga update");
+        showOsNotification(
+          isJP() ? "📚 新しい漫画情報！" : "📚 New Manga Update!",
+          isJP()
+            ? `「${title}」が漫画セクションに追加されました。`
+            : `"${title}" was added to the Manga section.`,
+          { tag: "threadborn-manga", url: "./#manga" }
+        );
+        addLocalNotif(
+          isJP() ? "漫画更新" : "Manga Update",
+          isJP()
+            ? `「${title}」が追加されました。`
+            : `"${title}" is now in the Manga Coming Soon section.`
+        );
+      }
+      _lastMangaCount = mangaCount;
 
       // ── Community / Announcements ──────────────────────────────────────────
       try {
