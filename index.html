@@ -7271,17 +7271,19 @@
                             ? `<button onclick="deleteCommunityPost(\'${escapeHtml(post.id || "")}\')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px;margin-left:10px;">[Delete]</button>`
                             : "";
                         return `
-          <article class="comment-item reaction-item chat-message ${post.category === "spoiler" ? "chat-spoiler" : ""}">
-            <div class="comment-head">
-              <span style="display:flex;align-items:center;gap:10px;">
-                <img class="clickable-avatar" src="${avatar}" alt="${username} avatar" onclick="openPublicProfile('${username}')" />
-                <button class="profile-link-btn" type="button" onclick="openPublicProfile('${username}')">${username}${renderNameBadges(user)}</button>
-              </span>
-              <span><span class="chat-type-chip">${category}</span> • ${when}</span>${deleteBtn}
+          <div class="chat-message-row">
+            <img class="chat-avatar clickable-avatar" src="${avatar}" alt="${username} avatar" onclick="openPublicProfile('${username}')" />
+            <div class="chat-message-content">
+              <div class="chat-message-header">
+                <button class="chat-username profile-link-btn" type="button" onclick="openPublicProfile('${username}')">${username}${renderNameBadges(user)}</button>
+                <span class="chat-timestamp">${when}</span>
+                ${post.category && post.category !== 'chat' ? `<span class="chat-type-chip">${category}</span>` : ''}
+                ${deleteBtn}
+              </div>
+              ${ping ? `<div class="chat-ping">↳ ${ping}</div>` : ''}
+              <div class="chat-body ${contentClass}" ${contentClass ? "onclick=\"this.classList.add('revealed')\"" : ""}>${content || "<em>No message text.</em>"}</div>
             </div>
-            <div class="chat-ping">↳ ${ping}</div>
-            <div class="${contentClass}" ${contentClass ? "onclick=\"this.classList.add('revealed')\"" : ""}>${content || "<em>No message text.</em>"}</div>
-          </article>`;
+          </div>`;
                     })
                     .join("");
             }
@@ -7461,26 +7463,28 @@
 
             async function submitReaderReaction(event) {
                 event.preventDefault();
-                const target = parseReactionTarget(
+                const targetRaw = parseReactionTarget(
                     document.getElementById("reaction-target")?.value,
                 );
+                // If no target selected, use a general chat sentinel
+                const target = targetRaw || { targetType: "general", volumeId: "general-chat", chapterId: "" };
                 const category =
                     document.getElementById("reaction-category")?.value ||
                     "chat";
                 const textEl = document.getElementById("reaction-text");
                 const content = (textEl?.value || "").trim();
                 const status = document.getElementById("reaction-status");
-                if (!target) return;
                 if (!content) {
                     if (status) status.textContent = "Message text is required.";
                     return;
                 }
                 const pingLabel =
-                    target.targetType === "chapter"
-                        ? `${target.volumeId} • ${target.chapterId}`
-                        : target.targetType === "volume"
-                          ? target.volumeId
-                          : "General chat";
+                    targetRaw
+                        ? (target.targetType === "chapter"
+                            ? `${target.volumeId} • ${target.chapterId}`
+                            : target.volumeId)
+                        : "General chat";
+                if (status) status.textContent = "Sending...";
                 try {
                     await apiJson("/api/reader/community", {
                         method: "POST",
@@ -7492,9 +7496,7 @@
                         }),
                     });
                     if (textEl) textEl.value = "";
-                    if (status)
-                        status.textContent =
-                            "Submitted for admin review. It will appear after approval.";
+                    if (status) status.textContent = "";
                     await setReactionTarget(
                         target.targetType,
                         target.volumeId,
@@ -7759,10 +7761,6 @@
                         }),
                     });
                     input.value = "";
-                    const status = document.getElementById("community-status");
-                    if (status)
-                        status.textContent =
-                            "Reply submitted for admin review.";
                     await loadCommunityFeed();
                 } catch (error) {
                     const status = document.getElementById("community-status");
@@ -7811,8 +7809,7 @@
                         "community-image-preview",
                     );
                     if (preview) preview.style.display = "none";
-                    status.textContent =
-                        "Submitted for admin review. It will appear after approval.";
+                    status.textContent = "Posted successfully.";
                     await loadCommunityFeed();
                 } catch (error) {
                     status.textContent = error.message;
