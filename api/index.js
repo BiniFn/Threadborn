@@ -184,6 +184,7 @@ function moderationSignals(text) {
     { key: "self_harm", re: /\b(kill myself|suicide|self harm|cut myself)\b/i },
     { key: "sexual_minors", re: /\b(loli|shota|minor sex|underage)\b/i },
     { key: "spam", re: /(https?:\/\/|discord\.gg|t\.me\/|free money|crypto pump)/i },
+    { key: "profanity", re: /\b(fuck|shit|bitch|asshole|cunt|dick)\b/i },
   ];
   const matches = patterns.filter((item) => item.re.test(value)).map((item) => item.key);
   return {
@@ -1546,23 +1547,42 @@ return async (req, res) => {
       fail(res, 400, "Invalid post payload");
       return;
     }
-    const request = await createModerationRequest(
-      session.user_id,
-      "community_post",
-      withModerationSignals(
-        { title, content, imageUrl: imageUrl || "", category },
-        ["title", "content"],
-      ),
+    const payloadWithSignals = withModerationSignals(
+      { title, content, imageUrl: imageUrl || "", category },
+      ["title", "content"],
     );
-    success(
-      res,
-      {
-        pending: true,
-        requestId: request.id,
-        message: "Community post submitted for review.",
-      },
-      202,
-    );
+
+    if (payloadWithSignals.moderation.filtered) {
+      const request = await createModerationRequest(
+        session.user_id,
+        "community_post",
+        payloadWithSignals
+      );
+      success(
+        res,
+        {
+          pending: true,
+          requestId: request.id,
+          message: "Message held for review due to inappropriate language.",
+        },
+        202,
+      );
+    } else {
+      const { rows } = await pool.query(
+        `insert into posts (user_id, title, content, image_url, category, created_at, updated_at)
+         values ($1,$2,$3,$4,$5,now(),now()) returning id, created_at`,
+        [session.user_id, title, content, imageUrl || null, category]
+      );
+      success(
+        res,
+        {
+          pending: false,
+          post: rows[0],
+          message: "Posted successfully.",
+        },
+        201,
+      );
+    }
     return;
   }
 
@@ -1606,21 +1626,39 @@ return async (req, res) => {
       fail(res, 404, "Post not found");
       return;
     }
-    const request = await createModerationRequest(
-      session.user_id,
-      "community_comment",
-      withModerationSignals({ postId, content }, ["content"]),
-      { targetTable: "posts", targetId: postId },
-    );
-    success(
-      res,
-      {
-        pending: true,
-        requestId: request.id,
-        message: "Reply submitted for review.",
-      },
-      202,
-    );
+    const payloadWithSignals = withModerationSignals({ postId, content }, ["content"]);
+    if (payloadWithSignals.moderation.filtered) {
+      const request = await createModerationRequest(
+        session.user_id,
+        "community_comment",
+        payloadWithSignals,
+        { targetTable: "posts", targetId: postId },
+      );
+      success(
+        res,
+        {
+          pending: true,
+          requestId: request.id,
+          message: "Reply submitted for review due to inappropriate language.",
+        },
+        202,
+      );
+    } else {
+      const { rows } = await pool.query(
+        `insert into comments (post_id, user_id, content, created_at, updated_at)
+         values ($1,$2,$3,now(),now()) returning id, created_at`,
+        [postId, session.user_id, content]
+      );
+      success(
+        res,
+        {
+          pending: false,
+          comment: rows[0],
+          message: "Reply posted successfully.",
+        },
+        201,
+      );
+    }
     return;
   }
 
@@ -2132,31 +2170,58 @@ return async (req, res) => {
       return;
     }
 
-    const request = await createModerationRequest(
-      session.user_id,
-      "reader_reaction",
-      withModerationSignals(
-        {
-          targetType: target.targetType,
-          volumeId: target.volumeId,
-          chapterId: target.chapterId,
-          rating,
-          category,
-          content,
-        },
-        ["content"],
-      ),
+    const payloadWithSignals = withModerationSignals(
+      {
+        targetType: target.targetType,
+        volumeId: target.volumeId,
+        chapterId: target.chapterId,
+        rating,
+        category,
+        content,
+      },
+      ["content"],
     );
 
-    success(
-      res,
-      {
-        pending: true,
-        requestId: request.id,
-        message: "Reaction submitted for review.",
-      },
-      202,
-    );
+    if (payloadWithSignals.moderation.filtered) {
+      const request = await createModerationRequest(
+        session.user_id,
+        "reader_reaction",
+        payloadWithSignals
+      );
+      success(
+        res,
+        {
+          pending: true,
+          requestId: request.id,
+          message: "Reaction submitted for review due to inappropriate language.",
+        },
+        202,
+      );
+    } else {
+      const { rows } = await pool.query(
+        `insert into reader_reactions
+           (user_id, novel_id, target_type, volume_id, chapter_id, rating, category, content, updated_at)
+         values ($1, 'threadborn', $2, $3, $4, $5, $6, $7, now()) returning id, created_at`,
+        [
+          session.user_id,
+          target.targetType,
+          target.volumeId,
+          target.chapterId || null,
+          rating === null ? null : rating,
+          category,
+          content || "",
+        ]
+      );
+      success(
+        res,
+        {
+          pending: false,
+          reaction: rows[0],
+          message: "Reaction posted successfully.",
+        },
+        201,
+      );
+    }
   } catch (error) {
     fail(res, 500, "Reader reactions unavailable");
   }
