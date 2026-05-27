@@ -1,8 +1,8 @@
 # Threadborn: Volume 1: Reborn With Zero Dignity
 *Threadborn: Reborn With Zero Dignity*
 
-> Expanded Markdown Edition
-> This edition was lengthened using the light novel balance system: clear prose, fast dialogue, dark fantasy danger, warmth after horror, teasing romance tension, and stronger character reasons.
+> Reader edition
+> Includes the web extra scenes and cleaned manuscript text.
 
 *Complete · 5 Chapters*
 
@@ -621,6 +621,46 @@ Maybe because she looked afraid and stayed anyway.
 Maybe because he had died alone on wet asphalt and did not want his second life to begin by assuming everyone would leave.
 
 "Okay," he said.
+
+### Website Extra: The First Thread
+
+Before the floor opened, Yono looked down at his palm again.
+
+The crescent mark had stopped burning. That should have helped.
+
+It did not.
+
+A single gold line sat under his skin, thin as a hair, running from the mark toward his wrist. When he blinked, it was gone. When he looked away, he could still feel it, like a question someone had tied around his bones.
+
+"That is new," he said.
+
+Violet's expression changed for half a second.
+
+Only half.
+
+Then she smiled like nothing in the room could scare her, which was how Yono knew something absolutely could.
+
+"Do not pull on it," she said.
+
+"I was not going to."
+
+"You looked exactly like someone about to pull on it."
+
+"That is unfair. My face is naturally curious and stupid."
+
+"Yes."
+
+"You agreed too fast."
+
+The gold line flickered once more. This time, Yono heard a sound with it: a tiny scrape, like a chair moving in a room far below the world.
+
+Violet stepped closer.
+
+"If it speaks," she said, "do not answer."
+
+"What if it says something important?"
+
+"Especially then."
 
 The floor opened.
 
@@ -3779,6 +3819,48 @@ Softly.
 
 But it counted.
 
+### Website Extra: After the Lamp Went Out
+
+Yono did not sleep right away.
+
+He lay on the cot and watched the ceiling boards. Every few minutes, the ward around Meryn's house gave a soft wooden click, like the building was counting how many things wanted to get inside.
+
+Across the room, Liri had curled under a blanket with her ribbon tucked under her chin. Meryn had fallen asleep sitting up beside a basket of herbs. Violet stood by the window, arms folded, pretending she was only guarding the room.
+
+"You can sit down," Yono whispered.
+
+"I am sitting emotionally."
+
+"That is not a thing."
+
+"It is for goddesses."
+
+He turned his head. The crescent in his palm gave off no light now, but the skin around it felt bruised from the inside.
+
+"Back there," he said. "When the seal breathed. Did it recognize me?"
+
+Violet did not answer at once.
+
+That was an answer by itself.
+
+"It recognized what is attached to you," she said.
+
+"That sounds worse."
+
+"It is."
+
+The ward clicked again.
+
+This time something outside clicked back.
+
+Violet's eyes moved to the dark window.
+
+Yono sat up before he meant to.
+
+"Still emotionally sitting?" he asked.
+
+"No," she said, and the gold in her pupils sharpened. "Now I am standing."
+
 *End of Chapter 01*
 
 ***
@@ -4888,7 +4970,7 @@ She raised both arms.
 
 The runes changed.
 
-Not brightened. *Changed.* The patterns rearranged into something older Yono felt it before he saw it, the way Pre Attack Sight registered not just physical attacks but the *intention* behind them, and what he read in Violet right now was not the intention of a goddess throwing divine fire.
+Not brightened. *Changed.* The patterns rearranged into something older. Yono felt it before he saw it. Pre Attack Sight did not only catch physical attacks; it caught intention. What he read in Violet now was not divine fire.
 
 It was the intention of something that had been choosing to be smaller than it was because the people around it were not ready for the full version yet.
 
@@ -5660,7 +5742,7 @@ He had been in a bed with his girlfriend and the lamp burning low and he had not
 
 The crescent blazed gold.
 
-The gold went further than it had before not just the palm, up through the wrist, along the forearm, the thread light rising through his skin in branching lines the way dawn light finds its way through gaps before the sun arrives. It was bright enough to cast shadows. The trees around him cast shadows. His own hand cast a shadow on the ribbon.
+The gold went farther than before. Past the palm, through the wrist, along the forearm. Thread light branched under his skin like dawn finding gaps before the sun arrived. It was bright enough to cast shadows. The trees around him cast shadows. His own hand cast a shadow on the ribbon.
 
 He closed his fist around it.
 
@@ -7348,7 +7430,7 @@ Violet's eyes widened slightly.
 
 She looked at the ribbon on Liri's wrist from across the yard.
 
-At the faint luminance that was not just the fabric.
+At the faint light caught inside the fabric.
 
 At the thread inside.
 

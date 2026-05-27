@@ -133,6 +133,21 @@ function googleAppRedirectPayload(user, session) {
   }).toString();
 }
 
+function isAllowedCommunityImageUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return true;
+  try {
+    const parsed = new URL(text);
+    if (parsed.protocol !== "https:") return false;
+    return (
+      parsed.hostname === "blob.vercel-storage.com" ||
+      parsed.hostname.endsWith(".public.blob.vercel-storage.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
 function normalizeGoogleUsername(profile) {
   const source =
     profile.name ||
@@ -329,6 +344,9 @@ async function approveModerationRequest(request) {
   }
 
   if (request.request_type === "community_post") {
+    if (payload.imageUrl && !isAllowedCommunityImageUrl(payload.imageUrl)) {
+      throw new Error("Invalid community image URL in request");
+    }
     await pool.query(
       `insert into posts (user_id, title, content, image_url, category, created_at, updated_at)
        values ($1,$2,$3,$4,$5,now(),now())`,
@@ -1527,17 +1545,9 @@ return async (req, res) => {
     const content = cleanText(body.content, 3000);
     const imageUrl = cleanText(body.imageUrl, 800);
     const category = cleanText(body.category, 30);
-    if (imageUrl) {
-      try {
-        const parsedImage = new URL(imageUrl);
-        if (!["http:", "https:"].includes(parsedImage.protocol)) {
-          fail(res, 400, "Image URL must be http or https");
-          return;
-        }
-      } catch {
-        fail(res, 400, "Invalid image URL");
-        return;
-      }
+    if (imageUrl && !isAllowedCommunityImageUrl(imageUrl)) {
+      fail(res, 400, "Community images must be uploaded through Threadborn.");
+      return;
     }
     if (
       !title ||

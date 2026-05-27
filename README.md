@@ -93,7 +93,7 @@ It is a decision he made before he was Yono.
 
 > *The current Yono is always the strongest Yono.*
 
-The limit that keeps him human is that he still needs someone to see him. If no one is looking, if no one is thinking about him, he goes quiet. Violet understands this before he does. It is why she stays close. It is not just strategy.
+The limit that keeps him human is that he still needs someone to see him. If no one is looking, if no one is thinking about him, he goes quiet. Violet understands this before he does. That is why she stays close. Strategy is only part of it.
 
 ---
 

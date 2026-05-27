@@ -29,12 +29,18 @@
     ) {
       return "https://threadborn.vercel.app";
     }
+    if (
+      (host === "localhost" || host === "127.0.0.1") &&
+      window.location.port !== "3000"
+    ) {
+      return "https://threadborn.vercel.app";
+    }
     return "";
   }
 
   const API_BASE = resolveApiBase();
   const QUEUE_KEY = "threadborn_sync_queue_v1";
-  const FALLBACK_PROGRESS_KEY = "novelverse_reader_progress";
+  const FALLBACK_PROGRESS_KEY = "threadborn_reader_progress";
   const APP_SESSION_KEY = "threadborn_app_session";
   let csrfToken = "";
   let authUser = null;

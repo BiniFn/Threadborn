@@ -12,7 +12,7 @@
 
 ---
 
-## PUBLISHER NOTE
+## Publisher note
 
 This volume does not replace the main novel.
 
@@ -42,7 +42,7 @@ It will mean different things depending on when.
 
 ---
 
-## TABLE OF CONTENTS
+## Contents
 
 **PART ONE: THE WORLD OF ASTERIA**
 
@@ -281,7 +281,7 @@ This is not metaphor.
 
 This is mechanics.
 
-And it is why Velkor, who spent three hundred years systematically consuming the Threads of everyone who came near his prison door, was not just dangerous in the way that a very powerful enemy is dangerous.
+That is why Velkor is worse than a strong enemy. For three hundred years he ate the Threads of everyone who came near his prison door, and he learned from every meal.
 
 He was dangerous in the way that a fire in the wall of a ship is dangerous.
 
@@ -685,7 +685,7 @@ The formal categories of Thread work established by the original Covenant are as
 
 **Sensing:** Basic Thread awareness. The passive perception of Thread presence in one's environment without active engagement.
 
-**Reading:** Active interpretation of Thread content. Understanding not just that a Thread is there but what it connects, what its emotional signature is, how old it is, how strong. Thread reading is used in healing to assess a patient's relational health, in investigation to reconstruct the emotional history of a location, and in navigation to identify Thread fold zones where the local membrane is thin.
+**Reading:** Active interpretation of Thread content. Understanding that a Thread exists, what it connects, how old it is, how strong it is, and what emotional shape it carries. Thread reading is used in healing to assess a patient's relational health, in investigation to reconstruct the emotional history of a location, and in navigation to identify Thread fold zones where the local membrane is thin.
 
 **Touching:** Direct contact with a specific Thread without disrupting it. The rarest and most valued skill at the lower practitioner level because most people who reach for a Thread accidentally push or pull it. Touching requires a gentleness of intention that most people have to deliberately develop and cannot maintain under stress.
 
@@ -1553,7 +1553,7 @@ The white is not the white of blindness or the white of divine light. It is, as 
 
 He sees through the accumulated record of every event he has filed.
 
-This means he sees Yono not just as a person but as a case. A file entry. A data point in a framework so comprehensive that an uncategorizable entry is not an annoyance but a genuine landmark.
+He sees Yono as a person, yes, but also as a case file. A strange one. The kind of entry that makes an archivist stop pretending the archive explains everything.
 
 Your file is not keeping up with you, he says.
 
@@ -1929,7 +1929,7 @@ He says that was a good consequence line read.
 
 She says I know. It was the first one I have done that was not for professional purposes in eleven years.
 
-**Route LYRA ending:** The map she has been building of the situation around Lumera has a new layer: not just physical geography and Thread fold locations. People. Their positions in each other's lives. The consequence lines that run between them. She has been drawing these in smaller ink because she was not sure they belonged on a tactical map.
+**Route LYRA ending:** The map she has been building around Lumera gains a new layer: people, their places in each other's lives, and the consequence lines between them. She has been drawing these in smaller ink because she was not sure they belonged on a tactical map.
 
 She stops drawing them in smaller ink.
 
@@ -2450,7 +2450,7 @@ He is not done writing.
 
 Threadborn is about a boy who keeps choosing people even when the world keeps proving that power alone is not enough.
 
-### Clear Reader Version
+### Reader version
 
 The visible plot is survival. Yono dies, wakes in Asteria, reaches Lumera, protects Liri, meets the safehouse group, and faces the Covenant Door. That plot is easy to follow because each step is practical. He needs food, shelter, allies, information, and a way to stop the monsters arriving from old seals.
 
@@ -2462,15 +2462,15 @@ The emotional hook is simple: Yono wants to become worthy of the room he was sen
 
 The cosmic hook is larger. Asteria is not fully protected by its own reality. The thread membrane around it is old, damaged, and touched by things that do not think like people. Some entities threaten the world because they are cruel. Others threaten it because they are too large to notice it. Threadborn lives between those two kinds of danger.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Future volumes should keep the goal clear even when the scale rises. Yono is trying to bring people home, learn what the seals are hiding, and decide what kind of authority he is allowed to use without becoming the thing the world should fear.
 
@@ -2478,27 +2478,27 @@ Future volumes should keep the goal clear even when the scale rises. Yono is try
 
 Yono's short term goal, long term goal, and emotional goal are different, and the tension between them is the engine of the story.
 
-### Clear Reader Version
+### Reader version
 
 His short term goal is immediate and physical. He wants to keep the people near him alive today. That means Liri reaches the next morning. Violet does not spend herself alone. Meryn's house remains standing. Mirika has time to read the next symbol. Lyra gets enough facts to make the next call.
 
 His long term goal is structural. He must understand the black hall, break the right seals at the right time, stop the Covenant remnants from turning old mistakes into new disasters, and identify the older intelligence using Shade pressure as instruction. This goal is not solved by one fight because the enemy is partly a system.
 
-His emotional goal is private. Yono wants to prove that his kindness is not just panic wearing a heroic costume. At the bridge he moved for a cat before he understood the cost. In Asteria he keeps moving for people after he knows the cost. That difference matters.
+His private goal is messier. Yono wants to know whether his kindness is real or just panic dressed up as heroism. On the bridge he moved for a cat before he understood the cost. In Asteria he keeps moving after he understands it. That difference matters.
 
 Yono's fear is not a weakness the story wants to erase. Fear is part of his honesty. He is afraid when he fights, afraid when he heals, afraid when Violet looks at him like she knows something he has not admitted. The important question is whether fear makes him smaller or clearer.
 
 His hidden danger is that he can start treating himself as the cheapest resource in the room. Regeneration, Damage Denial, and Rule Maker all tempt him to believe his pain is less important than other people's safety. That sounds noble until it becomes another form of self erasure.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 The strongest future chapters should force these goals to disagree. Saving one person now may reveal a threat later. Breaking a seal may protect Lumera but frighten the people he wants to protect. Loving Violet may make him braver and less careful at the same time.
 
@@ -2506,9 +2506,9 @@ The strongest future chapters should force these goals to disagree. Saving one p
 
 Asteria is the world. Lumera is the first city that teaches Yono what that world costs.
 
-### Clear Reader Version
+### Reader version
 
-Asteria is not just a fantasy map. It is a reality woven out of threads: memory, emotion, fate, promises, grief, and the habits of physical law. Most people living there no longer see those threads, but the threads still hold the world together.
+Asteria is a world built out of threads: memory, emotion, fate, promises, grief, and the stubborn habits of physical law. Most people there no longer see those threads. The threads hold anyway.
 
 Lumera matters because it is ordinary before it is important. It has bakers, guards, shop doors, small families, bad rooftops, frightened children, and people who give bread to someone who entered through a wall. That ordinary life makes the monsters matter.
 
@@ -2518,15 +2518,15 @@ The city is also a pressure point. Old Covenant systems run beneath it, and some
 
 For Yono, Lumera becomes the first answer to why he should stay. He does not defend an abstract world. He defends a place where Liri can sleep, Sela can swing a broom at monsters, and Meryn can order exhausted people to eat.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Asteria should keep feeling bigger than the chapter in front of the reader, while Lumera remains the emotional anchor. The story can visit moons, sealed rooms, and other planets later, but it should remember the first city where Yono learned names.
 
@@ -2534,7 +2534,7 @@ Asteria should keep feeling bigger than the chapter in front of the reader, whil
 
 The Covenant began as protection and became a machine that protected itself.
 
-### Clear Reader Version
+### Reader version
 
 The first Covenant was a promise between Thread Seers. It was meant to stop the world from tearing further after the Unraveling. In its cleanest form, it said that thread power belonged to care, not conquest.
 
@@ -2546,15 +2546,15 @@ The Covenant's greatest failure is not only Velkor. It is that Velkor became pos
 
 Yono is dangerous to the Covenant because he does not fit its forms. He has old authority without official permission. He has a crown but no office. He makes choices before asking which department owns the problem.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 The Covenant should not be treated as a single villain. It should be a broken tool. Some characters will try to repair it, some will weaponize it, and some will decide the safest future requires building something new beside its ruins.
 
@@ -2562,11 +2562,11 @@ The Covenant should not be treated as a single villain. It should be a broken to
 
 Shade beasts are broken threads given teeth. Velkor is hunger that learned to call itself a person.
 
-### Clear Reader Version
+### Reader version
 
 A Shade beast is not a normal animal. It is what happens when a connection is ripped loose and given form by pain, violence, or old thread residue. The beast moves toward living thread because living thread feels like food, repair, and meaning at once.
 
-This is why the first Shade attacks are frightening in a personal way. They do not just threaten bodies. They threaten the feeling that the world has rules. When a beast moves wrong, speaks wrong, or leaves black residue pointing toward Yono, the reader understands that the enemy is learning.
+The first Shade attacks feel personal because they damage more than bodies. They damage the sense that the world has rules. When a beast moves wrong, speaks wrong, or leaves black residue pointing toward Yono, the enemy is learning.
 
 Velkor stands above ordinary Shade beasts because he chose hunger as a method. He was a Thread Seer who discovered that consuming thread could create power. Then he practiced that method long enough for hunger to become identity.
 
@@ -2574,15 +2574,15 @@ His prison matters because three hundred years of sealing did not make him harml
 
 The later threat is worse because Velkor is not the top of the ladder. The expanded records imply instruction behind hunger. Something older can use Velkor style pressure as language. That means Shade attacks can become messages, tests, or signatures.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Future Shade beasts should reveal information through behavior. A beast that targets a ribbon tells one kind of truth. A beast that avoids Violet tells another. A beast that waits is more terrifying than one that screams.
 
@@ -2590,7 +2590,7 @@ Future Shade beasts should reveal information through behavior. A beast that tar
 
 The black hall is not a power menu. It is Yono's buried history arranged as a place.
 
-### Clear Reader Version
+### Reader version
 
 The black hall appears as darkness, cords, distance, and a crown because Yono's mind needs shapes for things too old to explain directly. The hall is a translation. It turns memory, authority, fear, and self limitation into architecture.
 
@@ -2602,15 +2602,15 @@ Thread memory means connections remember pressure. Liri's ribbon matters because
 
 The crown is the most dangerous symbol in the hall. A crown can mean authority, duty, loneliness, or permission to decide for others. Yono's best protection is not weakness. It is staying small enough to hear people before he changes rules around them.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Every seal break should answer a real need and create a new moral problem. The reader should feel excitement when a cord breaks and unease a second later, because the story has just removed one more limit from someone still learning how to be gentle.
 
@@ -2618,7 +2618,7 @@ Every seal break should answer a real need and create a new moral problem. The r
 
 Rule Maker changes what a situation permits. Thread Cut removes the link between a force and its purpose.
 
-### Clear Reader Version
+### Reader version
 
 Rule Maker is not wish magic. It works best when Yono can identify the exact rule a threat is relying on. If a construct can cross a ward because the ward recognizes it as lawful, Rule Maker can revise that permission. If a monster's attack assumes distance matters, Rule Maker can change how that distance applies.
 
@@ -2630,15 +2630,15 @@ Together these abilities make Yono terrifying because they target assumptions. M
 
 The emotional risk is authority without consent. If Yono can decide what counts, he must become more careful, not less. He needs Violet, Meryn, Mirika, Lyra, Liri, and even skeptical enemies because they remind him that a rule made for love can still harm someone if love stops listening.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 The next uses of Rule Maker and Thread Cut should be clever before they are large. A tiny rule changed at the right moment can be more satisfying than a world sized miracle. The ceiling rises best when the reader understands the floor.
 
@@ -2646,7 +2646,7 @@ The next uses of Rule Maker and Thread Cut should be clever before they are larg
 
 Violet is not powerful because flowers are pretty. She is powerful because flowers remember growth, death, patience, and return.
 
-### Clear Reader Version
+### Reader version
 
 Violet's Concept system is the divine mirror of Yono's seals. Where Yono's power returns through broken cords, Violet's concepts bloom through flowers. Each flower is a stored divine idea. Some are combat tools. Some are boundaries. Some are answers she collected long before Yono knew her name.
 
@@ -2658,15 +2658,15 @@ Violet's trigger is honest helplessness. She can handle threats. She can handle 
 
 Her hidden truth is that she wants to be chosen after being known. Not worshiped. Not excused. Chosen by someone who sees the push, the guilt, the pride, the fear, the power, and the softness she keeps trying to hide.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Violet's future role is not only love interest or mentor. She is a second door. As Yono's hall opens, Violet's own divine reserves and buried concepts should open in answer, creating a romance built on mutual revelation rather than simple protection.
 
@@ -2674,9 +2674,9 @@ Violet's future role is not only love interest or mentor. She is a second door. 
 
 The cast works because each person wants something simple on the surface and something harder underneath.
 
-### Clear Reader Version
+### Reader version
 
-Liri wants safety, but underneath that she wants proof that being small does not make her disposable. Her ribbon is not just an item. It is a portable home, a memory of family, and a test of whether adults will protect something fragile when the world says there are bigger problems.
+Liri wants safety. Under that, she wants proof that being small does not make her disposable. Her ribbon is a portable home, a memory of family, and a test: will the adults protect something fragile when the world keeps shouting about bigger problems?
 
 Meryn wants to heal, but underneath that she wants to win an argument with a door she opened too late. Rell's absence lives inside every jar of Stored Breath. She spends herself because stillness feels too much like the old failure.
 
@@ -2688,15 +2688,15 @@ Sela wants her daughter fed and alive. Underneath that, she wants ordinary life 
 
 Cadreth wants the file completed, but underneath that he wants to witness an exception large enough to make his archive honest again. He is not kind, but he is not simple. A record keeper who sees a thing beyond record becomes dangerous in a new way.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 The archive should keep adding motives as the cast expands. A strong Threadborn character can be introduced with a joke, but they should eventually reveal a wound, a rule, and a reason they cannot easily say out loud.
 
@@ -2704,7 +2704,7 @@ The archive should keep adding motives as the cast expands. A strong Threadborn 
 
 Every major character needs a pressure point that changes how they speak when the story touches it.
 
-### Clear Reader Version
+### Reader version
 
 Yono's hidden truth is not only that he was something older. It is that part of him fears becoming that older thing again. His trigger is someone using his kindness as a trap. When the enemy learns to aim at the people he protects, Yono's softness becomes both strength and opening.
 
@@ -2718,15 +2718,15 @@ Lyra's hidden truth is the wrong call she survived. Her trigger is certainty spo
 
 Liri's hidden truth is that she remembers more from the attack than adults think. Her trigger is being discussed like a symbol instead of a person. Her future role is to make the found family route morally real, because the story cannot claim to protect children while ignoring what children understand.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Future chapters should reveal these truths through action before explanation. A character flinching at a phrase can teach more than a page of biography if the scene lets the reader feel the silence after it.
 
@@ -2734,7 +2734,7 @@ Future chapters should reveal these truths through action before explanation. A 
 
 The IF routes are original alternate paths built from Threadborn choices: stay, hide, spend, record, obey, or break.
 
-### Clear Reader Version
+### Reader version
 
 Route VIOLET asks what happens if Violet stops treating distance as discipline. In this route she stays closer, speaks sooner, and protects Yono more aggressively. The price is that Yono may rely on her before he understands his own authority, while Violet may confuse being needed with being forgiven.
 
@@ -2748,15 +2748,15 @@ Route LIRI asks what happens if found family becomes the main route instead of a
 
 Route FRACTURE asks what happens if a seal breaks for the wrong reason. This is the route where power arrives before consent, where the black hall opens because pain kicks the door instead of choice turning the handle. It is not evil for spectacle. It is tragedy as a warning label.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 Each IF route should begin from a Threadborn decision and follow its own consequences. The goal is not to copy another series' alternate paths, but to use the same exciting idea: one changed choice can reveal a completely different truth about the same heart.
 
@@ -2764,7 +2764,7 @@ Each IF route should begin from a Threadborn decision and follow its own consequ
 
 After Velkor, the story enters a new phase: the enemy is not only stronger, it is more intentional.
 
-### Clear Reader Version
+### Reader version
 
 Volume One teaches survival. It gives Yono the bridge, the white room, Lumera, Liri, the safehouse, the Covenant Door, Velkor, and the first clear proof that the black hall is not symbolic decoration. It ends with more answers than the beginning, but the answers widen the danger.
 
@@ -2776,15 +2776,15 @@ Yono's next road is also romantic. Romance here should not pause the plot. It sh
 
 The simple goal remains: bring everyone home. The hard truth is that home keeps getting larger. First it is one child. Then a safehouse. Then a city. Then a world. Then maybe a universe with a damaged membrane and something outside it that does not know how fragile names are.
 
-### Why This Matters
+### Why it matters
 
-This section exists so the reader can hold the story in simple terms while the scale keeps rising. Threadborn can move from a city street to a sealed cosmic hall, but the reader should always know who is hurting, what choice is being made, and what the choice may cost later.
+Keep this close while the scale climbs: someone is hurt, someone chooses, and the choice leaves a mark. Threadborn can go from a city street to a sealed hall under the world, but the story works best when the cost stays personal.
 
-The clearest way to read the series is this: power answers emotion, but emotion does not excuse power. When a thread reacts to grief, fear, love, guilt, or rage, the reaction tells the truth about the character in that moment. It does not automatically prove the character is right.
+Power answers emotion here. It does not excuse it. If a thread reacts to grief, fear, love, guilt, or rage, that reaction tells the truth about the person in that moment. It does not mean they are right.
 
-That rule keeps the story balanced. Brutality matters because bodies and hearts remember it. Warmth matters because people need a reason to stand up after the brutality. Comedy matters because the characters are alive enough to be awkward, petty, embarrassed, and ridiculous even while the world opens under their feet.
+That is the balance. The wounds matter because bodies and hearts remember. The warm parts matter because people need a reason to stand back up. The jokes matter because these characters are still alive enough to be awkward, petty, embarrassed, and ridiculous.
 
-### Future Use
+### Future use
 
 The road after Volume One should keep the chapter by chapter promise. Last chapter's ceiling becomes the new floor, but each new floor needs a human footprint on it or the scale stops meaning anything.
 
@@ -3608,7 +3608,7 @@ The reader should leave this note with one clean memory: Threadborn is not compl
 
 **Black Hall:** The interior metaphysical space within Yono where his sealed abilities are stored. Experienced visually as a dark corridor with gold cords suspended in it. Each cord corresponds to one sealed ability or state.
 
-**Bloom Absolute:** Violet Arden's most comprehensive combat application. Every surface in her immediate environment blooms with white flowers, each of which is a sealed divine concept she releases simultaneously.
+**Bloom Absolute:** Violet Arden's largest combat release. White flowers bloom across the nearby world, and each flower carries a sealed divine concept.
 
 **Cadreth:** The Archivist. The sole keeper of the archive of endings in Asteria. White eyes. Has been carrying Yono's file since before Yono was born.
 
@@ -3618,7 +3618,7 @@ The reader should leave this note with one clean memory: Threadborn is not compl
 
 **Covenant War:** The sixty year conflict three hundred years before Volume One events that ended with the Covenant Authority's dominance and Velkor's imprisonment.
 
-**Crescent:** The black mark in Yono's palm that serves as his Thread interface and the seal anchor for his black hall.
+**Crescent:** The black mark in Yono's palm. It is his Thread interface and the anchor for the black hall.
 
 **Hollow Thread:** A severed Thread whose resonance has not yet dissipated. Forms the basis of shade beast construction when manipulated by an external force.
 

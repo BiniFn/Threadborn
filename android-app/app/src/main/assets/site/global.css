@@ -1033,6 +1033,51 @@ button:disabled {
     margin-top: 20px;
 }
 
+.discuss-chat-shell {
+    display: grid;
+    grid-template-rows: auto minmax(320px, 1fr) auto;
+    min-height: min(72vh, 760px);
+    padding: 0;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(32, 36, 58, 0.94), rgba(13, 15, 26, 0.96)),
+        rgba(255, 255, 255, 0.03);
+}
+
+.discuss-server-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.discuss-server-bar span {
+    display: block;
+    margin-top: 2px;
+    color: var(--mist);
+    font-size: 12px;
+}
+
+.discuss-server-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 800;
+    background: linear-gradient(145deg, #7c3aed, #b91c1c);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.discuss-channel-row {
+    display: grid;
+    grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+    gap: 10px;
+}
+
 .community-shell {
     display: grid;
     grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
@@ -1195,6 +1240,14 @@ button:disabled {
     gap: 10px;
 }
 
+.discord-message-list {
+    align-content: start;
+    max-height: 52vh;
+    min-height: 320px;
+    overflow-y: auto;
+    padding: 4px 8px 4px 2px;
+}
+
 .comment-item {
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -1222,6 +1275,162 @@ button:disabled {
     letter-spacing: 0.08em;
     color: var(--mist);
     font-family: "Space Mono", monospace;
+}
+
+.chat-message-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 8px;
+    border-radius: 8px;
+}
+
+.chat-message-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.chat-message-content {
+    min-width: 0;
+}
+
+.chat-message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chat-username {
+    color: var(--bone);
+    font-weight: 800;
+}
+
+.chat-timestamp,
+.chat-ping {
+    color: var(--mist);
+    font-size: 12px;
+}
+
+.chat-type-chip {
+    border: 1px solid rgba(179, 136, 255, 0.35);
+    border-radius: 999px;
+    padding: 2px 7px;
+    color: #cbb7ff;
+    font-size: 11px;
+}
+
+.chat-body {
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.discord-message-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.discord-message-actions .btn {
+    padding: 5px 9px;
+    font-size: 12px;
+}
+
+.discord-replies {
+    display: grid;
+    gap: 6px;
+    margin-top: 8px;
+    padding-left: 12px;
+    border-left: 2px solid rgba(179, 136, 255, 0.22);
+}
+
+.discord-reply {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.16);
+    font-size: 14px;
+}
+
+.discord-reply-box {
+    display: none;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.discord-reply-box.active {
+    display: grid;
+}
+
+.discord-delete-btn {
+    border: 0;
+    background: none;
+    color: #ff7979;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.buy-panel {
+    position: relative;
+    overflow: hidden;
+    max-width: 780px;
+    margin-inline: auto;
+    padding: clamp(28px, 5vw, 56px);
+    border: 1px solid rgba(192, 57, 43, 0.32);
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 78% 10%, rgba(122, 26, 26, 0.28), transparent 34%),
+        linear-gradient(155deg, rgba(122, 26, 26, 0.18), rgba(8, 5, 8, 0.86) 66%);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+}
+
+.buy-panel::before {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(237, 224, 212, 0.08);
+    pointer-events: none;
+}
+
+.buy-mark {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(44px, 10vw, 94px);
+    line-height: 0.9;
+    color: rgba(237, 224, 212, 0.08);
+    position: absolute;
+    right: 22px;
+    bottom: 18px;
+    pointer-events: none;
+}
+
+.buy-panel h3 {
+    margin: 10px 0 14px;
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(34px, 7vw, 66px);
+    line-height: 0.95;
+}
+
+.buy-panel p:not(.eyebrow) {
+    max-width: 560px;
+    color: var(--mist);
+    font-size: 18px;
+    line-height: 1.75;
 }
 
 .chapter-card strong {
@@ -2778,6 +2987,11 @@ footer {
         grid-template-columns: 1fr;
     }
 
+    .discuss-channel-row,
+    .discord-reply-box {
+        grid-template-columns: 1fr;
+    }
+
     .community-compose {
         position: static;
     }
@@ -3099,35 +3313,97 @@ label {
 .discuss-chat-shell {
     max-width: 980px;
     margin-inline: auto;
+    display: grid;
+    grid-template-rows: auto minmax(320px, 1fr) auto;
+    min-height: min(72vh, 760px);
+    background:
+        linear-gradient(180deg, rgba(32, 36, 58, 0.94), rgba(13, 15, 26, 0.96)),
+        rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0;
+    overflow: hidden;
 }
 
 .discuss-chat-form {
-    border: 1px solid rgba(132, 208, 199, 0.22);
-    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     padding: 14px;
-    background: linear-gradient(180deg, rgba(132, 208, 199, 0.07), rgba(255, 255, 255, 0.025));
+    background: rgba(30, 31, 34, 0.6);
+    margin-bottom: 20px;
 }
 
-.chat-message {
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.035);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+.chat-message-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 8px;
+    margin-top: 0;
+    border-radius: 8px;
+    transition: background-color 0.1s ease;
 }
 
-.chat-message .comment-head {
-    align-items: flex-start;
+.chat-message-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.chat-message-content {
+    min-width: 0;
+}
+
+.chat-message-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.chat-username {
+    color: #fff;
+    font-weight: 500;
+    font-size: 16px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.chat-username:hover {
+    text-decoration: underline;
+}
+
+.chat-timestamp {
+    font-size: 0.75rem;
+    color: #949ba4;
+}
+
+.chat-body {
+    color: #dbdee1;
+    font-size: 16px;
+    line-height: 1.375rem;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .chat-ping {
     display: inline-flex;
     width: fit-content;
     max-width: 100%;
-    margin: 4px 0 10px;
-    padding: 5px 9px;
-    border: 1px solid rgba(132, 208, 199, 0.25);
-    border-radius: 999px;
-    color: #9fded7;
-    background: rgba(132, 208, 199, 0.08);
+    margin: 2px 0 8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: #00a8fc;
+    background: rgba(0, 168, 252, 0.1);
     font-size: 12px;
     overflow-wrap: anywhere;
 }
@@ -3135,16 +3411,31 @@ label {
 .chat-type-chip {
     display: inline-flex;
     align-items: center;
-    border-radius: 999px;
-    padding: 3px 8px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: var(--bone);
-    background: rgba(255, 255, 255, 0.06);
-    text-transform: capitalize;
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.05em;
 }
 
 .chat-spoiler {
-    border-color: rgba(255, 107, 107, 0.32);
+    background: #111214;
+    color: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+.chat-spoiler:hover {
+    background: #1e1f22;
+}
+
+.chat-spoiler.revealed {
+    background: rgba(255, 107, 107, 0.1);
+    color: #dbdee1;
 }
 
 .reader-reactions-inline {
