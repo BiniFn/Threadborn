@@ -1364,21 +1364,22 @@ function cleanText(value, max = 2000) {
 }
 
 return async (req, res) => {
-  if (allowCors(req, res)) {
-    return;
-  }
-  if (!takeRateLimitToken(`community:${getClientIp(req)}`, 30, 60_000)) {
-    fail(res, 429, "Too many requests");
-    return;
-  }
-  const session =
-    req.method === "GET"
-      ? await getSession(req).catch(() => null)
-      : await requireSession(req, res, fail);
-  if (!session && req.method !== "GET") {
-    return;
-  }
-  await pool.ensureMigrations();
+  try {
+    if (allowCors(req, res)) {
+      return;
+    }
+    if (!takeRateLimitToken(`community:${getClientIp(req)}`, 30, 60_000)) {
+      fail(res, 429, "Too many requests");
+      return;
+    }
+    const session =
+      req.method === "GET"
+        ? await getSession(req).catch(() => null)
+        : await requireSession(req, res, fail);
+    if (!session && req.method !== "GET") {
+      return;
+    }
+    await pool.ensureMigrations();
 
   const meResult = session
     ? await pool.query(
@@ -1714,7 +1715,11 @@ return async (req, res) => {
     return;
   }
 
-  fail(res, 405, "Method not allowed");
+    fail(res, 405, "Method not allowed");
+  } catch (error) {
+    console.error("[community] request failed:", error);
+    fail(res, 500, "Community chat is unavailable right now.");
+  }
 };
 
 })();
