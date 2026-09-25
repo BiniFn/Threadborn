@@ -7,6 +7,9 @@
   <title>Threadboner: Reborn With Zero Dignity | Official Light Novel Hub</title>
   <meta name="description" content="Official Threadboner light novel reader with chapter browsing, offline reading, universe codex, character archives, and mobile reader."/>
   <meta name="theme-color" content="#0a0a0c"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
   <link rel="icon" type="image/png" href="./assets/threadborn-favicon.png"/>
   <link rel="apple-touch-icon" href="./assets/threadborn-apple-touch.png"/>
   <link rel="manifest" href="./manifest.json"/>
@@ -245,65 +248,56 @@
         </a>
       </div>
 
-      <!-- Center: Desktop Navigation Links -->
-      <nav class="hidden lg:flex items-center gap-1 xl:gap-2">
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider transition-colors active-nav bg-primary-container text-on-primary-container font-semibold shadow-[0_0_12px_rgba(220,38,38,0.35)]" data-view="home" onclick="navigateTo('home')">Home</button>
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-1.5" onclick="resumeReading()">
+      <!-- Center: Desktop Navigation Links (Spacious & Clean) -->
+      <nav class="hidden lg:flex items-center gap-2 xl:gap-3">
+        <button class="nav-item px-3.5 py-1.5 rounded-lg text-xs xl:text-sm font-label-md uppercase tracking-wider transition-colors active-nav bg-thread-crimson text-white font-semibold shadow-[0_0_12px_rgba(220,38,38,0.35)] cursor-pointer" data-view="home" onclick="navigateTo('home')">Home</button>
+        <button class="nav-item px-3.5 py-1.5 rounded-lg text-xs xl:text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-1.5 cursor-pointer" onclick="resumeReading()">
           <span class="material-symbols-outlined text-[16px] text-thread-crimson">auto_stories</span>
           <span>Read</span>
         </button>
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="volumes" onclick="navigateTo('volumes')">Volumes</button>
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="chapters" onclick="navigateTo('chapters')">Chapters</button>
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="characters" onclick="navigateTo('characters')">Characters</button>
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="community" onclick="navigateTo('community')">Community</button>
-        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="buy" onclick="navigateTo('buy')">Buy</button>
+        <button class="nav-item px-3.5 py-1.5 rounded-lg text-xs xl:text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors cursor-pointer" data-view="volumes" onclick="navigateTo('volumes')">Volumes</button>
+        <button class="nav-item px-3.5 py-1.5 rounded-lg text-xs xl:text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors cursor-pointer" data-view="chapters" onclick="navigateTo('chapters')">Chapters</button>
+        <button class="nav-item px-3.5 py-1.5 rounded-lg text-xs xl:text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors cursor-pointer" data-view="community" onclick="navigateTo('community')">Community</button>
         
-        <!-- More Dropdown -->
+        <!-- Explore Dropdown -->
         <div class="relative group">
-          <button class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-label-md tracking-wider uppercase text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors">
-            <span>More</span>
+          <button class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-label-md tracking-wider uppercase text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors cursor-pointer">
+            <span>Explore</span>
             <span class="material-symbols-outlined text-[16px]">expand_more</span>
           </button>
-          <div class="absolute right-0 top-full mt-2 w-52 p-2 bg-surface-card/95 backdrop-blur-2xl border border-border-hairline rounded-xl shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50 flex flex-col gap-1">
-            <button class="w-full text-left px-3 py-2 rounded-lg text-sm font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2" onclick="navigateTo('lore')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">history_edu</span>Lore &amp; Arcs</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-sm font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2" onclick="navigateTo('powers')"><span class="material-symbols-outlined text-[16px] text-secondary">auto_awesome</span>Powers</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-sm font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2" onclick="navigateTo('stats')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">bar_chart</span>My Stats</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-sm font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2" onclick="navigateTo('app')"><span class="material-symbols-outlined text-[16px] text-secondary">install_mobile</span>App &amp; Offline</button>
+          <div class="absolute right-0 top-full mt-2 w-56 p-2 bg-surface-card/98 backdrop-blur-2xl border border-border-hairline rounded-xl shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50 flex flex-col gap-1">
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('characters')"><span class="material-symbols-outlined text-[16px] text-secondary">person</span>Characters Codex</button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('lore')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">history_edu</span>Lore &amp; Universe</button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('powers')"><span class="material-symbols-outlined text-[16px] text-secondary">auto_awesome</span>Powers &amp; Spells</button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('buy')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">shopping_bag</span>Physical Editions</button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('stats')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">bar_chart</span>Reading Telemetry</button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('app')"><span class="material-symbols-outlined text-[16px] text-secondary">install_mobile</span>App &amp; Offline</button>
+            <div class="h-px bg-border-hairline my-1"></div>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-thread-crimson hover:bg-thread-crimson/15 transition-colors flex items-center gap-2 cursor-pointer" onclick="clearAppCacheAndReload()"><span class="material-symbols-outlined text-[16px]">refresh</span>Clear Cache &amp; Reload</button>
           </div>
         </div>
       </nav>
 
-      <!-- Right: Search, Language Switch & Reading Status Pill -->
-      <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Right: Search, Language Switch & Account -->
+      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
         <!-- Search Trigger -->
-        <button aria-label="Search Chapters and Lore" class="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors flex items-center justify-center" id="search-modal-trigger" onclick="openSearchModal()">
+        <button aria-label="Search Chapters and Lore" class="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors flex items-center justify-center cursor-pointer" id="search-modal-trigger" onclick="openSearchModal()">
           <span class="material-symbols-outlined text-[20px]">search</span>
         </button>
 
         <!-- Language Pill EN | 日本語 -->
         <div class="flex items-center bg-surface-card rounded-full p-0.5 border border-border-hairline">
-          <button class="px-2.5 py-1 rounded-full text-xs font-label-sm font-semibold transition-colors" id="lang-btn-en" onclick="setLanguage('en')">EN</button>
+          <button class="px-2.5 py-1 rounded-full text-xs font-label-sm font-semibold transition-colors cursor-pointer" id="lang-btn-en" onclick="setLanguage('en')">EN</button>
           <span class="text-border-subtle px-0.5 text-xs">|</span>
-          <button class="px-2.5 py-1 rounded-full text-xs font-label-sm text-text-secondary hover:text-text-primary transition-colors" id="lang-btn-ja" onclick="setLanguage('ja')">日本語</button>
+          <button class="px-2.5 py-1 rounded-full text-xs font-label-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer" id="lang-btn-ja" onclick="setLanguage('ja')">日本語</button>
         </div>
 
-        <!-- User Account Pill (Desktop & Tablet) -->
-        <button aria-label="User Account" class="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full bg-surface-elevated hover:bg-surface-bright border border-border-hairline transition-all group cursor-pointer" id="user-chip-btn" onclick="openUserModal()">
-          <div class="w-6 h-6 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center overflow-hidden text-thread-crimson" id="user-chip-avatar">
+        <!-- User Account Pill -->
+        <button aria-label="User Account" class="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-surface-elevated hover:bg-surface-bright border border-border-hairline transition-all group cursor-pointer" id="user-chip-btn" onclick="openUserModal()">
+          <div class="w-6 h-6 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center overflow-hidden text-thread-crimson shrink-0" id="user-chip-avatar">
             <span class="material-symbols-outlined text-[15px]" id="user-chip-icon">person</span>
           </div>
-          <span class="font-label-sm text-[11px] text-text-primary font-semibold max-w-[80px] truncate" id="user-chip-name">Guest</span>
-        </button>
-
-        <!-- Quick Chapter Resume Pill (Desktop & Tablet) -->
-        <button class="hidden sm:flex items-center gap-2 pl-3 pr-2 py-1 rounded-full bg-surface-elevated hover:bg-surface-bright border border-border-hairline transition-all group" onclick="resumeReading()">
-          <div class="flex flex-col items-end text-right">
-            <span class="font-label-sm text-[10px] text-text-secondary leading-none" id="header-read-ch">Novel</span>
-            <span class="font-label-sm text-[10px] text-thread-crimson font-bold leading-none mt-0.5" id="header-read-pct">Start</span>
-          </div>
-          <div class="w-7 h-7 rounded-full bg-thread-crimson/20 group-hover:bg-thread-crimson text-thread-crimson group-hover:text-white flex items-center justify-center transition-colors">
-            <span class="material-symbols-outlined text-[15px]">auto_stories</span>
-          </div>
+          <span class="font-label-sm text-[11px] text-text-primary font-semibold max-w-[90px] truncate" id="user-chip-name">Guest</span>
         </button>
       </div>
     </div>
@@ -500,12 +494,18 @@
           </div>
         </div>
 
-        <div class="pt-2 flex items-center gap-3">
-          <button class="flex-1 py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider font-semibold border border-border-hairline transition-colors" onclick="showEditUserForm()">
-            Edit Profile
-          </button>
-          <button class="py-2.5 px-4 rounded-xl bg-thread-crimson/20 hover:bg-thread-crimson/30 text-thread-crimson font-label-md text-xs uppercase tracking-wider font-semibold border border-thread-crimson/30 transition-colors" onclick="logoutUser()">
-            Log Out
+        <div class="pt-2 flex flex-col gap-2">
+          <div class="flex items-center gap-3">
+            <button class="flex-1 py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider font-semibold border border-border-hairline transition-colors cursor-pointer" onclick="showEditUserForm()">
+              Edit Profile
+            </button>
+            <button class="py-2.5 px-4 rounded-xl bg-thread-crimson/20 hover:bg-thread-crimson/30 text-thread-crimson font-label-md text-xs uppercase tracking-wider font-semibold border border-thread-crimson/30 transition-colors cursor-pointer" onclick="logoutUser()">
+              Log Out
+            </button>
+          </div>
+          <button class="w-full py-2 rounded-xl text-text-muted hover:text-thread-crimson font-label-sm text-[11px] uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 border border-dashed border-border-hairline hover:border-thread-crimson/40 cursor-pointer" onclick="clearAppCacheAndReload()">
+            <span class="material-symbols-outlined text-[15px]">refresh</span>
+            <span>Clear Cache &amp; Refresh Site</span>
           </button>
         </div>
       </div>
@@ -553,8 +553,13 @@
           <button class="w-full py-3 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-[0_0_16px_rgba(220,38,38,0.4)] transition-all" type="submit">
             Save Profile &amp; Sign In
           </button>
-          <button class="w-full py-2 text-text-muted hover:text-text-primary font-label-sm text-xs uppercase tracking-wider transition-colors" type="button" onclick="continueAsGuest()">
+          <button class="w-full py-2 text-text-muted hover:text-text-primary font-label-sm text-xs uppercase tracking-wider transition-colors cursor-pointer" type="button" onclick="continueAsGuest()">
             Continue as Guest Reader
+          </button>
+          <div class="h-px bg-border-hairline my-1"></div>
+          <button class="w-full py-2 rounded-xl text-text-muted hover:text-thread-crimson font-label-sm text-[11px] uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 border border-dashed border-border-hairline hover:border-thread-crimson/40 cursor-pointer" type="button" onclick="clearAppCacheAndReload()">
+            <span class="material-symbols-outlined text-[15px]">refresh</span>
+            <span>Clear Cache &amp; Refresh Site</span>
           </button>
         </div>
       </form>
@@ -603,18 +608,18 @@
           </p>
 
           <!-- Action Buttons -->
-          <div class="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-            <button class="w-full sm:w-auto px-7 py-3 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(220,38,38,0.45)] transition-all duration-300 hover:shadow-[0_0_28px_rgba(220,38,38,0.65)] hover:-translate-y-0.5 active:translate-y-0" onclick="resumeReading()">
+          <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 w-full sm:w-auto">
+            <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(220,38,38,0.45)] transition-all duration-300 hover:shadow-[0_0_28px_rgba(220,38,38,0.65)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer" onclick="resumeReading()">
               <span class="material-symbols-outlined text-[18px]">auto_stories</span>
               <span id="hero-btn-read">Read Now</span>
             </button>
-            <button class="w-full sm:w-auto px-7 py-3 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 border border-border-hairline shadow-sm transition-all duration-300 hover:-translate-y-0.5" onclick="navigateTo('volumes')">
+            <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2.5 border border-border-hairline shadow-sm transition-all duration-300 hover:-translate-y-0.5 cursor-pointer" onclick="navigateTo('volumes')">
               <span class="material-symbols-outlined text-[18px]">explore</span>
               <span id="hero-btn-explore">Explore Volumes</span>
             </button>
           </div>
 
-          <div class="mt-3">
+          <div class="mt-4">
             <a class="group inline-flex items-center gap-1.5 font-label-md text-xs text-text-secondary hover:text-thread-crimson transition-colors" href="https://www.lulu.com/shop/binifn/threadborn/paperback/product-zmepder.html?q=threadborn+&amp;page=1&amp;pageSize=4" rel="noopener noreferrer" target="_blank">
               <span>Buy the Paperback on Lulu</span>
               <span class="material-symbols-outlined text-[13px] group-hover:translate-x-1 transition-transform">open_in_new</span>
@@ -624,14 +629,14 @@
       </section>
 
       <!-- CONTINUE READING BAR (Synced with localStorage) -->
-      <section class="w-full px-4 lg:px-8 -mt-4 relative z-20">
-        <div class="max-w-6xl mx-auto">
-          <div class="bg-surface-card/95 backdrop-blur-xl border border-border-hairline rounded-2xl p-5 lg:p-6 shadow-xl relative overflow-hidden">
+      <section class="w-full px-4 lg:px-8 mt-2 mb-8 relative z-20">
+        <div class="max-w-5xl mx-auto">
+          <div class="bg-surface-card/95 backdrop-blur-xl border border-border-hairline rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
             <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-thread-crimson via-covenant-blood to-mystic-purple"></div>
             
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pl-2">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 pl-2 sm:pl-3">
               <!-- Left: User State & Details -->
-              <div class="flex items-start sm:items-center gap-4 min-w-0">
+              <div class="flex items-center gap-4 min-w-0 flex-1">
                 <div class="w-12 h-12 rounded-xl bg-surface-elevated flex items-center justify-center shrink-0 border border-border-hairline shadow-sm text-thread-crimson">
                   <span class="material-symbols-outlined text-[24px]">bookmark</span>
                 </div>
@@ -642,7 +647,7 @@
                     </span>
                     <span class="font-caption text-xs text-text-muted" id="reading-saved-label">Saved on local device</span>
                   </div>
-                  <h3 class="font-headline-sm text-lg sm:text-xl text-text-primary truncate" id="reading-current-title">
+                  <h3 class="font-headline-sm text-base sm:text-lg text-text-primary truncate" id="reading-current-title">
                     Volume 1, Chapter 1 — The Goddess Who Pushed Me Off The Bridge
                   </h3>
                   <p class="font-label-md text-xs text-text-secondary mt-0.5" id="reading-current-meta">
@@ -651,31 +656,32 @@
                 </div>
               </div>
 
-              <!-- Middle: Progress Bar -->
-              <div class="flex flex-col gap-1.5 w-full lg:w-72 shrink-0">
-                <div class="flex justify-between items-center font-label-sm text-xs text-text-secondary">
-                  <span>Chapter Progress</span>
-                  <span class="text-thread-crimson font-semibold" id="reading-progress-text">0%</span>
+              <!-- Right: Progress & Quick Resume Actions -->
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-border-hairline">
+                <div class="flex flex-col gap-1 sm:w-44">
+                  <div class="flex justify-between items-center font-label-sm text-xs text-text-secondary">
+                    <span>Progress</span>
+                    <span class="text-thread-crimson font-semibold" id="reading-progress-text">0%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-surface-elevated overflow-hidden border border-border-hairline">
+                    <div class="h-full bg-gradient-to-r from-covenant-blood to-thread-crimson rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(220,38,38,0.5)]" id="reading-progress-bar" style="width: 0%"></div>
+                  </div>
                 </div>
-                <div class="w-full h-2 rounded-full bg-surface-elevated overflow-hidden border border-border-hairline">
-                  <div class="h-full bg-gradient-to-r from-covenant-blood to-thread-crimson rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(220,38,38,0.5)]" id="reading-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
 
-              <!-- Right: Quick Resume Actions -->
-              <div class="flex items-center gap-3 shrink-0">
-                <button class="px-5 py-2.5 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold flex items-center gap-2 shadow-[0_0_16px_rgba(220,38,38,0.35)] transition-all" onclick="resumeReading()">
-                  <span class="material-symbols-outlined text-[18px]">play_arrow</span>
-                  <span id="btn-continue-label">Continue Reading</span>
-                </button>
-                <button class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center border border-border-hairline" title="Add Bookmark" onclick="addBookmarkFromHome()">
-                  <span class="material-symbols-outlined text-[20px]">bookmark_add</span>
-                </button>
+                <div class="flex items-center gap-2">
+                  <button class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(220,38,38,0.35)] transition-all cursor-pointer" onclick="resumeReading()">
+                    <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                    <span id="btn-continue-label">Continue Reading</span>
+                  </button>
+                  <button class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center border border-border-hairline cursor-pointer shrink-0" title="Add Bookmark" onclick="addBookmarkFromHome()">
+                    <span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                  </button>
+                </div>
               </div>
             </div>
 
             <!-- First-time Reader Sub-strip -->
-            <div class="mt-4 pt-3 border-t border-border-hairline flex flex-wrap items-center justify-between gap-2 pl-2">
+            <div class="mt-4 pt-3 border-t border-border-hairline flex flex-wrap items-center justify-between gap-2 pl-2 sm:pl-3">
               <span class="font-caption text-xs text-text-muted flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[15px] text-text-secondary">info</span>
                 <span id="home-start-subtitle">New to Lumera? Begin with Volume 1, Chapter 1 — The Goddess Who Pushed Me Off The Bridge</span>
@@ -1596,11 +1602,38 @@
         if (installBtn) installBtn.classList.remove('hidden');
       });
 
-      // Register Service Worker
+      // Register Service Worker & check for updates
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js').then((reg) => {
+          reg.update();
+        }).catch(() => {});
       }
     });
+
+    // --- Hard Cache Clearing & Refresh ---
+    function clearAppCacheAndReload() {
+      try {
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            return Promise.all(names.map((name) => caches.delete(name)));
+          }).then(() => {
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(regs => {
+                return Promise.all(regs.map(r => r.unregister()));
+              }).then(() => {
+                window.location.reload(true);
+              });
+            } else {
+              window.location.reload(true);
+            }
+          });
+        } else {
+          window.location.reload(true);
+        }
+      } catch (err) {
+        window.location.reload(true);
+      }
+    }
 
     // --- Routing / View Switching ---
     function navigateTo(viewId) {
@@ -1798,8 +1831,10 @@
         if (btnContinue) {
           btnContinue.textContent = isEn ? "Start Chapter 1" : "第1章を読む";
         }
-        document.getElementById('header-read-ch').textContent = isEn ? "Novel" : "小説";
-        document.getElementById('header-read-pct').textContent = isEn ? "Start" : "開始";
+        const hCh = document.getElementById('header-read-ch');
+        if (hCh) hCh.textContent = isEn ? "Novel" : "小説";
+        const hPct = document.getElementById('header-read-pct');
+        if (hPct) hPct.textContent = isEn ? "Start" : "開始";
       } else {
         // Returning visitor with active progress
         const tagEl = document.getElementById('reading-status-tag');
@@ -1819,8 +1854,10 @@
             : `ページ ${activePage + 1} / ${totalPages} • 残り約${Math.max(1, Math.round((totalPages - activePage) * 0.7))}分`;
           document.getElementById('reading-progress-text').textContent = `${progressPct}%`;
           document.getElementById('reading-progress-bar').style.width = `${progressPct}%`;
-          document.getElementById('header-read-ch').textContent = `${curChapter.chapter}`;
-          document.getElementById('header-read-pct').textContent = `${progressPct}%`;
+          const hCh = document.getElementById('header-read-ch');
+          if (hCh) hCh.textContent = `${curChapter.chapter}`;
+          const hPct = document.getElementById('header-read-pct');
+          if (hPct) hPct.textContent = `${progressPct}%`;
         }
         const btnContinue = document.getElementById('btn-continue-label');
         if (btnContinue) {
