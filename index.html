@@ -231,10 +231,12 @@
           <span class="material-symbols-outlined text-[24px]">menu</span>
         </button>
         
-        <a class="flex items-center gap-3 group cursor-pointer" onclick="navigateTo('home')">
+        <a class="flex items-center gap-2.5 group cursor-pointer" onclick="navigateTo('home')">
           <div class="relative flex items-center justify-center">
-            <img alt="Threadboner Crest" class="h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(220,38,38,0.5)] transition-transform group-hover:scale-105" src="./assets/threadborn-logo-en-new.png"/>
-            <span class="absolute -inset-1 rounded-full bg-thread-crimson/15 blur-sm -z-10 group-hover:bg-thread-crimson/35 transition-colors"></span>
+            <div class="w-9 h-9 rounded-xl bg-surface-card border border-thread-crimson/50 flex items-center justify-center shadow-[0_0_12px_rgba(220,38,38,0.45)] group-hover:border-thread-crimson group-hover:shadow-[0_0_20px_rgba(220,38,38,0.7)] transition-all">
+              <span class="material-symbols-outlined text-thread-crimson text-[20px] group-hover:scale-110 transition-transform">auto_stories</span>
+            </div>
+            <span class="absolute -inset-1 rounded-full bg-thread-crimson/20 blur-sm -z-10 group-hover:bg-thread-crimson/40 transition-colors"></span>
           </div>
           <div class="flex flex-col">
             <span class="font-headline-sm text-[18px] sm:text-[20px] uppercase tracking-wider text-text-primary font-bold">Threadboner</span>
@@ -246,6 +248,10 @@
       <!-- Center: Desktop Navigation Links -->
       <nav class="hidden lg:flex items-center gap-1 xl:gap-2">
         <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider transition-colors active-nav bg-primary-container text-on-primary-container font-semibold shadow-[0_0_12px_rgba(220,38,38,0.35)]" data-view="home" onclick="navigateTo('home')">Home</button>
+        <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-1.5" onclick="resumeReading()">
+          <span class="material-symbols-outlined text-[16px] text-thread-crimson">auto_stories</span>
+          <span>Read</span>
+        </button>
         <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="volumes" onclick="navigateTo('volumes')">Volumes</button>
         <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="chapters" onclick="navigateTo('chapters')">Chapters</button>
         <button class="nav-item px-3.5 py-1.5 rounded-lg text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors" data-view="characters" onclick="navigateTo('characters')">Characters</button>
@@ -284,8 +290,8 @@
         <!-- Quick Chapter Resume Pill (Desktop & Tablet) -->
         <button class="hidden sm:flex items-center gap-2 pl-3 pr-2 py-1 rounded-full bg-surface-elevated hover:bg-surface-bright border border-border-hairline transition-all group" onclick="resumeReading()">
           <div class="flex flex-col items-end text-right">
-            <span class="font-label-sm text-[10px] text-text-secondary leading-none" id="header-read-ch">Ch. 1</span>
-            <span class="font-label-sm text-[10px] text-thread-crimson font-bold leading-none mt-0.5" id="header-read-pct">0%</span>
+            <span class="font-label-sm text-[10px] text-text-secondary leading-none" id="header-read-ch">Novel</span>
+            <span class="font-label-sm text-[10px] text-thread-crimson font-bold leading-none mt-0.5" id="header-read-pct">Start</span>
           </div>
           <div class="w-7 h-7 rounded-full bg-thread-crimson/20 group-hover:bg-thread-crimson text-thread-crimson group-hover:text-white flex items-center justify-center transition-colors">
             <span class="material-symbols-outlined text-[15px]">auto_stories</span>
@@ -304,7 +310,9 @@
     <!-- Drawer Header -->
     <div class="flex items-center justify-between pb-5 border-b border-border-hairline mb-5">
       <div class="flex items-center gap-2.5">
-        <img alt="Threadboner" class="h-8 w-auto" src="./assets/threadborn-logo-en-new.png"/>
+        <div class="w-8 h-8 rounded-lg bg-surface-elevated border border-thread-crimson/50 flex items-center justify-center text-thread-crimson shadow-[0_0_10px_rgba(220,38,38,0.35)]">
+          <span class="material-symbols-outlined text-[18px]">auto_stories</span>
+        </div>
         <span class="font-headline-sm text-lg uppercase tracking-wider text-text-primary font-bold">Threadboner</span>
       </div>
       <button aria-label="Close Drawer" class="p-2 text-text-secondary hover:text-text-primary flex items-center justify-center rounded-lg hover:bg-surface-elevated" onclick="closeMobileDrawer()">
@@ -434,7 +442,7 @@
     <div class="view-panel" id="view-home">
 
       <!-- HERO SECTION -->
-      <section class="relative w-full overflow-hidden px-4 lg:px-8 pt-10 pb-16 lg:pt-16 lg:pb-24">
+      <section class="relative w-full overflow-hidden px-4 lg:px-8 pt-4 pb-8 sm:pt-6 sm:pb-10 lg:pt-8 lg:pb-10">
         <!-- Ambient Atmospheric Glows -->
         <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[520px] bg-gradient-to-b from-thread-crimson/20 via-mystic-purple/15 to-transparent blur-3xl opacity-60"></div>
         <div class="pointer-events-none absolute top-1/4 -right-24 w-96 h-96 bg-mystic-abyss/25 blur-[120px] rounded-full"></div>
@@ -443,44 +451,43 @@
         <div class="relative max-w-5xl mx-auto flex flex-col items-center text-center">
           
           <!-- Meta Genre Pill -->
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-card border border-border-hairline shadow-sm mb-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-card border border-border-hairline shadow-sm mb-3">
             <span class="inline-block w-2 h-2 rounded-full bg-thread-crimson animate-pulse"></span>
-            <span class="font-label-sm text-xs uppercase tracking-widest text-text-secondary" id="hero-genre-pill">Anime / Light Novel • Dark Fantasy • Cosmic Horror</span>
+            <span class="font-label-sm text-[11px] sm:text-xs uppercase tracking-widest text-text-secondary" id="hero-genre-pill">Anime / Light Novel • Dark Fantasy • Cosmic Horror</span>
           </div>
 
-          <!-- Main Logo Emblem -->
-          <div class="relative mb-6 group cursor-pointer" onclick="resumeReading()">
-            <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-surface-elevated border border-border-hairline shadow-[0_0_30px_rgba(220,38,38,0.4)] flex flex-col items-center justify-center gap-2 mx-auto p-4 transition-transform duration-300 group-hover:scale-105">
-              <span class="material-symbols-outlined text-thread-crimson text-[52px]">auto_stories</span>
-              <span class="font-headline-sm text-lg uppercase tracking-widest text-text-primary font-bold">Threadboner</span>
-              <span class="font-label-sm text-[10px] text-text-muted uppercase tracking-wider">Starting Life Beyond</span>
+          <!-- Main Logo Emblem (Compact Covenant Crest) -->
+          <div class="relative mb-3 group cursor-pointer" onclick="resumeReading()">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-surface-elevated border border-thread-crimson/40 shadow-[0_0_24px_rgba(220,38,38,0.4)] flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-105 group-hover:border-thread-crimson group-hover:shadow-[0_0_30px_rgba(220,38,38,0.65)]">
+              <span class="material-symbols-outlined text-thread-crimson text-[30px] sm:text-[34px]">auto_stories</span>
             </div>
+            <span class="absolute -inset-1 rounded-full bg-thread-crimson/20 blur-md -z-10 group-hover:bg-thread-crimson/40 transition-colors"></span>
           </div>
 
           <!-- Hero Headline -->
-          <h1 class="font-headline-lg text-3xl sm:text-5xl lg:text-6xl uppercase tracking-wider text-text-primary drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] font-bold max-w-4xl" id="hero-title">
+          <h1 class="font-headline-lg text-2xl sm:text-4xl lg:text-5xl uppercase tracking-wider text-text-primary drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] font-bold max-w-3xl leading-tight" id="hero-title">
             Fate isn't given. <span class="text-transparent bg-clip-text bg-gradient-to-r from-thread-crimson via-primary to-secondary">It's severed.</span>
           </h1>
-          <p class="font-body-lg text-base sm:text-lg text-text-secondary max-w-2xl mx-auto mt-4 leading-relaxed" id="hero-subtitle">
+          <p class="font-body-md text-xs sm:text-sm lg:text-base text-text-secondary max-w-2xl mx-auto mt-2 leading-relaxed" id="hero-subtitle">
             A boy dies, wakes in Lumera, and steps into a world that was never meant to survive him. Yono Kazeshima faces dark fantasy, romance, and sealed monsters in Threadboner.
           </p>
 
           <!-- Action Buttons -->
-          <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-            <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-lg text-sm uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(220,38,38,0.45)] transition-all duration-300 hover:shadow-[0_0_32px_rgba(220,38,38,0.65)] hover:-translate-y-0.5 active:translate-y-0" onclick="resumeReading()">
-              <span class="material-symbols-outlined text-[20px]">auto_stories</span>
+          <div class="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+            <button class="w-full sm:w-auto px-7 py-3 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(220,38,38,0.45)] transition-all duration-300 hover:shadow-[0_0_28px_rgba(220,38,38,0.65)] hover:-translate-y-0.5 active:translate-y-0" onclick="resumeReading()">
+              <span class="material-symbols-outlined text-[18px]">auto_stories</span>
               <span id="hero-btn-read">Read Now</span>
             </button>
-            <button class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-lg text-sm uppercase tracking-wider font-semibold flex items-center justify-center gap-2 border border-border-hairline shadow-sm transition-all duration-300 hover:-translate-y-0.5" onclick="navigateTo('volumes')">
-              <span class="material-symbols-outlined text-[20px]">explore</span>
+            <button class="w-full sm:w-auto px-7 py-3 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 border border-border-hairline shadow-sm transition-all duration-300 hover:-translate-y-0.5" onclick="navigateTo('volumes')">
+              <span class="material-symbols-outlined text-[18px]">explore</span>
               <span id="hero-btn-explore">Explore Volumes</span>
             </button>
           </div>
 
-          <div class="mt-6">
+          <div class="mt-3">
             <a class="group inline-flex items-center gap-1.5 font-label-md text-xs text-text-secondary hover:text-thread-crimson transition-colors" href="https://www.lulu.com/shop/binifn/threadborn/paperback/product-zmepder.html?q=threadborn+&amp;page=1&amp;pageSize=4" rel="noopener noreferrer" target="_blank">
               <span>Buy the Paperback on Lulu</span>
-              <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">open_in_new</span>
+              <span class="material-symbols-outlined text-[13px] group-hover:translate-x-1 transition-transform">open_in_new</span>
             </a>
           </div>
         </div>
@@ -503,7 +510,7 @@
                     <span class="px-2.5 py-0.5 rounded-full bg-thread-crimson/20 text-thread-crimson font-label-sm text-[10px] uppercase tracking-wider font-semibold" id="reading-status-tag">
                       In Progress
                     </span>
-                    <span class="font-caption text-xs text-text-muted">Saved on local device</span>
+                    <span class="font-caption text-xs text-text-muted" id="reading-saved-label">Saved on local device</span>
                   </div>
                   <h3 class="font-headline-sm text-lg sm:text-xl text-text-primary truncate" id="reading-current-title">
                     Volume 1, Chapter 1 — The Goddess Who Pushed Me Off The Bridge
@@ -1310,6 +1317,18 @@
 
     // --- Lifecycle Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
+      // Ensure page lands on top of Home view, reader closed
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
+
+      const reader = document.getElementById('reader-view');
+      if (reader) {
+        reader.classList.add('hidden');
+        reader.classList.remove('flex');
+      }
+
       loadSavedProgress();
       applyLanguageUI();
       applyReaderTheme(readerTheme);
@@ -1526,19 +1545,63 @@
     // --- Home View Rendering ---
     function renderHome() {
       const data = getDataset();
+      const isEn = currentLang === 'en';
 
       // Update Continue Reading banner
       const curChapter = data.chapters[activeChapter] || data.chapters[0];
-      if (curChapter) {
-        document.getElementById('reading-current-title').textContent = `${curChapter.volume}, ${curChapter.chapter} — ${curChapter.title}`;
-        const totalPages = curChapter.pages ? curChapter.pages.length : 1;
-        const progressPct = Math.round(((activePage + 1) / totalPages) * 100);
-        document.getElementById('reading-current-meta').textContent = `Page ${activePage + 1} of ${totalPages} • Approx. ${Math.max(1, Math.round((totalPages - activePage) * 0.7))} mins left`;
-        document.getElementById('reading-progress-text').textContent = `${progressPct}%`;
-        document.getElementById('reading-progress-bar').style.width = `${progressPct}%`;
-        
-        document.getElementById('header-read-ch').textContent = `${curChapter.chapter}`;
-        document.getElementById('header-read-pct').textContent = `${progressPct}%`;
+      const totalPages = curChapter && curChapter.pages ? curChapter.pages.length : 1;
+
+      if (!hasSavedProgress) {
+        // Fresh visitor state (has not started reading yet)
+        const tagEl = document.getElementById('reading-status-tag');
+        if (tagEl) {
+          tagEl.textContent = isEn ? "Ready to Begin" : "未読";
+          tagEl.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-label-sm text-[10px] uppercase tracking-wider font-semibold";
+        }
+        const savedLabelEl = document.getElementById('reading-saved-label');
+        if (savedLabelEl) {
+          savedLabelEl.textContent = isEn ? "Start from Chapter 1" : "第1章から開始";
+        }
+        if (curChapter) {
+          document.getElementById('reading-current-title').textContent = `${curChapter.volume}, ${curChapter.chapter} — ${curChapter.title}`;
+          document.getElementById('reading-current-meta').textContent = isEn 
+            ? `5 Canon Volumes • 13 Total Chapters • 10-15 min read`
+            : `本編2巻・EX外伝収録 • 全13章 • 未読`;
+          document.getElementById('reading-progress-text').textContent = "0%";
+          document.getElementById('reading-progress-bar').style.width = "0%";
+        }
+        const btnContinue = document.getElementById('btn-continue-label');
+        if (btnContinue) {
+          btnContinue.textContent = isEn ? "Start Chapter 1" : "第1章を読む";
+        }
+        document.getElementById('header-read-ch').textContent = isEn ? "Novel" : "小説";
+        document.getElementById('header-read-pct').textContent = isEn ? "Start" : "開始";
+      } else {
+        // Returning visitor with active progress
+        const tagEl = document.getElementById('reading-status-tag');
+        if (tagEl) {
+          tagEl.textContent = isEn ? "In Progress" : "読書中";
+          tagEl.className = "px-2.5 py-0.5 rounded-full bg-thread-crimson/20 text-thread-crimson font-label-sm text-[10px] uppercase tracking-wider font-semibold";
+        }
+        const savedLabelEl = document.getElementById('reading-saved-label');
+        if (savedLabelEl) {
+          savedLabelEl.textContent = isEn ? "Saved on local device" : "端末に保存済み";
+        }
+        if (curChapter) {
+          document.getElementById('reading-current-title').textContent = `${curChapter.volume}, ${curChapter.chapter} — ${curChapter.title}`;
+          const progressPct = Math.round(((activePage + 1) / totalPages) * 100);
+          document.getElementById('reading-current-meta').textContent = isEn
+            ? `Page ${activePage + 1} of ${totalPages} • Approx. ${Math.max(1, Math.round((totalPages - activePage) * 0.7))} mins left`
+            : `ページ ${activePage + 1} / ${totalPages} • 残り約${Math.max(1, Math.round((totalPages - activePage) * 0.7))}分`;
+          document.getElementById('reading-progress-text').textContent = `${progressPct}%`;
+          document.getElementById('reading-progress-bar').style.width = `${progressPct}%`;
+          document.getElementById('header-read-ch').textContent = `${curChapter.chapter}`;
+          document.getElementById('header-read-pct').textContent = `${progressPct}%`;
+        }
+        const btnContinue = document.getElementById('btn-continue-label');
+        if (btnContinue) {
+          btnContinue.textContent = isEn ? "Continue Reading" : "続きを読む";
+        }
       }
 
       // Render Volumes Showcase Cards
@@ -1990,9 +2053,10 @@
     }
     function resetReadingProgress() {
       if (confirm('Reset all reading progress to Chapter 1, Page 1?')) {
+        localStorage.removeItem('threadboner_progress');
+        hasSavedProgress = false;
         activeChapter = 0;
         activePage = 0;
-        saveProgress();
         renderHome();
         renderStatsView();
       }
@@ -2282,6 +2346,7 @@
     }
 
     // Persistence
+    let hasSavedProgress = false;
     function saveProgress() {
       const data = {
         chapter: activeChapter,
@@ -2289,16 +2354,24 @@
         updated: Date.now()
       };
       localStorage.setItem('threadboner_progress', JSON.stringify(data));
+      hasSavedProgress = true;
     }
     function loadSavedProgress() {
       try {
         const raw = localStorage.getItem('threadboner_progress');
         if (raw) {
           const parsed = JSON.parse(raw);
-          activeChapter = parsed.chapter || 0;
-          activePage = parsed.page || 0;
+          if (typeof parsed.chapter === 'number') {
+            activeChapter = parsed.chapter;
+            activePage = parsed.page || 0;
+            hasSavedProgress = true;
+            return;
+          }
         }
       } catch (e) {}
+      hasSavedProgress = false;
+      activeChapter = 0;
+      activePage = 0;
     }
     function recordReadingPage() {
       try {
