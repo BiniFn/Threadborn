@@ -17,6 +17,9 @@
   <!-- Google Fonts & Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
@@ -216,9 +219,16 @@
     }
   </style>
 
-  <!-- Load Embedded Datasets -->
-  <script src="./content-en.js"></script>
-  <script src="./content-ja.js"></script>
+  <!-- Load Embedded Datasets (Deferred for Instant DOM Parsing & Paint) -->
+  <script src="./content-en.js" defer></script>
+  <script>
+    if (localStorage.getItem('threadboner_lang') === 'ja') {
+      const s = document.createElement('script');
+      s.src = './content-ja.js';
+      s.defer = true;
+      document.head.appendChild(s);
+    }
+  </script>
 </head>
 <body class="bg-surface-base font-body-md text-text-primary antialiased selection:bg-thread-crimson selection:text-white">
 
@@ -864,35 +874,9 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Theory Deck -->
-            <div class="lg:col-span-7 bg-surface-card border border-border-hairline rounded-2xl p-6 space-y-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center font-label-md text-sm text-white font-bold">
-                    K
-                  </div>
-                  <div>
-                    <span class="font-label-md text-sm text-text-primary font-semibold">Kazuma_Archive</span>
-                    <p class="font-caption text-[11px] text-text-muted">26 minutes ago • Theory Deck</p>
-                  </div>
-                </div>
-                <span class="px-2.5 py-0.5 rounded-full bg-mystic-purple/30 text-secondary font-label-sm text-[10px]">
-                  Vol 2 Spoiler
-                </span>
-              </div>
-              <p class="font-body-md text-sm text-text-secondary leading-relaxed">
-                "Yono isn't just ignoring the damage rule in Chapter 7—he's actively overwriting the local reality anchor that Violet set up back on the bridge. If the third seal falls, he won't need to return to Asteria at all."
-              </p>
-              <div class="flex items-center gap-4 text-text-muted font-label-sm text-xs pt-2">
-                <button class="flex items-center gap-1.5 hover:text-thread-crimson transition-colors" id="poll-like-btn" onclick="toggleTheoryLike()">
-                  <span class="material-symbols-outlined text-[16px]">thumb_up</span>
-                  <span id="theory-like-count">48</span>
-                </button>
-                <button class="flex items-center gap-1.5 hover:text-text-primary transition-colors" onclick="navigateTo('community')">
-                  <span class="material-symbols-outlined text-[16px]">chat_bubble</span>
-                  <span>19 replies</span>
-                </button>
-              </div>
+            <!-- Community Theory & Discussion Deck -->
+            <div class="lg:col-span-7 bg-surface-card border border-border-hairline rounded-2xl p-6 space-y-4" id="home-community-preview">
+              <!-- Dynamically populated by renderHomeCommunityPreview() -->
             </div>
 
             <!-- Community Live Poll -->
@@ -1518,7 +1502,7 @@
     let readerFontFamily = localStorage.getItem('threadboner_font_family') || 'Inter';
     let userBookmarks = JSON.parse(localStorage.getItem('threadboner_bookmarks') || '[]');
     let userVote = localStorage.getItem('threadboner_poll_vote') || null;
-    let theoryLikes = parseInt(localStorage.getItem('threadboner_theory_likes') || '48', 10);
+    let theoryLikes = parseInt(localStorage.getItem('threadboner_theory_likes') || '0', 10);
     let deferredPrompt = null;
     let speechSynth = window.speechSynthesis;
     let currentUtterance = null;
@@ -1558,20 +1542,15 @@
         reader.classList.remove('flex');
       }
 
+      initCommunityStorage();
       initUserSession();
       loadSavedProgress();
       applyLanguageUI();
       applyReaderTheme(readerTheme);
       document.documentElement.style.setProperty('--reader-font-size', readerFontSize + 'px');
       
-      renderHome();
-      renderVolumesView();
-      renderChaptersView();
-      renderCharactersView();
-      renderLoreView();
-      renderPowersView();
-      renderCommunityView();
-      renderStatsView();
+      // Fast path: Only render Home view on startup for instant paint and minimal main thread load
+      renderViewIfNeeded('home');
 
       // Keyboard navigation
       window.addEventListener('keydown', (e) => {
@@ -1635,6 +1614,40 @@
       }
     }
 
+    // --- Performance: Lazy View Rendering Engine ---
+    const renderedViews = new Set();
+
+    function renderViewIfNeeded(viewId) {
+      if (renderedViews.has(viewId)) return;
+      renderedViews.add(viewId);
+      switch (viewId) {
+        case 'home':
+          renderHome();
+          break;
+        case 'volumes':
+          renderVolumesView();
+          break;
+        case 'chapters':
+          renderChaptersView();
+          break;
+        case 'characters':
+          renderCharactersView();
+          break;
+        case 'lore':
+          renderLoreView();
+          break;
+        case 'powers':
+          renderPowersView();
+          break;
+        case 'community':
+          renderCommunityView();
+          break;
+        case 'stats':
+          renderStatsView();
+          break;
+      }
+    }
+
     // --- Routing / View Switching ---
     function navigateTo(viewId) {
       document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
@@ -1643,6 +1656,9 @@
         target.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+
+      // Lazily render view on demand
+      renderViewIfNeeded(viewId);
 
       // Update active nav button state
       document.querySelectorAll('.nav-item').forEach(btn => {
@@ -1656,15 +1672,26 @@
 
     // --- Language Controller ---
     function setLanguage(lang) {
+      if (lang === 'ja' && !window.DATA_JA) {
+        const s = document.createElement('script');
+        s.src = './content-ja.js';
+        s.onload = () => {
+          applyLanguageSwitch(lang);
+        };
+        document.head.appendChild(s);
+        return;
+      }
+      applyLanguageSwitch(lang);
+    }
+
+    function applyLanguageSwitch(lang) {
       currentLang = lang;
       localStorage.setItem('threadboner_lang', lang);
       applyLanguageUI();
-      renderHome();
-      renderVolumesView();
-      renderChaptersView();
-      renderCharactersView();
-      renderLoreView();
-      renderPowersView();
+      renderedViews.clear();
+      const activePanel = document.querySelector('.view-panel:not(.hidden)');
+      const activeViewId = activePanel ? activePanel.id.replace('view-', '') : 'home';
+      renderViewIfNeeded(activeViewId);
       if (!document.getElementById('reader-view').classList.contains('hidden')) {
         renderReaderPage();
       }
@@ -2015,8 +2042,9 @@
         `).join('');
       }
 
-      // Render Community Poll
+      // Render Community Poll & Dynamic Theory/Discussion Deck
       renderPoll();
+      renderHomeCommunityPreview();
     }
 
     // Filter Chapters for Home quick launcher
@@ -2096,10 +2124,94 @@
       localStorage.setItem('threadboner_poll_vote', optionId);
       renderPoll();
     }
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function toggleTheoryLike() {
       theoryLikes += 1;
       localStorage.setItem('threadboner_theory_likes', theoryLikes);
-      document.getElementById('theory-like-count').textContent = theoryLikes;
+      const el = document.getElementById('theory-like-count');
+      if (el) el.textContent = theoryLikes;
+    }
+
+    function renderHomeCommunityPreview() {
+      const container = document.getElementById('home-community-preview');
+      if (!container) return;
+
+      const posts = getCommunityPosts();
+      if (posts.length > 0) {
+        const latest = posts[0];
+        const initial = (latest.author || 'R')[0].toUpperCase();
+        const replyCount = (latest.replies || []).length;
+        container.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center font-label-md text-sm text-thread-crimson font-bold">
+                ${initial}
+              </div>
+              <div>
+                <span class="font-label-md text-sm text-text-primary font-semibold">${escapeHTML(latest.author)}</span>
+                <p class="font-caption text-[11px] text-text-muted">${escapeHTML(latest.date || 'Recently')} • #${escapeHTML(latest.channel || 'theories')}</p>
+              </div>
+            </div>
+            ${latest.isSpoiler ? `
+              <span class="px-2.5 py-0.5 rounded-full bg-mystic-purple/30 text-secondary font-label-sm text-[10px]">
+                Spoiler
+              </span>
+            ` : ''}
+          </div>
+          <p class="font-body-md text-sm text-text-secondary leading-relaxed line-clamp-3">
+            "${escapeHTML(latest.text)}"
+          </p>
+          <div class="flex items-center gap-4 text-text-muted font-label-sm text-xs pt-2">
+            <button class="flex items-center gap-1.5 hover:text-thread-crimson transition-colors" onclick="toggleCommunityPostLike('${latest.id}'); renderHomeCommunityPreview();">
+              <span class="material-symbols-outlined text-[16px]">${latest.likedByMe ? 'favorite' : 'thumb_up'}</span>
+              <span>${latest.likes || 0}</span>
+            </button>
+            <button class="flex items-center gap-1.5 hover:text-text-primary transition-colors" onclick="navigateTo('community')">
+              <span class="material-symbols-outlined text-[16px]">chat_bubble</span>
+              <span>${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}</span>
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center text-thread-crimson shadow-[0_0_12px_rgba(220,38,38,0.25)]">
+                <span class="material-symbols-outlined text-[22px]">forum</span>
+              </div>
+              <div>
+                <span class="font-label-md text-sm text-text-primary font-semibold">Community Hub & Discussions</span>
+                <p class="font-caption text-[11px] text-text-muted">Live Reader Discussion Stream</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-label-sm text-[10px] uppercase font-semibold">
+              Live
+            </span>
+          </div>
+          <p class="font-body-md text-sm text-text-secondary leading-relaxed">
+            Join fellow readers in discussing the secrets of Lumera, Velkor's seals, character fates, and chapter reactions. Be the first to share your theory!
+          </p>
+          <div class="flex items-center justify-between pt-2">
+            <div class="flex items-center gap-2 text-text-muted font-label-sm text-xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Discussions open</span>
+            </div>
+            <button class="px-4 py-2 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold transition-colors flex items-center gap-1.5 shadow-sm" onclick="navigateTo('community')">
+              <span class="material-symbols-outlined text-[16px]">chat</span>
+              <span>Start Discussion</span>
+            </button>
+          </div>
+        `;
+      }
     }
 
     // --- Volumes View Rendering ---
@@ -2444,91 +2556,39 @@
     // --- Social / Community Discussions ---
     let activeCommunityChannel = 'all';
 
-    const DEFAULT_COMMUNITY_POSTS = [
-      {
-        id: "post-1",
-        author: "VelkorWatcher",
-        role: "Abyssal Weaver",
-        avatarIcon: "shield",
-        channel: "theories",
-        date: "24 minutes ago",
-        text: "The moment Yono cut the binding thread in Chapter 5, the entire Asteria covenant trembled. The fact that the seal broke from the inside means Velkor didn't awaken—Yono's past self unlocked the door.",
-        isSpoiler: true,
-        likes: 42,
-        likedByMe: false,
-        replies: [
-          {
-            author: "VioletDisciple",
-            role: "Scholar of Lumera",
-            avatarIcon: "auto_stories",
-            date: "12 minutes ago",
-            text: "Notice that Violet didn't stop him. She knew that keeping the seal intact would lead to the third collapse anyway."
+    const DEFAULT_COMMUNITY_POSTS = [];
+
+    function initCommunityStorage() {
+      try {
+        const stored = localStorage.getItem('threadboner_community_posts');
+        if (stored) {
+          let posts = JSON.parse(stored);
+          if (Array.isArray(posts)) {
+            // Purge any legacy mock posts completely
+            const filtered = posts.filter(p => 
+              !['post-1', 'post-2', 'post-3', 'post-4'].includes(p.id) &&
+              !['Kazuma_Archive', 'VelkorWatcher', 'TokyoCreamBun', 'LiriProtector', 'VioletDisciple', 'AsteriaScholar'].includes(p.author)
+            );
+            localStorage.setItem('threadboner_community_posts', JSON.stringify(filtered));
           }
-        ]
-      },
-      {
-        id: "post-2",
-        author: "Kazuma_Archive",
-        role: "Scholar of Lumera",
-        avatarIcon: "psychology",
-        channel: "theories",
-        date: "1 hour ago",
-        text: "Yono isn't just ignoring the damage rule in Chapter 7—he's actively overwriting the local reality anchor that Violet set up back on the bridge. If the third seal falls, he won't need to return to Asteria at all.",
-        isSpoiler: false,
-        likes: 56,
-        likedByMe: false,
-        replies: []
-      },
-      {
-        id: "post-3",
-        author: "TokyoCreamBun",
-        role: "Tokyo Exile",
-        avatarIcon: "local_fire_department",
-        channel: "memes",
-        date: "2 hours ago",
-        text: "Can we appreciate that Yono died over a cat and a cream bun, gets reincarnated as an Eldritch god, and still complains about convenience store prices in Tokyo? Zero Dignity protagonist of the year.",
-        isSpoiler: false,
-        likes: 89,
-        likedByMe: false,
-        replies: [
-          {
-            author: "AsteriaScholar",
-            role: "Reader",
-            avatarIcon: "person",
-            date: "45 minutes ago",
-            text: "That 180 yen cream bun is the emotional anchor of the entire cosmology."
-          }
-        ]
-      },
-      {
-        id: "post-4",
-        author: "LiriProtector",
-        role: "Covenant Initiate",
-        avatarIcon: "auto_stories",
-        channel: "general",
-        date: "3 hours ago",
-        text: "Just finished Volume 1! The pacing in the final chapter with the Shade debt confrontation was insane. Reading on dark mode amoled theme with Inter font feels like a premium light novel app.",
-        isSpoiler: false,
-        likes: 31,
-        likedByMe: false,
-        replies: []
-      }
-    ];
+        }
+      } catch (e) {}
+    }
 
     function getCommunityPosts() {
       try {
         const stored = localStorage.getItem('threadboner_community_posts');
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
-      localStorage.setItem('threadboner_community_posts', JSON.stringify(DEFAULT_COMMUNITY_POSTS));
-      return DEFAULT_COMMUNITY_POSTS;
+      return [];
     }
 
     function saveCommunityPosts(posts) {
       localStorage.setItem('threadboner_community_posts', JSON.stringify(posts));
+      renderHomeCommunityPreview();
     }
 
     function filterCommunityChannel(channel, btn) {
@@ -2655,6 +2715,7 @@
     }
 
     function renderCommunityView() {
+      renderedViews.add('community');
       const stream = document.getElementById('community-comments-stream');
       if (!stream) return;
 
@@ -2691,15 +2752,15 @@
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-thread-crimson/20 border border-thread-crimson/30 flex items-center justify-center text-thread-crimson shrink-0">
-                  <span class="material-symbols-outlined text-[18px]">${p.avatarIcon || 'person'}</span>
+                  <span class="material-symbols-outlined text-[18px]">${escapeHTML(p.avatarIcon || 'person')}</span>
                 </div>
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
-                    <span class="font-headline-sm text-sm text-text-primary font-bold">${p.author}</span>
-                    <span class="px-2 py-0.5 rounded-full bg-thread-crimson/15 text-thread-crimson font-label-sm text-[9px] uppercase font-bold tracking-wider">${p.role || 'Reader'}</span>
-                    <span class="px-2 py-0.5 rounded-md bg-surface-elevated text-text-muted font-label-sm text-[10px]">${channelLabel}</span>
+                    <span class="font-headline-sm text-sm text-text-primary font-bold">${escapeHTML(p.author)}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-thread-crimson/15 text-thread-crimson font-label-sm text-[9px] uppercase font-bold tracking-wider">${escapeHTML(p.role || 'Reader')}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-surface-elevated text-text-muted font-label-sm text-[10px]">${escapeHTML(channelLabel)}</span>
                   </div>
-                  <span class="font-caption text-[11px] text-text-muted">${p.date}</span>
+                  <span class="font-caption text-[11px] text-text-muted">${escapeHTML(p.date || 'Recently')}</span>
                 </div>
               </div>
 
@@ -2723,11 +2784,11 @@
                   </button>
                 </div>
                 <p class="font-body-md text-xs sm:text-sm text-text-secondary leading-relaxed blur-sm select-none transition-all duration-200" id="post-text-${p.id}">
-                  ${p.text}
+                  ${escapeHTML(p.text)}
                 </p>
               ` : `
                 <p class="font-body-md text-xs sm:text-sm text-text-secondary leading-relaxed">
-                  ${p.text}
+                  ${escapeHTML(p.text)}
                 </p>
               `}
             </div>
@@ -2757,12 +2818,12 @@
                     <div class="p-3 rounded-xl bg-surface-elevated space-y-1">
                       <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2">
-                          <span class="font-headline-sm text-xs text-text-primary font-bold">${r.author}</span>
-                          <span class="px-1.5 py-0.2 rounded bg-thread-crimson/15 text-thread-crimson font-label-sm text-[8px] uppercase font-bold">${r.role || 'Reader'}</span>
+                          <span class="font-headline-sm text-xs text-text-primary font-bold">${escapeHTML(r.author)}</span>
+                          <span class="px-1.5 py-0.2 rounded bg-thread-crimson/15 text-thread-crimson font-label-sm text-[8px] uppercase font-bold">${escapeHTML(r.role || 'Reader')}</span>
                         </div>
-                        <span class="font-caption text-[10px] text-text-muted">${r.date}</span>
+                        <span class="font-caption text-[10px] text-text-muted">${escapeHTML(r.date || 'Recently')}</span>
                       </div>
-                      <p class="font-body-md text-xs text-text-secondary leading-relaxed">${r.text}</p>
+                      <p class="font-body-md text-xs text-text-secondary leading-relaxed">${escapeHTML(r.text)}</p>
                     </div>
                   `).join('')}
                 </div>
