@@ -1,4 +1,4 @@
-const CACHE_NAME = "threadboner-cache-v5";
+const CACHE_NAME = "threadboner-cache-v6";
 const CORE_ASSETS = [
   "./",
   "./index.html",

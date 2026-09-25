@@ -278,20 +278,45 @@
         <button class="nav-item px-3.5 py-1.5 rounded-lg text-xs xl:text-sm font-label-md uppercase tracking-wider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors cursor-pointer" data-view="community" onclick="navigateTo('community')">Community</button>
         
         <!-- Explore Dropdown -->
-        <div class="relative group">
-          <button class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-label-md tracking-wider uppercase text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors cursor-pointer">
+        <div class="relative" id="explore-dropdown-wrapper">
+          <button id="explore-dropdown-btn" onclick="toggleExploreDropdown(event)" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-label-md tracking-wider uppercase text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors cursor-pointer" aria-haspopup="true" aria-expanded="false">
             <span>Explore</span>
-            <span class="material-symbols-outlined text-[16px]">expand_more</span>
+            <span class="material-symbols-outlined text-[16px] transition-transform duration-200" id="explore-arrow-icon">expand_more</span>
           </button>
-          <div class="absolute right-0 top-full mt-2 w-56 p-2 bg-surface-card/98 backdrop-blur-2xl border border-border-hairline rounded-xl shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50 flex flex-col gap-1">
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('characters')"><span class="material-symbols-outlined text-[16px] text-secondary">person</span>Characters Codex</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('lore')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">history_edu</span>Lore &amp; Universe</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('powers')"><span class="material-symbols-outlined text-[16px] text-secondary">auto_awesome</span>Powers &amp; Spells</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('buy')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">shopping_bag</span>Physical Editions</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('stats')"><span class="material-symbols-outlined text-[16px] text-thread-crimson">bar_chart</span>Reading Telemetry</button>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2 cursor-pointer" onclick="navigateTo('app')"><span class="material-symbols-outlined text-[16px] text-secondary">install_mobile</span>App &amp; Offline</button>
-            <div class="h-px bg-border-hairline my-1"></div>
-            <button class="w-full text-left px-3 py-2 rounded-lg text-xs font-label-md text-thread-crimson hover:bg-thread-crimson/15 transition-colors flex items-center gap-2 cursor-pointer" onclick="clearAppCacheAndReload()"><span class="material-symbols-outlined text-[16px]">refresh</span>Clear Cache &amp; Reload</button>
+          <div id="explore-dropdown-menu" class="absolute right-0 top-full mt-2 w-60 p-2.5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.12)] border border-border-hairline hidden flex-col gap-1 z-[100]" style="background-color: #14141c !important; backdrop-filter: blur(24px);">
+            <div class="px-3 py-1.5 text-[10px] font-label-sm uppercase tracking-wider text-text-muted font-bold border-b border-white/5 mb-1 flex items-center justify-between">
+              <span>Archives &amp; Codex</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-thread-crimson"></span>
+            </div>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('characters'); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px] text-secondary">person</span>
+              <span>Characters Codex</span>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('lore'); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px] text-thread-crimson">history_edu</span>
+              <span>Lore &amp; Universe</span>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('powers'); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px] text-secondary">auto_awesome</span>
+              <span>Powers &amp; Spells</span>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('buy'); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px] text-thread-crimson">shopping_bag</span>
+              <span>Physical Editions</span>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('stats'); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px] text-thread-crimson">bar_chart</span>
+              <span>Reading Telemetry</span>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('app'); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px] text-secondary">install_mobile</span>
+              <span>App &amp; Offline</span>
+            </button>
+            <div class="h-px bg-white/10 my-1"></div>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-xs font-label-md text-thread-crimson hover:bg-thread-crimson/15 transition-colors flex items-center gap-2.5 cursor-pointer font-semibold" onclick="clearAppCacheAndReload(); closeExploreDropdown();">
+              <span class="material-symbols-outlined text-[17px]">refresh</span>
+              <span>Clear Cache &amp; Reload</span>
+            </button>
           </div>
         </div>
       </nav>
@@ -1582,6 +1607,8 @@
           } else if (e.key.toLowerCase() === 't') {
             cycleTheme();
           }
+        } else if (e.key === 'Escape') {
+          closeExploreDropdown();
         } else if (e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key === 'k')) {
           e.preventDefault();
           openSearchModal();
@@ -1629,6 +1656,54 @@
       }
     }
 
+    // --- Explore Navigation Dropdown Controller ---
+    function toggleExploreDropdown(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const menu = document.getElementById('explore-dropdown-menu');
+      const btn = document.getElementById('explore-dropdown-btn');
+      const arrow = document.getElementById('explore-arrow-icon');
+      if (!menu) return;
+
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        menu.classList.add('flex');
+        if (btn) {
+          btn.setAttribute('aria-expanded', 'true');
+          btn.classList.add('bg-surface-elevated', 'text-text-primary');
+        }
+        if (arrow) arrow.classList.add('rotate-180');
+      } else {
+        closeExploreDropdown();
+      }
+    }
+
+    function closeExploreDropdown() {
+      const menu = document.getElementById('explore-dropdown-menu');
+      const btn = document.getElementById('explore-dropdown-btn');
+      const arrow = document.getElementById('explore-arrow-icon');
+      if (menu) {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+      }
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'false');
+        btn.classList.remove('bg-surface-elevated', 'text-text-primary');
+      }
+      if (arrow) arrow.classList.remove('rotate-180');
+    }
+
+    // Global click listener to close Explore dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('explore-dropdown-wrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        closeExploreDropdown();
+      }
+    });
+
     // --- Performance: Lazy View Rendering Engine ---
     const renderedViews = new Set();
 
@@ -1665,6 +1740,7 @@
 
     // --- Routing / View Switching ---
     function navigateTo(viewId) {
+      closeExploreDropdown();
       document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
       const target = document.getElementById(`view-${viewId}`);
       if (target) {
