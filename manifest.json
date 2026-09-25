@@ -1,13 +1,13 @@
 {
-  "name": "Threadborn: Reborn With Zero Dignity",
-  "short_name": "Threadborn",
-  "description": "Official reading hub for Threadborn. Read updated chapters, export collector PDFs, and download styled EPUBs fully offline.",
+  "name": "Threadboner: Reborn With Zero Dignity",
+  "short_name": "Threadboner",
+  "description": "Official light novel reader and universe codex for Threadboner. Read updated chapters, explore characters and lore, and read offline.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#050505",
-  "theme_color": "#090607",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
   "categories": [
     "books",
     "entertainment"
