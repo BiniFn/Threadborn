@@ -287,6 +287,14 @@
           <button class="px-2.5 py-1 rounded-full text-xs font-label-sm text-text-secondary hover:text-text-primary transition-colors" id="lang-btn-ja" onclick="setLanguage('ja')">日本語</button>
         </div>
 
+        <!-- User Account Pill (Desktop & Tablet) -->
+        <button aria-label="User Account" class="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full bg-surface-elevated hover:bg-surface-bright border border-border-hairline transition-all group cursor-pointer" id="user-chip-btn" onclick="openUserModal()">
+          <div class="w-6 h-6 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center overflow-hidden text-thread-crimson" id="user-chip-avatar">
+            <span class="material-symbols-outlined text-[15px]" id="user-chip-icon">person</span>
+          </div>
+          <span class="font-label-sm text-[11px] text-text-primary font-semibold max-w-[80px] truncate" id="user-chip-name">Guest</span>
+        </button>
+
         <!-- Quick Chapter Resume Pill (Desktop & Tablet) -->
         <button class="hidden sm:flex items-center gap-2 pl-3 pr-2 py-1 rounded-full bg-surface-elevated hover:bg-surface-bright border border-border-hairline transition-all group" onclick="resumeReading()">
           <div class="flex flex-col items-end text-right">
@@ -318,6 +326,20 @@
       <button aria-label="Close Drawer" class="p-2 text-text-secondary hover:text-text-primary flex items-center justify-center rounded-lg hover:bg-surface-elevated" onclick="closeMobileDrawer()">
         <span class="material-symbols-outlined text-[24px]">close</span>
       </button>
+    </div>
+
+    <!-- Mobile User Profile Bar -->
+    <div class="p-3 rounded-xl bg-surface-elevated border border-border-hairline mb-4 flex items-center justify-between cursor-pointer hover:bg-surface-bright transition-colors" onclick="openUserModal(); closeMobileDrawer();">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center text-thread-crimson shrink-0" id="m-user-avatar">
+          <span class="material-symbols-outlined text-[18px]" id="m-user-icon">person</span>
+        </div>
+        <div class="flex flex-col min-w-0">
+          <span class="font-headline-sm text-xs text-text-primary font-bold truncate" id="m-user-name">Guest Reader</span>
+          <span class="font-label-sm text-[10px] text-text-muted truncate" id="m-user-role">Tap to log in / edit profile</span>
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-text-muted text-[18px]">chevron_right</span>
     </div>
 
     <!-- Mobile Language Selector -->
@@ -428,6 +450,114 @@
       <div class="overflow-y-auto p-4 space-y-2 flex-1" id="search-results">
         <p class="text-text-muted text-xs text-center py-8 font-label-md uppercase tracking-wider">Type keywords to search across the Threadboner universe</p>
       </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4.1 COVENANT USER / LOGIN MODAL -->
+  <!-- ========================================================================= -->
+  <div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-200 opacity-0 pointer-events-none" id="user-modal">
+    <div class="bg-surface-card border border-border-hairline rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col p-6 space-y-5">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-border-hairline">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-thread-crimson/20 flex items-center justify-center text-thread-crimson">
+            <span class="material-symbols-outlined text-[18px]">account_circle</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-base text-text-primary font-bold" id="user-modal-title">Covenant Account</h3>
+            <p class="font-label-sm text-[11px] text-text-muted" id="user-modal-subtitle">Sync progress, post theories &amp; join discussions</p>
+          </div>
+        </div>
+        <button class="p-1 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" onclick="closeUserModal()">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- State: Logged In / Profile View -->
+      <div class="space-y-4 hidden" id="user-profile-view">
+        <div class="p-4 rounded-xl bg-surface-elevated border border-border-hairline flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center text-thread-crimson">
+            <span class="material-symbols-outlined text-[24px]" id="profile-display-icon">person</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <h4 class="font-headline-sm text-base text-text-primary font-bold truncate" id="profile-display-name">Username</h4>
+              <span class="px-2 py-0.5 rounded-full bg-thread-crimson/20 text-thread-crimson font-label-sm text-[9px] uppercase font-bold" id="profile-display-role">Reader</span>
+            </div>
+            <p class="font-label-sm text-xs text-text-muted mt-0.5" id="profile-display-meta">Covenant Initiate • Lumera Registry</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-center">
+          <div class="p-3 rounded-xl bg-surface-elevated border border-border-hairline">
+            <span class="font-headline-sm text-lg text-thread-crimson font-bold" id="profile-stat-chapters">0</span>
+            <p class="font-label-sm text-[10px] text-text-muted uppercase">Chapters Read</p>
+          </div>
+          <div class="p-3 rounded-xl bg-surface-elevated border border-border-hairline">
+            <span class="font-headline-sm text-lg text-secondary font-bold" id="profile-stat-posts">0</span>
+            <p class="font-label-sm text-[10px] text-text-muted uppercase">Community Posts</p>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center gap-3">
+          <button class="flex-1 py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider font-semibold border border-border-hairline transition-colors" onclick="showEditUserForm()">
+            Edit Profile
+          </button>
+          <button class="py-2.5 px-4 rounded-xl bg-thread-crimson/20 hover:bg-thread-crimson/30 text-thread-crimson font-label-md text-xs uppercase tracking-wider font-semibold border border-thread-crimson/30 transition-colors" onclick="logoutUser()">
+            Log Out
+          </button>
+        </div>
+      </div>
+
+      <!-- State: Login / Register / Edit Form -->
+      <form class="space-y-4" id="user-auth-form" onsubmit="handleUserAuthSubmit(event)">
+        <div class="space-y-1.5">
+          <label class="font-label-sm text-xs text-text-secondary uppercase">Reader Handle / Name</label>
+          <input class="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-hairline text-text-primary text-xs font-body-md placeholder:text-text-muted focus:border-thread-crimson outline-none" id="auth-username-input" placeholder="e.g. LumeraSeeker, YonoFan99" required type="text" maxlength="25"/>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="font-label-sm text-xs text-text-secondary uppercase">Covenant Role Title</label>
+          <select class="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-hairline text-text-primary text-xs font-body-md outline-none focus:border-thread-crimson" id="auth-role-select">
+            <option value="Reader">Reader (Wandering Mortal)</option>
+            <option value="Scholar of Lumera">Scholar of Lumera (Lore Analyst)</option>
+            <option value="Covenant Initiate">Covenant Initiate (Thread Seer)</option>
+            <option value="Abyssal Weaver">Abyssal Weaver (Door Watcher)</option>
+            <option value="Tokyo Exile">Tokyo Exile (Zero Dignity)</option>
+          </select>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="font-label-sm text-xs text-text-secondary uppercase">Choose Avatar Crest</label>
+          <div class="grid grid-cols-5 gap-2" id="avatar-picker-grid">
+            <button type="button" class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright border border-thread-crimson text-thread-crimson flex items-center justify-center transition-all avatar-opt" data-icon="person" onclick="selectAvatarIcon('person', this)">
+              <span class="material-symbols-outlined text-[20px]">person</span>
+            </button>
+            <button type="button" class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright border border-border-hairline text-text-secondary flex items-center justify-center transition-all avatar-opt" data-icon="auto_stories" onclick="selectAvatarIcon('auto_stories', this)">
+              <span class="material-symbols-outlined text-[20px]">auto_stories</span>
+            </button>
+            <button type="button" class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright border border-border-hairline text-text-secondary flex items-center justify-center transition-all avatar-opt" data-icon="shield" onclick="selectAvatarIcon('shield', this)">
+              <span class="material-symbols-outlined text-[20px]">shield</span>
+            </button>
+            <button type="button" class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright border border-border-hairline text-text-secondary flex items-center justify-center transition-all avatar-opt" data-icon="local_fire_department" onclick="selectAvatarIcon('local_fire_department', this)">
+              <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+            </button>
+            <button type="button" class="p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright border border-border-hairline text-text-secondary flex items-center justify-center transition-all avatar-opt" data-icon="psychology" onclick="selectAvatarIcon('psychology', this)">
+              <span class="material-symbols-outlined text-[20px]">psychology</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 flex flex-col gap-2">
+          <button class="w-full py-3 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-[0_0_16px_rgba(220,38,38,0.4)] transition-all" type="submit">
+            Save Profile &amp; Sign In
+          </button>
+          <button class="w-full py-2 text-text-muted hover:text-text-primary font-label-sm text-xs uppercase tracking-wider transition-colors" type="button" onclick="continueAsGuest()">
+            Continue as Guest Reader
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -611,11 +741,22 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <!-- Book Cover Mockup -->
             <div class="lg:col-span-5 flex justify-center">
-              <div class="relative w-56 sm:w-64 aspect-[1/1.4] rounded-xl shadow-2xl bg-surface-elevated overflow-hidden border border-border-hairline group">
-                <img alt="Threadboner Volume 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="./assets/volume1-cover.png"/>
-                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] font-label-sm text-text-primary bg-surface-base/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-border-hairline">
-                  <span>Official Print Edition</span>
-                  <span class="text-thread-crimson">Matte Softcover</span>
+              <div class="relative w-56 sm:w-64 aspect-[1/1.4] rounded-xl shadow-2xl bg-gradient-to-br from-[#1c0808] via-surface-elevated to-[#101018] p-6 flex flex-col justify-between border border-thread-crimson/40 group overflow-hidden">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded bg-thread-crimson/20 text-thread-crimson font-label-sm text-[9px] uppercase font-bold tracking-wider">Collector Softcover</span>
+                  <span class="text-text-muted font-label-sm text-[10px]">Vol. 1</span>
+                </div>
+                <div class="text-center my-auto py-4 space-y-2">
+                  <div class="w-12 h-12 rounded-xl bg-thread-crimson/20 border border-thread-crimson/50 mx-auto flex items-center justify-center text-thread-crimson shadow-[0_0_16px_rgba(220,38,38,0.4)] group-hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined text-[26px]">auto_stories</span>
+                  </div>
+                  <h3 class="font-headline-sm text-base text-text-primary uppercase font-bold tracking-wider">Threadboner</h3>
+                  <p class="font-label-sm text-[11px] text-thread-crimson uppercase tracking-widest font-semibold">Reborn With Zero Dignity</p>
+                  <p class="font-caption text-[10px] text-text-muted">By BiniFn • Asteria Publishing</p>
+                </div>
+                <div class="flex items-center justify-between text-[10px] font-label-sm text-text-muted border-t border-white/5 pt-2">
+                  <span>Lulu Softcover</span>
+                  <span class="text-secondary">Official Print</span>
                 </div>
               </div>
             </div>
@@ -996,28 +1137,79 @@
     </div>
 
     <!-- --------------------------------------------------------------------- -->
-    <!-- VIEW: COMMUNITY -->
+    <!-- VIEW: COMMUNITY / DISCUSS -->
     <!-- --------------------------------------------------------------------- -->
     <div class="view-panel hidden px-4 lg:px-8 py-10 max-w-6xl mx-auto space-y-8" id="view-community">
-      <div>
-        <span class="font-label-sm text-xs uppercase tracking-widest text-thread-crimson font-semibold">Discussion Deck</span>
-        <h2 class="font-headline-lg text-3xl uppercase text-text-primary font-bold mt-1">READER COMMUNITY</h2>
-        <p class="font-body-md text-sm text-text-secondary mt-1">Discuss the latest chapter releases, share theories, and vote in canon polls.</p>
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span class="font-label-sm text-xs uppercase tracking-widest text-thread-crimson font-semibold">Community &amp; Discussion</span>
+          <h2 class="font-headline-lg text-3xl uppercase text-text-primary font-bold mt-1">DISCUSS &amp; THEORIES</h2>
+          <p class="font-body-md text-sm text-text-secondary mt-1">Live reader discussions, lore speculations, Volume 2 theories, and chapter reactions.</p>
+        </div>
+        <button class="px-4 py-2 rounded-xl bg-surface-elevated hover:bg-surface-bright text-text-primary font-label-md text-xs uppercase tracking-wider flex items-center gap-2 border border-border-hairline self-start sm:self-auto transition-colors cursor-pointer" onclick="openUserModal()">
+          <span class="material-symbols-outlined text-thread-crimson text-[18px]">account_circle</span>
+          <span id="comm-profile-btn-label">My Profile / Log In</span>
+        </button>
       </div>
 
-      <!-- Add Comment Form -->
-      <div class="bg-surface-card border border-border-hairline rounded-2xl p-6 shadow-md space-y-4">
-        <h3 class="font-headline-sm text-base text-text-primary font-bold">Leave a Reaction or Theory</h3>
+      <!-- Channel Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none" id="comm-channel-tabs">
+        <button class="px-4 py-2 rounded-xl bg-thread-crimson text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-sm shrink-0 comm-tab cursor-pointer" data-channel="all" onclick="filterCommunityChannel('all', this)">
+          # All Discussions
+        </button>
+        <button class="px-4 py-2 rounded-xl bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-surface-bright font-label-md text-xs uppercase tracking-wider shrink-0 comm-tab cursor-pointer" data-channel="general" onclick="filterCommunityChannel('general', this)">
+          # General Chat
+        </button>
+        <button class="px-4 py-2 rounded-xl bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-surface-bright font-label-md text-xs uppercase tracking-wider shrink-0 comm-tab cursor-pointer" data-channel="theories" onclick="filterCommunityChannel('theories', this)">
+          # Lore &amp; Theories
+        </button>
+        <button class="px-4 py-2 rounded-xl bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-surface-bright font-label-md text-xs uppercase tracking-wider shrink-0 comm-tab cursor-pointer" data-channel="spoilers" onclick="filterCommunityChannel('spoilers', this)">
+          # Vol 2 Spoilers
+        </button>
+        <button class="px-4 py-2 rounded-xl bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-surface-bright font-label-md text-xs uppercase tracking-wider shrink-0 comm-tab cursor-pointer" data-channel="memes" onclick="filterCommunityChannel('memes', this)">
+          # Zero Dignity &amp; Memes
+        </button>
+      </div>
+
+      <!-- Add Post Form -->
+      <div class="bg-surface-card border border-border-hairline rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-border-hairline">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-thread-crimson/20 border border-thread-crimson/40 flex items-center justify-center text-thread-crimson" id="comm-user-avatar-preview">
+              <span class="material-symbols-outlined text-[18px]" id="comm-user-icon-preview">person</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-headline-sm text-xs text-text-primary font-bold" id="comm-user-name-preview">Guest Reader</span>
+              <span class="font-label-sm text-[10px] text-text-muted" id="comm-user-role-preview">Posting to community</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <select class="px-3 py-1.5 rounded-lg bg-surface-elevated border border-border-hairline text-text-primary text-xs font-label-sm outline-none focus:border-thread-crimson" id="comm-post-channel">
+              <option value="general"># General Chat</option>
+              <option value="theories"># Lore &amp; Theories</option>
+              <option value="spoilers"># Vol 2 Spoilers</option>
+              <option value="memes"># Zero Dignity &amp; Memes</option>
+            </select>
+          </div>
+        </div>
+
         <div class="space-y-3">
-          <input class="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-hairline text-text-primary text-xs font-body-md placeholder:text-text-muted focus:border-thread-crimson outline-none" id="comm-name-input" placeholder="Your Reader Handle (e.g. LumeraSeeker)" type="text"/>
-          <textarea class="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-hairline text-text-primary text-xs font-body-md placeholder:text-text-muted focus:border-thread-crimson outline-none h-24 resize-none" id="comm-msg-input" placeholder="Share your thoughts on the latest volume or chapter..."></textarea>
-          <button class="px-6 py-2.5 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-[0_0_12px_rgba(220,38,38,0.4)] transition-all" onclick="submitCommunityPost()">
-            Post Comment
-          </button>
+          <textarea class="w-full px-4 py-3 rounded-xl bg-surface-elevated border border-border-hairline text-text-primary text-xs font-body-md placeholder:text-text-muted focus:border-thread-crimson outline-none h-24 resize-none leading-relaxed" id="comm-msg-input" placeholder="Share your theory on Velkor, react to Volume 1 ending, or ask a lore question..."></textarea>
+          
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <label class="flex items-center gap-2 text-xs font-label-sm text-text-secondary cursor-pointer select-none">
+              <input type="checkbox" id="comm-spoiler-check" class="rounded border-border-hairline text-thread-crimson focus:ring-0 bg-surface-elevated"/>
+              <span>Tag as Spoiler</span>
+            </label>
+
+            <button class="px-6 py-2.5 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-[0_0_16px_rgba(220,38,38,0.4)] transition-all cursor-pointer" onclick="submitCommunityPost()">
+              Post Discussion
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Comments Stream -->
+      <!-- Discussions & Comments Stream -->
       <div class="space-y-4" id="community-comments-stream">
         <!-- Rendered dynamically -->
       </div>
@@ -1124,7 +1316,25 @@
       </div>
 
       <div class="bg-surface-card border border-border-hairline rounded-2xl p-6 lg:p-10 shadow-xl flex flex-col md:flex-row gap-8 items-center">
-        <img alt="Threadboner Volume 1 Softcover" class="w-48 sm:w-56 aspect-[1/1.4] object-cover rounded-xl shadow-2xl border border-border-hairline" src="./assets/volume1-cover.png"/>
+        <div class="w-48 sm:w-56 aspect-[1/1.4] rounded-xl shadow-2xl bg-gradient-to-br from-[#1c0808] via-surface-elevated to-[#101018] p-6 flex flex-col justify-between border border-thread-crimson/40 shrink-0">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded bg-thread-crimson/20 text-thread-crimson font-label-sm text-[9px] uppercase font-bold tracking-wider">Collector Softcover</span>
+            <span class="text-text-muted font-label-sm text-[10px]">Vol. 1</span>
+          </div>
+          <div class="text-center my-auto py-4 space-y-2">
+            <div class="w-12 h-12 rounded-xl bg-thread-crimson/20 border border-thread-crimson/50 mx-auto flex items-center justify-center text-thread-crimson shadow-[0_0_16px_rgba(220,38,38,0.4)]">
+              <span class="material-symbols-outlined text-[28px]">auto_stories</span>
+            </div>
+            <h3 class="font-headline-sm text-base text-text-primary uppercase font-bold tracking-wider">Threadboner</h3>
+            <p class="font-label-sm text-[11px] text-thread-crimson uppercase tracking-widest font-semibold">Reborn With Zero Dignity</p>
+            <p class="font-caption text-[10px] text-text-muted">By BiniFn</p>
+          </div>
+          <div class="flex items-center justify-between text-[10px] font-label-sm text-text-muted border-t border-white/5 pt-2">
+            <span>Physical Edition</span>
+            <span class="text-secondary">Printed by Lulu</span>
+          </div>
+        </div>
+
         <div class="space-y-4 flex-1">
           <span class="px-3 py-1 rounded-full bg-thread-crimson/20 text-thread-crimson font-label-sm text-xs uppercase tracking-wider font-semibold">Official Collector Copy</span>
           <h3 class="font-headline-lg text-2xl text-text-primary font-bold">Threadboner: Reborn With Zero Dignity (Volume 1)</h3>
@@ -1146,7 +1356,7 @@
   <!-- ========================================================================= -->
   <!-- 6. THE IMMERSIVE NOVEL READER OVERLAY -->
   <!-- ========================================================================= -->
-  <div class="fixed inset-0 z-50 overflow-hidden hidden flex-col theme-night transition-colors duration-200" id="reader-view">
+  <div class="fixed inset-0 z-50 overflow-hidden hidden flex-col theme-night transition-colors duration-200" id="reader-view" style="display: none;">
     
     <!-- Reader Top Bar -->
     <header class="sticky top-0 z-30 w-full bg-inherit/90 backdrop-blur-md border-b border-white/10 px-4 py-2.5 flex items-center justify-between gap-3 shadow-md" id="reader-header">
@@ -1307,6 +1517,18 @@
     let speechSynth = window.speechSynthesis;
     let currentUtterance = null;
 
+    // --- User Account State ---
+    const DEFAULT_GUEST_USER = {
+      id: 'guest',
+      username: 'Guest',
+      displayName: 'Guest Reader',
+      role: 'Reader',
+      avatarIcon: 'person',
+      isLoggedIn: false
+    };
+    let currentUser = null;
+    let selectedAvatarIcon = 'person';
+
     // Retrieve active dataset based on language
     function getDataset() {
       if (currentLang === 'ja' && window.DATA_JA) {
@@ -1325,10 +1547,12 @@
 
       const reader = document.getElementById('reader-view');
       if (reader) {
+        reader.style.display = 'none';
         reader.classList.add('hidden');
         reader.classList.remove('flex');
       }
 
+      initUserSession();
       loadSavedProgress();
       applyLanguageUI();
       applyReaderTheme(readerTheme);
@@ -1611,9 +1835,23 @@
           <!-- Volume 1 -->
           <div class="bg-surface-card border border-border-hairline rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:bg-surface-elevated transition-all group">
             <div class="space-y-4">
-              <div class="relative w-full h-56 rounded-xl overflow-hidden bg-surface-container border border-border-hairline">
-                <img alt="Volume 1 Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="./assets/volume1-cover.png"/>
-                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-surface-base/85 backdrop-blur-md text-secondary font-label-sm text-[10px] uppercase font-semibold">Complete</span>
+              <div class="relative w-full h-56 rounded-xl overflow-hidden bg-gradient-to-br from-[#1d0a0a] via-surface-elevated to-[#0d0d14] border border-thread-crimson/40 p-5 flex flex-col justify-between group-hover:border-thread-crimson transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded bg-thread-crimson/25 text-thread-crimson font-label-sm text-[10px] uppercase font-bold tracking-wider">Volume 01</span>
+                  <span class="px-2.5 py-1 rounded-full bg-surface-base/85 backdrop-blur-md text-secondary font-label-sm text-[10px] uppercase font-semibold">Complete</span>
+                </div>
+                <div class="text-center my-auto py-2 space-y-1">
+                  <div class="w-10 h-10 rounded-xl bg-thread-crimson/20 border border-thread-crimson/50 mx-auto flex items-center justify-center text-thread-crimson shadow-[0_0_12px_rgba(220,38,38,0.4)] group-hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined text-[22px]">auto_stories</span>
+                  </div>
+                  <span class="font-headline-sm text-sm uppercase tracking-wider text-text-primary font-bold block">Threadboner</span>
+                  <span class="font-label-sm text-[10px] text-thread-crimson uppercase tracking-widest font-semibold block">Reborn With Zero Dignity</span>
+                  <span class="font-caption text-[10px] text-text-muted block">By BiniFn • Asteria Realm</span>
+                </div>
+                <div class="flex items-center justify-between text-[10px] font-label-sm text-text-muted border-t border-white/5 pt-1.5">
+                  <span>Canon Arc 1</span>
+                  <span class="text-secondary">5 Chapters</span>
+                </div>
               </div>
               <div>
                 <div class="flex items-center justify-between text-text-muted font-label-sm text-[11px] mb-1">
@@ -1641,9 +1879,23 @@
           <!-- Volume 2 -->
           <div class="bg-surface-card border border-border-hairline rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:bg-surface-elevated transition-all group">
             <div class="space-y-4">
-              <div class="relative w-full h-56 rounded-xl overflow-hidden bg-surface-container border border-border-hairline">
-                <img alt="Volume 2 Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="./assets/volume2-cover.jpg"/>
-                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-thread-crimson/90 backdrop-blur-md text-white font-label-sm text-[10px] uppercase font-semibold">Active Arc</span>
+              <div class="relative w-full h-56 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a0815] via-surface-elevated to-[#0b0c16] border border-secondary/40 p-5 flex flex-col justify-between group-hover:border-secondary transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded bg-secondary/25 text-secondary font-label-sm text-[10px] uppercase font-bold tracking-wider">Volume 02</span>
+                  <span class="px-2.5 py-1 rounded-full bg-thread-crimson/90 backdrop-blur-md text-white font-label-sm text-[10px] uppercase font-semibold">Active Arc</span>
+                </div>
+                <div class="text-center my-auto py-2 space-y-1">
+                  <div class="w-10 h-10 rounded-xl bg-secondary/20 border border-secondary/50 mx-auto flex items-center justify-center text-secondary shadow-[0_0_12px_rgba(168,85,247,0.4)] group-hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined text-[22px]">lock_open</span>
+                  </div>
+                  <span class="font-headline-sm text-sm uppercase tracking-wider text-text-primary font-bold block">Threadboner</span>
+                  <span class="font-label-sm text-[10px] text-secondary uppercase tracking-widest font-semibold block">The Covenant Door</span>
+                  <span class="font-caption text-[10px] text-text-muted block">By BiniFn • Asteria Realm</span>
+                </div>
+                <div class="flex items-center justify-between text-[10px] font-label-sm text-text-muted border-t border-white/5 pt-1.5">
+                  <span>Canon Arc 2</span>
+                  <span class="text-thread-crimson">7 Chapters</span>
+                </div>
               </div>
               <div>
                 <div class="flex items-center justify-between text-text-muted font-label-sm text-[11px] mb-1">
@@ -1964,47 +2216,532 @@
       `).join('');
     }
 
-    // --- Community View & Comments ---
+    // --- User Session & Profile Controller ---
+    function initUserSession() {
+      try {
+        const stored = localStorage.getItem('threadboner_user');
+        if (stored) {
+          currentUser = JSON.parse(stored);
+        }
+      } catch (e) {
+        currentUser = null;
+      }
+      if (!currentUser || !currentUser.username) {
+        currentUser = { ...DEFAULT_GUEST_USER };
+      }
+      selectedAvatarIcon = currentUser.avatarIcon || 'person';
+      renderUserChip();
+      syncCommunityUserPreview();
+    }
+
+    function getActiveUser() {
+      if (!currentUser) initUserSession();
+      return currentUser;
+    }
+
+    function saveActiveUser(userObj) {
+      currentUser = { ...userObj, isLoggedIn: true };
+      localStorage.setItem('threadboner_user', JSON.stringify(currentUser));
+      renderUserChip();
+      syncCommunityUserPreview();
+    }
+
+    function renderUserChip() {
+      const u = getActiveUser();
+      const chipName = document.getElementById('user-chip-name');
+      const chipIcon = document.getElementById('user-chip-icon');
+      if (chipName) {
+        chipName.textContent = u.isLoggedIn ? (u.username || 'Reader') : (currentLang === 'ja' ? 'ゲスト' : 'Guest');
+      }
+      if (chipIcon) {
+        chipIcon.textContent = u.avatarIcon || 'person';
+      }
+
+      // Mobile Drawer Profile Bar
+      const mName = document.getElementById('m-user-name');
+      const mRole = document.getElementById('m-user-role');
+      const mIcon = document.getElementById('m-user-icon');
+      if (mName) {
+        mName.textContent = u.isLoggedIn ? (u.displayName || u.username) : (currentLang === 'ja' ? 'ゲスト読者' : 'Guest Reader');
+      }
+      if (mRole) {
+        mRole.textContent = u.isLoggedIn 
+          ? (u.role || 'Covenant Initiate') 
+          : (currentLang === 'ja' ? 'タップしてログイン・登録' : 'Tap to log in / edit profile');
+      }
+      if (mIcon) {
+        mIcon.textContent = u.avatarIcon || 'person';
+      }
+
+      // Community Profile Button
+      const commProfileBtn = document.getElementById('comm-profile-btn-label');
+      if (commProfileBtn) {
+        commProfileBtn.textContent = u.isLoggedIn 
+          ? `${u.username} (${u.role || 'Reader'})` 
+          : (currentLang === 'ja' ? 'プロフィール / ログイン' : 'My Profile / Log In');
+      }
+    }
+
+    function syncCommunityUserPreview() {
+      const u = getActiveUser();
+      const previewName = document.getElementById('comm-user-name-preview');
+      const previewRole = document.getElementById('comm-user-role-preview');
+      const previewIcon = document.getElementById('comm-user-icon-preview');
+      if (previewName) {
+        previewName.textContent = u.isLoggedIn ? (u.displayName || u.username) : (currentLang === 'ja' ? 'ゲスト読者' : 'Guest Reader');
+      }
+      if (previewRole) {
+        previewRole.textContent = u.isLoggedIn ? `${u.role || 'Reader'} • Posting to community` : 'Guest • Enter your handle in profile';
+      }
+      if (previewIcon) {
+        previewIcon.textContent = u.avatarIcon || 'person';
+      }
+    }
+
+    function openUserModal() {
+      const modal = document.getElementById('user-modal');
+      if (!modal) return;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      const u = getActiveUser();
+      
+      const profileView = document.getElementById('user-profile-view');
+      const authForm = document.getElementById('user-auth-form');
+
+      if (u.isLoggedIn) {
+        if (profileView) profileView.classList.remove('hidden');
+        if (authForm) authForm.classList.add('hidden');
+
+        const dispName = document.getElementById('profile-display-name');
+        const dispRole = document.getElementById('profile-display-role');
+        const dispIcon = document.getElementById('profile-display-icon');
+        const dispMeta = document.getElementById('profile-display-meta');
+        if (dispName) dispName.textContent = u.displayName || u.username;
+        if (dispRole) dispRole.textContent = u.role || 'Reader';
+        if (dispIcon) dispIcon.textContent = u.avatarIcon || 'person';
+        if (dispMeta) dispMeta.textContent = `${u.role || 'Initiate'} • Lumera Registry #${((u.username || '').length * 42 + 107)}`;
+
+        const stats = JSON.parse(localStorage.getItem('threadboner_stats') || '{"chapters": 0}');
+        const chStat = document.getElementById('profile-stat-chapters');
+        if (chStat) chStat.textContent = stats.chapters || 0;
+
+        const posts = getCommunityPosts();
+        const userPostsCount = posts.filter(p => p.author === u.username || p.author === u.displayName).length;
+        const postStat = document.getElementById('profile-stat-posts');
+        if (postStat) postStat.textContent = userPostsCount;
+      } else {
+        showEditUserForm();
+      }
+    }
+
+    function closeUserModal() {
+      const modal = document.getElementById('user-modal');
+      if (modal) {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function showEditUserForm() {
+      const profileView = document.getElementById('user-profile-view');
+      const authForm = document.getElementById('user-auth-form');
+      if (profileView) profileView.classList.add('hidden');
+      if (authForm) authForm.classList.remove('hidden');
+
+      const u = getActiveUser();
+      const usernameInput = document.getElementById('auth-username-input');
+      const roleSelect = document.getElementById('auth-role-select');
+      if (usernameInput) {
+        usernameInput.value = u.isLoggedIn ? u.username : '';
+        setTimeout(() => usernameInput.focus(), 50);
+      }
+      if (roleSelect && u.role) {
+        roleSelect.value = u.role;
+      }
+      selectAvatarIcon(u.avatarIcon || 'person');
+    }
+
+    function selectAvatarIcon(iconName, el) {
+      selectedAvatarIcon = iconName;
+      document.querySelectorAll('#avatar-picker-grid .avatar-opt').forEach(btn => {
+        if (btn.dataset.icon === iconName) {
+          btn.className = "p-2.5 rounded-xl bg-surface-bright border border-thread-crimson text-thread-crimson flex items-center justify-center transition-all avatar-opt shadow-[0_0_10px_rgba(220,38,38,0.3)]";
+        } else {
+          btn.className = "p-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright border border-border-hairline text-text-secondary flex items-center justify-center transition-all avatar-opt";
+        }
+      });
+    }
+
+    function handleUserAuthSubmit(e) {
+      if (e) e.preventDefault();
+      const usernameInput = document.getElementById('auth-username-input');
+      const roleSelect = document.getElementById('auth-role-select');
+      const val = (usernameInput ? usernameInput.value : '').trim();
+      if (!val) return;
+
+      const newUser = {
+        id: 'usr_' + Date.now().toString(36),
+        username: val,
+        displayName: val,
+        role: roleSelect ? roleSelect.value : 'Reader',
+        avatarIcon: selectedAvatarIcon || 'person',
+        isLoggedIn: true
+      };
+
+      saveActiveUser(newUser);
+      closeUserModal();
+      renderCommunityView();
+    }
+
+    function logoutUser() {
+      currentUser = { ...DEFAULT_GUEST_USER };
+      localStorage.removeItem('threadboner_user');
+      renderUserChip();
+      syncCommunityUserPreview();
+      closeUserModal();
+      renderCommunityView();
+    }
+
+    function continueAsGuest() {
+      closeUserModal();
+    }
+
+    // --- Social / Community Discussions ---
+    let activeCommunityChannel = 'all';
+
+    const DEFAULT_COMMUNITY_POSTS = [
+      {
+        id: "post-1",
+        author: "VelkorWatcher",
+        role: "Abyssal Weaver",
+        avatarIcon: "shield",
+        channel: "theories",
+        date: "24 minutes ago",
+        text: "The moment Yono cut the binding thread in Chapter 5, the entire Asteria covenant trembled. The fact that the seal broke from the inside means Velkor didn't awaken—Yono's past self unlocked the door.",
+        isSpoiler: true,
+        likes: 42,
+        likedByMe: false,
+        replies: [
+          {
+            author: "VioletDisciple",
+            role: "Scholar of Lumera",
+            avatarIcon: "auto_stories",
+            date: "12 minutes ago",
+            text: "Notice that Violet didn't stop him. She knew that keeping the seal intact would lead to the third collapse anyway."
+          }
+        ]
+      },
+      {
+        id: "post-2",
+        author: "Kazuma_Archive",
+        role: "Scholar of Lumera",
+        avatarIcon: "psychology",
+        channel: "theories",
+        date: "1 hour ago",
+        text: "Yono isn't just ignoring the damage rule in Chapter 7—he's actively overwriting the local reality anchor that Violet set up back on the bridge. If the third seal falls, he won't need to return to Asteria at all.",
+        isSpoiler: false,
+        likes: 56,
+        likedByMe: false,
+        replies: []
+      },
+      {
+        id: "post-3",
+        author: "TokyoCreamBun",
+        role: "Tokyo Exile",
+        avatarIcon: "local_fire_department",
+        channel: "memes",
+        date: "2 hours ago",
+        text: "Can we appreciate that Yono died over a cat and a cream bun, gets reincarnated as an Eldritch god, and still complains about convenience store prices in Tokyo? Zero Dignity protagonist of the year.",
+        isSpoiler: false,
+        likes: 89,
+        likedByMe: false,
+        replies: [
+          {
+            author: "AsteriaScholar",
+            role: "Reader",
+            avatarIcon: "person",
+            date: "45 minutes ago",
+            text: "That 180 yen cream bun is the emotional anchor of the entire cosmology."
+          }
+        ]
+      },
+      {
+        id: "post-4",
+        author: "LiriProtector",
+        role: "Covenant Initiate",
+        avatarIcon: "auto_stories",
+        channel: "general",
+        date: "3 hours ago",
+        text: "Just finished Volume 1! The pacing in the final chapter with the Shade debt confrontation was insane. Reading on dark mode amoled theme with Inter font feels like a premium light novel app.",
+        isSpoiler: false,
+        likes: 31,
+        likedByMe: false,
+        replies: []
+      }
+    ];
+
+    function getCommunityPosts() {
+      try {
+        const stored = localStorage.getItem('threadboner_community_posts');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      localStorage.setItem('threadboner_community_posts', JSON.stringify(DEFAULT_COMMUNITY_POSTS));
+      return DEFAULT_COMMUNITY_POSTS;
+    }
+
+    function saveCommunityPosts(posts) {
+      localStorage.setItem('threadboner_community_posts', JSON.stringify(posts));
+    }
+
+    function filterCommunityChannel(channel, btn) {
+      activeCommunityChannel = channel;
+      document.querySelectorAll('#comm-channel-tabs .comm-tab').forEach(b => {
+        b.className = "px-4 py-2 rounded-xl bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-surface-bright font-label-md text-xs uppercase tracking-wider shrink-0 comm-tab cursor-pointer transition-colors";
+      });
+      if (btn) {
+        btn.className = "px-4 py-2 rounded-xl bg-thread-crimson text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-sm shrink-0 comm-tab cursor-pointer transition-colors";
+      }
+      renderCommunityView();
+    }
+
+    function submitCommunityPost() {
+      const msgInput = document.getElementById('comm-msg-input');
+      const channelSelect = document.getElementById('comm-post-channel');
+      const spoilerCheck = document.getElementById('comm-spoiler-check');
+      const text = (msgInput ? msgInput.value : '').trim();
+      if (!text) return;
+
+      const user = getActiveUser();
+      const channel = channelSelect ? channelSelect.value : 'general';
+      const isSpoiler = spoilerCheck ? spoilerCheck.checked : false;
+
+      const newPost = {
+        id: 'post-' + Date.now().toString(36),
+        author: user.isLoggedIn ? (user.displayName || user.username) : 'Anonymous Reader',
+        role: user.isLoggedIn ? user.role : 'Guest Reader',
+        avatarIcon: user.avatarIcon || 'person',
+        channel: channel,
+        date: 'Just now',
+        text: text,
+        isSpoiler: isSpoiler,
+        likes: 0,
+        likedByMe: false,
+        replies: []
+      };
+
+      const posts = getCommunityPosts();
+      posts.unshift(newPost);
+      saveCommunityPosts(posts);
+
+      if (msgInput) msgInput.value = '';
+      if (spoilerCheck) spoilerCheck.checked = false;
+
+      if (activeCommunityChannel !== 'all' && activeCommunityChannel !== channel) {
+        activeCommunityChannel = 'all';
+        const allTab = document.querySelector('#comm-channel-tabs [data-channel="all"]');
+        if (allTab) {
+          document.querySelectorAll('#comm-channel-tabs .comm-tab').forEach(b => {
+            b.className = "px-4 py-2 rounded-xl bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-surface-bright font-label-md text-xs uppercase tracking-wider shrink-0 comm-tab cursor-pointer transition-colors";
+          });
+          allTab.className = "px-4 py-2 rounded-xl bg-thread-crimson text-white font-label-md text-xs uppercase tracking-wider font-semibold shadow-sm shrink-0 comm-tab cursor-pointer transition-colors";
+        }
+      }
+
+      renderCommunityView();
+    }
+
+    function toggleCommunityPostLike(postId) {
+      const posts = getCommunityPosts();
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.likedByMe) {
+        post.likes = Math.max(0, post.likes - 1);
+        post.likedByMe = false;
+      } else {
+        post.likes = (post.likes || 0) + 1;
+        post.likedByMe = true;
+      }
+      saveCommunityPosts(posts);
+      renderCommunityView();
+    }
+
+    function toggleCommunityReplies(postId) {
+      const container = document.getElementById(`replies-container-${postId}`);
+      if (container) {
+        container.classList.toggle('hidden');
+      }
+    }
+
+    function submitCommunityReply(postId) {
+      const input = document.getElementById(`reply-input-${postId}`);
+      const text = (input ? input.value : '').trim();
+      if (!text) return;
+
+      const user = getActiveUser();
+      const posts = getCommunityPosts();
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (!post.replies) post.replies = [];
+      post.replies.push({
+        author: user.isLoggedIn ? (user.displayName || user.username) : 'Anonymous Reader',
+        role: user.isLoggedIn ? user.role : 'Guest Reader',
+        avatarIcon: user.avatarIcon || 'person',
+        date: 'Just now',
+        text: text
+      });
+
+      saveCommunityPosts(posts);
+      if (input) input.value = '';
+      renderCommunityView();
+      const container = document.getElementById(`replies-container-${postId}`);
+      if (container) container.classList.remove('hidden');
+    }
+
+    function deleteCommunityPost(postId) {
+      const posts = getCommunityPosts().filter(p => p.id !== postId);
+      saveCommunityPosts(posts);
+      renderCommunityView();
+    }
+
+    function revealSpoiler(postId) {
+      const textEl = document.getElementById(`post-text-${postId}`);
+      const warningEl = document.getElementById(`spoiler-warning-${postId}`);
+      if (textEl) {
+        textEl.classList.remove('blur-sm', 'select-none');
+      }
+      if (warningEl) {
+        warningEl.classList.add('hidden');
+      }
+    }
+
     function renderCommunityView() {
       const stream = document.getElementById('community-comments-stream');
       if (!stream) return;
 
-      const stored = JSON.parse(localStorage.getItem('threadboner_comments') || '[]');
-      const defaultPosts = [
-        { name: "VelkorWatcher", date: "1 hour ago", text: "The moment Yono cut the binding thread in Chapter 5, the entire Asteria covenant trembled. Can't wait for Vol 3." },
-        { name: "AsteriaScholar", date: "3 hours ago", text: "Violet's backstory in the EX Novel gave so much context to her silence during the forest scene." }
-      ];
-      const allPosts = [...stored, ...defaultPosts];
+      const u = getActiveUser();
+      const allPosts = getCommunityPosts();
+      const filteredPosts = activeCommunityChannel === 'all' 
+        ? allPosts 
+        : allPosts.filter(p => p.channel === activeCommunityChannel);
 
-      stream.innerHTML = allPosts.map(p => `
-        <div class="bg-surface-card border border-border-hairline rounded-2xl p-5 space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-thread-crimson/20 border border-thread-crimson/30 flex items-center justify-center font-bold text-xs text-thread-crimson">
-                ${(p.name || 'U')[0].toUpperCase()}
-              </div>
-              <span class="font-label-md text-xs text-text-primary font-bold">${p.name}</span>
-            </div>
-            <span class="font-caption text-[11px] text-text-muted">${p.date}</span>
+      if (!filteredPosts.length) {
+        stream.innerHTML = `
+          <div class="bg-surface-card border border-border-hairline rounded-2xl p-8 text-center space-y-2">
+            <span class="material-symbols-outlined text-text-muted text-[36px]">forum</span>
+            <p class="font-headline-sm text-sm text-text-primary font-bold">No discussions in this channel yet</p>
+            <p class="font-body-md text-xs text-text-secondary">Be the first to share your reaction, theory, or meme!</p>
           </div>
-          <p class="font-body-md text-xs text-text-secondary leading-relaxed pl-10">${p.text}</p>
-        </div>
-      `).join('');
-    }
-    function submitCommunityPost() {
-      const name = document.getElementById('comm-name-input').value.trim() || 'Anonymous Reader';
-      const text = document.getElementById('comm-msg-input').value.trim();
-      if (!text) return;
+        `;
+        return;
+      }
 
-      const stored = JSON.parse(localStorage.getItem('threadboner_comments') || '[]');
-      stored.unshift({
-        name: name,
-        date: 'Just now',
-        text: text
-      });
-      localStorage.setItem('threadboner_comments', JSON.stringify(stored));
-      document.getElementById('comm-msg-input').value = '';
-      renderCommunityView();
+      stream.innerHTML = filteredPosts.map(p => {
+        const canDelete = u.isLoggedIn && (p.author === u.username || p.author === u.displayName);
+        const replies = p.replies || [];
+        const channelLabel = {
+          general: '# General',
+          theories: '# Lore & Theories',
+          spoilers: '# Vol 2 Spoilers',
+          memes: '# Memes'
+        }[p.channel] || `# ${p.channel || 'Discussion'}`;
+
+        return `
+          <div class="bg-surface-card border border-border-hairline rounded-2xl p-5 sm:p-6 shadow-md space-y-4 hover:border-white/15 transition-all">
+            <!-- Post Header -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-thread-crimson/20 border border-thread-crimson/30 flex items-center justify-center text-thread-crimson shrink-0">
+                  <span class="material-symbols-outlined text-[18px]">${p.avatarIcon || 'person'}</span>
+                </div>
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-headline-sm text-sm text-text-primary font-bold">${p.author}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-thread-crimson/15 text-thread-crimson font-label-sm text-[9px] uppercase font-bold tracking-wider">${p.role || 'Reader'}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-surface-elevated text-text-muted font-label-sm text-[10px]">${channelLabel}</span>
+                  </div>
+                  <span class="font-caption text-[11px] text-text-muted">${p.date}</span>
+                </div>
+              </div>
+
+              ${canDelete ? `
+                <button class="p-1.5 rounded-lg text-text-muted hover:text-thread-crimson hover:bg-surface-elevated transition-colors cursor-pointer" onclick="deleteCommunityPost('${p.id}')" title="Delete post">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- Post Content -->
+            <div class="relative">
+              ${p.isSpoiler ? `
+                <div class="mb-2 p-2.5 rounded-xl bg-surface-elevated border border-thread-crimson/30 flex items-center justify-between gap-2" id="spoiler-warning-${p.id}">
+                  <div class="flex items-center gap-2 text-xs text-thread-crimson font-semibold">
+                    <span class="material-symbols-outlined text-[16px]">visibility_off</span>
+                    <span>Warning: Contains Story Spoilers</span>
+                  </div>
+                  <button class="px-2.5 py-1 rounded-lg bg-thread-crimson/20 hover:bg-thread-crimson/30 text-thread-crimson font-label-sm text-[10px] uppercase font-bold transition-colors cursor-pointer" onclick="revealSpoiler('${p.id}')">
+                    Reveal
+                  </button>
+                </div>
+                <p class="font-body-md text-xs sm:text-sm text-text-secondary leading-relaxed blur-sm select-none transition-all duration-200" id="post-text-${p.id}">
+                  ${p.text}
+                </p>
+              ` : `
+                <p class="font-body-md text-xs sm:text-sm text-text-secondary leading-relaxed">
+                  ${p.text}
+                </p>
+              `}
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="flex items-center justify-between pt-2 border-t border-border-hairline text-text-muted font-label-sm text-xs">
+              <div class="flex items-center gap-4">
+                <button class="flex items-center gap-1.5 hover:text-thread-crimson transition-colors cursor-pointer ${p.likedByMe ? 'text-thread-crimson font-bold' : ''}" onclick="toggleCommunityPostLike('${p.id}')">
+                  <span class="material-symbols-outlined text-[17px]">${p.likedByMe ? 'favorite' : 'favorite_border'}</span>
+                  <span>${p.likes || 0}</span>
+                </button>
+                <button class="flex items-center gap-1.5 hover:text-text-primary transition-colors cursor-pointer" onclick="toggleCommunityReplies('${p.id}')">
+                  <span class="material-symbols-outlined text-[17px]">chat_bubble_outline</span>
+                  <span>${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}</span>
+                </button>
+              </div>
+              <button class="text-thread-crimson hover:underline cursor-pointer" onclick="toggleCommunityReplies('${p.id}')">
+                Reply
+              </button>
+            </div>
+
+            <!-- Nested Replies & Composer -->
+            <div class="pt-3 border-t border-white/5 space-y-3 hidden" id="replies-container-${p.id}">
+              ${replies.length ? `
+                <div class="space-y-2.5 pl-3 sm:pl-5 border-l-2 border-border-hairline">
+                  ${replies.map(r => `
+                    <div class="p-3 rounded-xl bg-surface-elevated space-y-1">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                          <span class="font-headline-sm text-xs text-text-primary font-bold">${r.author}</span>
+                          <span class="px-1.5 py-0.2 rounded bg-thread-crimson/15 text-thread-crimson font-label-sm text-[8px] uppercase font-bold">${r.role || 'Reader'}</span>
+                        </div>
+                        <span class="font-caption text-[10px] text-text-muted">${r.date}</span>
+                      </div>
+                      <p class="font-body-md text-xs text-text-secondary leading-relaxed">${r.text}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+
+              <!-- Quick Reply Form -->
+              <div class="flex items-center gap-2 pt-1">
+                <input class="flex-1 px-3.5 py-2 rounded-xl bg-surface-elevated border border-border-hairline text-text-primary text-xs font-body-md placeholder:text-text-muted focus:border-thread-crimson outline-none" id="reply-input-${p.id}" placeholder="Write a reply..." type="text" onkeydown="if(event.key==='Enter') submitCommunityReply('${p.id}')"/>
+                <button class="px-4 py-2 rounded-xl bg-thread-crimson hover:bg-covenant-blood text-white font-label-sm text-xs uppercase tracking-wider font-semibold transition-colors cursor-pointer" onclick="submitCommunityReply('${p.id}')">
+                  Reply
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // --- Stats View ---
@@ -2119,8 +2856,11 @@
       activePage = Math.max(0, Math.min(pgIndex, (ch && ch.pages ? ch.pages.length - 1 : 0)));
       
       const readerView = document.getElementById('reader-view');
-      readerView.classList.remove('hidden');
-      readerView.classList.add('flex');
+      if (readerView) {
+        readerView.style.display = 'flex';
+        readerView.classList.remove('hidden');
+        readerView.classList.add('flex');
+      }
       document.body.style.overflow = 'hidden';
 
       // Hide mobile bottom dock while reading
@@ -2138,8 +2878,11 @@
 
     function closeReader() {
       const readerView = document.getElementById('reader-view');
-      readerView.classList.add('hidden');
-      readerView.classList.remove('flex');
+      if (readerView) {
+        readerView.style.display = 'none';
+        readerView.classList.add('hidden');
+        readerView.classList.remove('flex');
+      }
       document.body.style.overflow = '';
       stopSpeech();
 
@@ -2286,7 +3029,10 @@
     }
     function applyReaderTheme(themeName) {
       const reader = document.getElementById('reader-view');
-      reader.className = `fixed inset-0 z-50 overflow-hidden flex flex-col theme-${themeName} transition-colors duration-200`;
+      if (!reader) return;
+      const themeClasses = ['theme-night', 'theme-amoled', 'theme-paper', 'theme-ember', 'theme-forest', 'theme-ocean'];
+      themeClasses.forEach(cls => reader.classList.remove(cls));
+      reader.classList.add(`theme-${themeName}`);
     }
     function cycleTheme() {
       const themes = ['night', 'amoled', 'paper', 'ember', 'forest', 'ocean'];

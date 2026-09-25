@@ -1,13 +1,10 @@
-const CACHE_NAME = "threadboner-cache-v1";
+const CACHE_NAME = "threadboner-cache-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./content-en.js",
   "./content-ja.js",
   "./manifest.json",
-  "./assets/volume1-cover.png",
-  "./assets/volume2-cover.jpg",
-  "./assets/threadborn-logo-en-new.png",
   "./assets/threadborn-favicon.png",
   "./assets/threadborn-icon-192.png",
   "./assets/threadborn-icon-512.png"

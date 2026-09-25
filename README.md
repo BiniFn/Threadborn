@@ -1,6 +1,6 @@
-# THREADBORN
+# THREADBONER
 ## Starting Life Beyond the Covenant Door
-### スレッドボーン：契約の扉の彼方で始まる生
+### スレッドボナー：契約の扉の彼方で始まる生
 
 *An original dark fantasy light novel by **BiniFn***
 
@@ -10,7 +10,7 @@
 >
 > Copyright © 2024–2026 **BiniFn**. All Rights Reserved.
 >
-> This repository and all of its contents — including source code and the complete text of the light novel **"Threadborn: Starting Life Beyond the Covenant Door"** (スレッドボーン) — are the exclusive intellectual property of **BiniFn** and are protected under international copyright law.
+> This repository and all of its contents — including source code and the complete text of the light novel **"Threadboner: Starting Life Beyond the Covenant Door"** (スレッドボナー) — are the exclusive intellectual property of **BiniFn** and are protected under international copyright law.
 >
 > **You may NOT:** copy, reproduce, distribute, modify, plagiarize, use as AI training data, scrape, mirror, or create derivative works from any part of this repository without prior written permission from the author.
 >
@@ -124,7 +124,7 @@ He is sealed beneath the world. He calls Yono *little crown*. He has been patien
 
 ## Themes
 
-Threadborn is a story about what you choose to be when no one is forcing you to be anything.
+Threadboner is a story about what you choose to be when no one is forcing you to be anything.
 
 Yono did not become small because he was hiding. He became small because he decided that a life that fit inside one day, with problems he could actually hold, and a cream bun at the end of the week, was a life worth having. The world he woke into is the opposite of that. It is vast and ancient and full of things that want him to be vast and ancient with them.
 
@@ -153,7 +153,7 @@ Includes the full reader with chapter navigation, progress saving, and offline s
 
 ## Credits
 
-**BiniFn** — Author, creator, and sole owner of Threadborn and all associated works.
+**BiniFn** — Author, creator, and sole owner of Threadboner and all associated works.
 
 | Channel | Link |
 |---|---|
